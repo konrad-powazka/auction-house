@@ -45,26 +45,3 @@ gulp.task('default', ['clean'], function () {
         ], { base: './Scripts/' })
         .pipe(gulp.dest(destinationRoot + 'scripts/'));
 });
-
-var angularJs = [
-    './node_modules/angular2/bundles/angular2.dev.js',
-    './node_modules/angular2/bundles/router.dev.js',
-    './node_modules/angular2/bundles/angular2-polyfills.js',
-    './node_modules/angular2/bundles/http.dev.js'
-];
-
-var js = [
-    './node_modules/bootstrap/dist/js/bootstrap.js',
-    './node_modules/systemjs/dist/system.js',
-    './node_modules/rxjs/bundles/Rx.js',
-    './node_modules/typescript/lib/typescript.js',
-    './node_modules/jquery/dist/jquery.js'
-];
-
-var css = [
-    './node_modules/bootstrap/dist/css/bootstrap.css'
-];
-
-var fonts = [
-    './node_modules/bootstrap/dist/fonts/*.*'
-];
