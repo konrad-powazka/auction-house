@@ -18,23 +18,37 @@ gulp.task('default', ['clean'], function () {
     var scriptDependenciesDestinationRoot = dependenciesDestinationRoot + 'scripts/';
 
     gulp.src([
-        dependenciesSourceRoot + 'rxjs/bundles/Rx.umd.js'
-    ])
-    .pipe(gulp.dest(scriptDependenciesDestinationRoot));
+            dependenciesSourceRoot + 'zone.js/dist/zone.js',
+            dependenciesSourceRoot + 'reflect-metadata/Reflect.js',
+            dependenciesSourceRoot + 'systemjs/dist/system.src.js',
+            dependenciesSourceRoot + 'rxjs/bundles/Rx.umd.js',
+            dependenciesSourceRoot + 'ng2-bootstrap/bundles/ng2-bootstrap.js'
+        ])
+        .pipe(gulp.dest(scriptDependenciesDestinationRoot));
 
     var angularScriptDependenciesDestinationRoot = scriptDependenciesDestinationRoot + 'angular/';
 
-    gulp.src([
-            dependenciesSourceRoot + '@angular/core/bundles/core.umd.js',
-            dependenciesSourceRoot + '@angular/common/bundles/common.umd.js',
-            dependenciesSourceRoot + '@angular/compiler/bundles/compiler.umd.js',
-            dependenciesSourceRoot + '@angular/platform-browser/bundles/platform-browser.umd.js',
-            dependenciesSourceRoot + '@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js'
-            //dependenciesSourceRoot + 'bootstrap/dist/js/bootstrap.js',
-            //dependenciesSourceRoot + 'systemjs/dist/system.js',
-            //dependenciesSourceRoot + 'typescript/lib/typescript.js',
-        ])
-        .pipe(gulp.dest(angularScriptDependenciesDestinationRoot));
+    var ngPackageNames = [
+      'common',
+      'compiler',
+      'core',
+      'forms',
+      'http',
+      'platform-browser',
+      'platform-browser-dynamic',
+      'router',
+      'router-deprecated',
+      'upgrade'
+    ];
+
+    for (var i = 0; i < ngPackageNames.length; i++) {
+        var ngPackageName = ngPackageNames[i];
+        var ngPackagePath = dependenciesSourceRoot + '@angular/' + ngPackageName + '/bundles/' + ngPackageName + '.umd.js';
+        var ngPackageDestPath = angularScriptDependenciesDestinationRoot + ngPackageName;
+
+        gulp.src(ngPackagePath)
+        .pipe(gulp.dest(ngPackageDestPath));
+    }
 
     gulp.src([
         "node_modules/bootstrap/dist/css/bootstrap.css"
