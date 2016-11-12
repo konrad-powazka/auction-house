@@ -12,10 +12,12 @@ namespace AuctionHouse.Web
 {
     public class CqrsApiControllerTypesEmitter
     {
+        private const string AssemblyNameText = "AuctionHouse.Web.Controllers.Api.Dynamic";
+
         public Assembly EmitCqrsApiControllersAssembly()
         {
             var appDomain = AppDomain.CurrentDomain;
-            var assemblyName = new AssemblyName("AuctionHouse.Web.DynamicControllers");
+            var assemblyName = new AssemblyName(AssemblyNameText);
 
             var assemblyBuilder =
                 appDomain.DefineDynamicAssembly(assemblyName,
@@ -74,9 +76,11 @@ namespace AuctionHouse.Web
 
             foreach (var messageType in messageTypes)
             {
-                var controllerTypeName = $"AuctionHouse.Web.DynamicControllers.{messageType.Name}Controller";
+                var controllerTypeName = $"{AssemblyNameText}.{messageType.Name}Controller";
+
                 var controllerBaseTypeGenericArgs =
                     getControllerBaseTypeGenericArgsForMessageType(messageType).ToArray();
+
                 var controllerBaseType = controllersBaseType.MakeGenericType(controllerBaseTypeGenericArgs);
 
                 var controllerTypeBuilder = moduleBuilder.DefineType(controllerTypeName, TypeAttributes.Public,
