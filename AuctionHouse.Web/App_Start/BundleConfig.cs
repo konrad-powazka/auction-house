@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Optimization;
 
@@ -13,30 +12,30 @@ namespace AuctionHouse.Web
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                 "~/Scripts/jquery-{version}.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                "~/Scripts/jquery.unobtrusive*",
-                "~/Scripts/jquery.validate*"));
-
-            bundles.Add(new ScriptBundle("~/bundles/app").Include(
-                "~/Scripts/sammy-{version}.js",
-                "~/Scripts/app/common.js",
-                "~/Scripts/app/app.datamodel.js",
-                "~/Scripts/app/app.viewmodel.js",
-                "~/Scripts/app/home.viewmodel.js",
-                "~/Scripts/app/_run.js"));
-
-            // Use the development version of Modernizr to develop with and learn from. Then, when you're
-            // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
-            bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                "~/Scripts/modernizr-*"));
-
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                 "~/Scripts/bootstrap.js",
                 "~/Scripts/respond.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/angular").Include(
+                "~/Scripts/angular.js",
+                "~/Scripts/angular-ui-router.js",
+                "~/Scripts/angular-ui.js"));
+
+            var appBundle = new ScriptBundle("~/bundles/app").IncludeDirectory("~/Scripts/app", "*.js", true);
+            appBundle.Orderer = new AppBundleOrderer();
+            bundles.Add(appBundle);
+
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                 "~/Content/bootstrap.css",
-                 "~/Content/Site.css"));
+                "~/Content/bootstrap.css",
+                "~/Content/Site.css"));
+        }
+
+        private class AppBundleOrderer : IBundleOrderer
+        {
+            public IEnumerable<BundleFile> OrderFiles(BundleContext context, IEnumerable<BundleFile> files)
+            {
+                return files.OrderBy(f => f.IncludedVirtualPath.EndsWith("Application.js") ? 1 : 0);
+            }
         }
     }
 }

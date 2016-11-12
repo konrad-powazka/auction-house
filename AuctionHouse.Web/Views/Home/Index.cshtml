@@ -1,12 +1,11 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="AuctionHouse">
 <head>
     <meta charset="utf-8" />
     <title>@ViewBag.Title - My ASP.NET Application</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -32,6 +31,9 @@
             BODY
             <button id="send-command">Send cmd</button>
             <button id="send-query">Send query</button>
+            <div ng-controller="CreateAuctionCtrl as createAuctionCtrl">
+                {{ message }}
+            </div>
         </div>
         <hr />
         <footer>
@@ -41,7 +43,8 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
-
+    @Scripts.Render("~/bundles/angular")
+    @Scripts.Render("~/bundles/app")
 <script type="text/javascript">
     $(document).ready(function() {
         $('#send-command')
