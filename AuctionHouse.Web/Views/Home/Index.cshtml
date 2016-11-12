@@ -1,46 +1,61 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Auction House</title>
-
-    <script src="~/dependencies/scripts/zone.js"></script>
-    <script src="~/dependencies/scripts/Reflect.js"></script>
-    <script src="~/dependencies/scripts/system.src.js"></script>
-
-    <script src="~/scripts/systemjs.config.js"></script>
-    <script>
-        System.import('app')
-              .then(null, console.error.bind(console));
-    </script>
-
-    <link rel="stylesheet" href="~/dependencies/styles/bootstrap.css" @*asp-append-version="true"*@ />
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Project name</a>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div id="navbar" class="collapse navbar-collapse">
+            <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("API", "Index", "Help", new { area = "HelpPage" }, null)</li>
                 </ul>
             </div>
         </div>
-    </nav>
-    <div class="container" style="padding-top: 40px;">
-        <div><auction-house /></div>
-        Text
     </div>
+    <div class="container body-content">
+        <div>
+            BODY
+            <button id="send-command">Send cmd</button>
+            <button id="send-query">Send query</button>
+        </div>
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#send-command')
+            .click(function() {
+                $.post('api/CreateAuctionCommand/Handle');
+            });
+
+        $('#send-query')
+                .click(function () {
+                    $.get('api/TestQuery/Handle', null, function(data) {
+                        alert(data);
+                    });
+                });
+    })
+</script>
 </body>
 </html>

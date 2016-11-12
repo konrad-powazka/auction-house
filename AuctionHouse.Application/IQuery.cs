@@ -3,4 +3,8 @@
     public interface IQuery<TResult>
     {
     }
+
+    public class TestQuery : IQuery<string>
+    {
+    }
 }

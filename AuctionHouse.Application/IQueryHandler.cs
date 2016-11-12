@@ -4,4 +4,12 @@
     {
         TResult Handle(TQuery query);
     }
+
+    public class TestQueryHandler : IQueryHandler<TestQuery, string>
+    {
+        public string Handle(TestQuery query)
+        {
+            return "Test XXX";
+        }
+    }
 }
