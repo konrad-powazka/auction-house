@@ -6,7 +6,7 @@ var AuctionHouse;
         function Application() {
         }
         Application.bootstrap = function () {
-            var module = angular.module('AuctionHouse', []);
+            var module = angular.module('auctionHouse', ['formly', 'formlyBootstrap']);
             for (var controllerName in Application.controllers) {
                 if (Application.controllers.hasOwnProperty(controllerName)) {
                     var controllerCtor = Application.controllers[controllerName];

@@ -5,7 +5,22 @@ var AuctionHouse;
         var CreateAuctionCtrl = (function () {
             function CreateAuctionCtrl($scope) {
                 this.$scope = $scope;
-                $scope.message = 'Test message';
+                this.model = {};
+                this.fields = [
+                    {
+                        key: 'title',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Title'
+                        }
+                    },
+                    {
+                        key: 'description',
+                        type: 'textarea',
+                        templateOptions: {
+                            label: 'Description'
+                        }
+                    }];
             }
             return CreateAuctionCtrl;
         }());

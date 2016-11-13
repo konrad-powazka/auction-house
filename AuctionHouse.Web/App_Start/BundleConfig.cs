@@ -6,7 +6,6 @@ namespace AuctionHouse.Web
 {
     public class BundleConfig
     {
-        // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
@@ -19,7 +18,10 @@ namespace AuctionHouse.Web
             bundles.Add(new ScriptBundle("~/bundles/angular").Include(
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-ui-router.js",
-                "~/Scripts/angular-ui.js"));
+                "~/Scripts/angular-ui.js",
+                "~/Scripts/api-check.js",
+                "~/Scripts/formly.js",
+                "~/Scripts/angular-formly-templates-bootstrap.js"));
 
             var appBundle = new ScriptBundle("~/bundles/app").IncludeDirectory("~/Scripts/app", "*.js", true);
             appBundle.Orderer = new AppBundleOrderer();

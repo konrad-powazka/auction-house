@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" ng-app="AuctionHouse">
+<html lang="en" ng-app="auctionHouse">
 <head>
     <meta charset="utf-8" />
     <title>@ViewBag.Title - My ASP.NET Application</title>
@@ -28,11 +28,14 @@
     </div>
     <div class="container body-content">
         <div>
-            BODY
             <button id="send-command">Send cmd</button>
             <button id="send-query">Send query</button>
             <div ng-controller="CreateAuctionCtrl as createAuctionCtrl">
-                {{ message }}
+                <form ng-submit="vm.submit()" name="createAuctionCtrl.form" novalidate>
+                    <formly-form model="createAuctionCtrl.model" fields="createAuctionCtrl.fields" form="createAuctionCtrl.form">
+                        <button type="submit" class="btn btn-primary submit-button" ng-disabled="createAuctionCtrl.form.$invalid">Submit</button>
+                    </formly-form>
+                </form>
             </div>
         </div>
         <hr />

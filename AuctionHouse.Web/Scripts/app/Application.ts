@@ -11,7 +11,7 @@
         };
 
         static bootstrap(): void {
-            const module = angular.module('AuctionHouse', [] as string[]);
+            const module = angular.module('auctionHouse', ['formly', 'formlyBootstrap'] as string[]);
 
             for (let controllerName in Application.controllers) {
                 if (Application.controllers.hasOwnProperty(controllerName)) {
