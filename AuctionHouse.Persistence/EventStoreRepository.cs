@@ -1,12 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AuctionHouse.Domain;
 
 namespace AuctionHouse.Persistence
 {
-    class EventStoreRepository
+    public class EventStoreRepository<TAggregateRoot> : IRepository<TAggregateRoot>
+        where TAggregateRoot : AggregateRoot, new()
     {
+        public TAggregateRoot Get(Guid aggregateRootId)
+        {
+            var eventsToReplay = new IEvent[0]; //TODO: Get from ES
+            var aggregateRoot = new TAggregateRoot();
+            aggregateRoot.ReplayEvents(eventsToReplay);
+
+            return aggregateRoot;
+        }
+
+        public void Save(TAggregateRoot aggregateRoot, int previousAggregateRootVersion)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
