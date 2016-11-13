@@ -1,0 +1,1 @@
+//# sourceMappingURL=INamedCompomentOptions.js.map

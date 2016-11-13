@@ -30,13 +30,8 @@
         <div>
             <button id="send-command">Send cmd</button>
             <button id="send-query">Send query</button>
-            <div ng-controller="CreateAuctionCtrl as createAuctionCtrl">
-                <form ng-submit="vm.submit()" name="createAuctionCtrl.form" novalidate>
-                    <formly-form model="createAuctionCtrl.model" fields="createAuctionCtrl.fields" form="createAuctionCtrl.form">
-                        <button type="submit" class="btn btn-primary submit-button" ng-disabled="createAuctionCtrl.form.$invalid">Submit</button>
-                    </formly-form>
-                </form>
-            </div>
+            <a ui-sref="createAuction" ui-sref-active="active">Create auction</a>
+            <ui-view></ui-view>
         </div>
         <hr />
         <footer>

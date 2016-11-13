@@ -1,13 +1,10 @@
 ﻿namespace AuctionHouse.Auctions {
-    import IController = angular.IController;
-    import IScope = angular.IScope;
-    import IFieldArray = AngularFormly.IFieldArray;
-
-    export class CreateAuctionCtrl implements IController {
-        fields: IFieldArray;
+    export class CreateAuctionCtrl implements ng.IController {
+        fields: AngularFormly.IFieldArray;
         model: any = {};
+        message: string = 'asdsad';
 
-        constructor(private $scope: IScope) {
+        constructor() {
             this.fields = [
             {
                 key: 'title',

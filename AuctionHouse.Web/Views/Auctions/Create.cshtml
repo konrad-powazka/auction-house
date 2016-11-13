@@ -1,0 +1,5 @@
+﻿<form ng-submit="$ctrl.submit()" name="$ctrl.form" novalidate>
+    <formly-form model="$ctrl.model" fields="$ctrl.fields" form="$ctrl.form">
+        <button type="submit" class="btn btn-primary submit-button" ng-disabled="$ctrl.form.$invalid">Submit</button>
+    </formly-form>
+</form>

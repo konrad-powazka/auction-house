@@ -1,24 +1,35 @@
 var AuctionHouse;
 (function (AuctionHouse) {
-    var CreateAuctionCtrl = AuctionHouse.Auctions.CreateAuctionCtrl;
-    var ViewAuctionCtrl = AuctionHouse.Auctions.ViewAuctionCtrl;
     var Application = (function () {
         function Application() {
         }
         Application.bootstrap = function () {
-            var module = angular.module('auctionHouse', ['formly', 'formlyBootstrap']);
-            for (var controllerName in Application.controllers) {
-                if (Application.controllers.hasOwnProperty(controllerName)) {
-                    var controllerCtor = Application.controllers[controllerName];
-                    module.controller(controllerName, controllerCtor);
+            var module = angular.module('auctionHouse', ['ui.router', 'formly', 'formlyBootstrap']);
+            for (var _i = 0, _a = Application.components; _i < _a.length; _i++) {
+                var component = _a[_i];
+                module.component(component.registerAs, component);
+            }
+            module.config(Application.configureRouting);
+        };
+        ;
+        Application.configureRouting = function ($stateProvider) {
+            var states = [
+                {
+                    name: 'createAuction',
+                    //templateUrl: 'Template/Auctions/Create'
+                    url: '/auction/create',
+                    component: 'createAuction'
                 }
+            ];
+            for (var _i = 0, states_1 = states; _i < states_1.length; _i++) {
+                var state = states_1[_i];
+                $stateProvider.state(state);
             }
         };
         ;
-        Application.controllers = {
-            'CreateAuctionCtrl': CreateAuctionCtrl,
-            'ViewAuctionCtrl': ViewAuctionCtrl
-        };
+        Application.components = [
+            new AuctionHouse.Auctions.CreateAuctionComponent()
+        ];
         return Application;
     }());
     AuctionHouse.Application = Application;

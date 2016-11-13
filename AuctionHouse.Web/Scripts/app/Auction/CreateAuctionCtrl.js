@@ -3,9 +3,9 @@ var AuctionHouse;
     var Auctions;
     (function (Auctions) {
         var CreateAuctionCtrl = (function () {
-            function CreateAuctionCtrl($scope) {
-                this.$scope = $scope;
+            function CreateAuctionCtrl() {
                 this.model = {};
+                this.message = 'asdsad';
                 this.fields = [
                     {
                         key: 'title',

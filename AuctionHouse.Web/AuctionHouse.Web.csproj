@@ -261,6 +261,7 @@
     <Content Include="Scripts\formly.min.js.map" />
     <Content Include="Scripts\api-check.min.js.map" />
     <Content Include="Scripts\angular-formly-templates-bootstrap.min.js.map" />
+    <Content Include="Scripts\angular-ui-router.min.js.map" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\formly.js" />
     <Content Include="Scripts\formly.min.js" />
@@ -288,6 +289,7 @@
     </Content>
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\underscore.min.map" />
+    <Content Include="Views\Auctions\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -310,11 +312,13 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\Application.ts" />
+    <TypeScriptCompile Include="Scripts\app\Auction\CreateAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\Auction\ViewAuctionCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\Auction\CreateAuctionCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\INamedComponentOptions.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-formly\angular-formly.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-ui\angular-ui-router.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-ui\angular-ui-sortable.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-component-router.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
