@@ -3,18 +3,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using AuctionHouse.Application;
+using System.Threading;
 using AuctionHouse.Core.Emit;
+using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Reflection;
 using AuctionHouse.Web.Controllers.Api;
 
-namespace AuctionHouse.Web
+namespace AuctionHouse.Web.Cqrs
 {
-    public class CqrsApiControllerTypesEmitter
+    public static class CqrsApiControllerTypesEmitter
     {
         private const string AssemblyNameText = "AuctionHouse.Web.Controllers.Api.Dynamic";
 
-        public Assembly EmitCqrsApiControllersAssembly()
+        private static readonly Lazy<Assembly> CqrsApiControllersAssembly =
+            new Lazy<Assembly>(EmitCqrsApiControllersAssemblyInternal, LazyThreadSafetyMode.ExecutionAndPublication);
+
+        private static readonly Lazy<Assembly> MessagesAssembly = new Lazy<Assembly>(() =>
+        {
+            const string messagesAssemblyNameText = "AuctionHouse.Messages";
+
+            var messagesAssembly =
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .SingleOrDefault(a => a.GetName().Name == messagesAssemblyNameText);
+
+            if (messagesAssembly == null)
+            {
+                var messagesAssemblyName = typeof(CqrsApiControllerTypesEmitter)
+                    .Assembly
+                    .GetReferencedAssemblies()
+                    .Single(a => a.Name == messagesAssemblyNameText);
+
+                messagesAssembly = Assembly.Load(messagesAssemblyName);
+            }
+
+            return messagesAssembly;
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
+
+
+        public static Assembly EmitCqrsApiControllersAssembly()
+        {
+            return CqrsApiControllersAssembly.Value;
+        }
+
+        public static Assembly EmitCqrsApiControllersAssemblyInternal()
         {
             var appDomain = AppDomain.CurrentDomain;
             var assemblyName = new AssemblyName(AssemblyNameText);
@@ -49,7 +80,7 @@ namespace AuctionHouse.Web
             {
                 var queryResultType =
                     queryType.GetInterfaces()
-                        .Single(t => t.GetGenericTypeDefinition() == queriesCommonType)
+                        .Single(t => t.IsGenericType && t.GetGenericTypeDefinition() == queriesCommonType)
                         .GetGenericArguments()
                         .Single();
 
@@ -64,15 +95,13 @@ namespace AuctionHouse.Web
             Type messagesCommonType,
             Func<Type, IEnumerable<Type>> getControllerBaseTypeGenericArgsForMessageType)
         {
-            var messageTypes =
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(a => a.GetTypes())
-                    .Where(
-                        t =>
-                            (messagesCommonType.IsAssignableFrom(t) ||
-                             t.GetInterfaces()
-                                 .Any(it => it.IsGenericType && it.GetGenericTypeDefinition() == messagesCommonType)) &&
-                            t.CanBeInstantiated());
+            var messageTypes = MessagesAssembly.Value.GetTypes()
+                .Where(
+                    t =>
+                        (messagesCommonType.IsAssignableFrom(t) ||
+                         t.GetInterfaces()
+                             .Any(it => it.IsGenericType && it.GetGenericTypeDefinition() == messagesCommonType)) &&
+                        t.CanBeInstantiated());
 
             foreach (var messageType in messageTypes)
             {

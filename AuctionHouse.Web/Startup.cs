@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using AuctionHouse.Application;
 using Autofac;
 using Autofac.Integration.WebApi;
 using Microsoft.Owin;

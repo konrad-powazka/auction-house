@@ -1,4 +1,4 @@
-﻿namespace AuctionHouse.Application
+﻿namespace AuctionHouse.Core.Messaging
 {
     public interface ICommandHandler<in TCommand> where TCommand : ICommand
     {

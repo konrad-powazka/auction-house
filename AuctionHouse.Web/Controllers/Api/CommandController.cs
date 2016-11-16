@@ -1,27 +1,33 @@
 ﻿using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
-using AuctionHouse.Application;
+using AuctionHouse.Core.Messaging;
+using AuctionHouse.Web.Cqrs;
 
 namespace AuctionHouse.Web.Controllers.Api
 {
     public abstract class CommandController<TCommand> : ApiController where TCommand : ICommand
     {
-        private readonly ICommandHandler<TCommand> _handler;
+        private readonly ICommandQueue _commandQueue;
 
-        protected CommandController(ICommandHandler<TCommand> handler)
+        protected CommandController(ICommandQueue commandQueue)
         {
-            if (handler == null)
+            if (commandQueue == null)
             {
-                throw new ArgumentNullException(nameof(handler));
+                throw new ArgumentNullException(nameof(commandQueue));
             }
 
-            _handler = handler;
+            _commandQueue = commandQueue;
         }
 
         [HttpPost]
-        public void Handle(TCommand command)
+        public async Task<HttpResponseMessage> Handle(TCommand command)
         {
-            _handler.Handle(command);
+            await _commandQueue.QueueCommand(command);
+
+            return new HttpResponseMessage(HttpStatusCode.Accepted);
         }
     }
 }

@@ -9,7 +9,6 @@ using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using AuctionHouse.Application;
 using AuctionHouse.Web.Controllers;
 using Autofac;
 using Autofac.Integration.Mvc;

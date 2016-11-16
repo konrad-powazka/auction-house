@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AuctionHouse.Core.Messaging;
 
 namespace AuctionHouse.Domain
 {
@@ -7,7 +8,7 @@ namespace AuctionHouse.Domain
     {     
         private readonly Dictionary<Type, Action<IEvent>> _eventAppliers = new Dictionary<Type, Action<IEvent>>();
         private bool _wereEventsReplayed = false;
-        private List<IEvent> _changes = new List<IEvent>();
+        private readonly List<IEvent> _changes = new List<IEvent>();
 
         public void ReplayEvents(IEnumerable<IEvent> eventsToReplay)
         {
@@ -63,7 +64,7 @@ namespace AuctionHouse.Domain
 
             if (!_eventAppliers.TryGetValue(eventType, out applyEventAction))
             {
-                throw new ArgumentException($"No applier has been registered for events of type '{eventType}");
+                throw new ArgumentException($"No applier has been registered for events of type '{eventType}'");
             }
 
             applyEventAction(eventToApply);

@@ -1,4 +1,5 @@
 ﻿using System;
+using AuctionHouse.Core.Messaging;
 using AuctionHouse.Domain;
 
 namespace AuctionHouse.Persistence

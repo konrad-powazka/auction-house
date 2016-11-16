@@ -1,6 +1,7 @@
 ﻿using System;
+using AuctionHouse.Core.Messaging;
 
-namespace AuctionHouse.Application.Auction
+namespace AuctionHouse.Messages.Auctions
 {
     public class CreateAuctionCommand : ICommand
     {

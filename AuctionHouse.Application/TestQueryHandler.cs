@@ -1,10 +1,8 @@
-﻿namespace AuctionHouse.Application
-{
-    public interface IQueryHandler<in TQuery, out TResult> where TQuery : IQuery<TResult>
-    {
-        TResult Handle(TQuery query);
-    }
+﻿using AuctionHouse.Core.Messaging;
+using AuctionHouse.Messages;
 
+namespace AuctionHouse.Application
+{
     public class TestQueryHandler : IQueryHandler<TestQuery, string>
     {
         public string Handle(TestQuery query)

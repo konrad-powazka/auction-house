@@ -44,7 +44,6 @@
     <Compile Include="Auctions\AuctionCreatedEvent.cs" />
     <Compile Include="Auctions\Auction.cs" />
     <Compile Include="Auctions\AuctionState.cs" />
-    <Compile Include="IEvent.cs" />
     <Compile Include="Money\Currency.cs" />
     <Compile Include="Money\Money.cs" />
     <Compile Include="Entity.cs" />
@@ -52,6 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Users\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
+      <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
+      <Name>AuctionHouse.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

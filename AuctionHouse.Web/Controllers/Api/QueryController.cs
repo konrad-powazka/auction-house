@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web.Http;
-using AuctionHouse.Application;
+using AuctionHouse.Core.Messaging;
 
 namespace AuctionHouse.Web.Controllers.Api
 {

@@ -47,7 +47,7 @@
     $(document).ready(function() {
         $('#send-command')
             .click(function() {
-                $.post('api/CreateAuctionCommand/Handle');
+                $.post('api/CreateAuctionCommand/Handle', { Title: 'Test auction' });
             });
 
         $('#send-query')

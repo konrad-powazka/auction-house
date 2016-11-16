@@ -1,4 +1,5 @@
 using System;
+using AuctionHouse.Core.Messaging;
 
 namespace AuctionHouse.Domain.Auctions
 {

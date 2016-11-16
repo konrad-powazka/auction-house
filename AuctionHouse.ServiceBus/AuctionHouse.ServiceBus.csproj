@@ -4,15 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7F543D2A-0A24-4C6E-8C7E-105240D83F6C}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AuctionHouse.Persistence</RootNamespace>
-    <AssemblyName>AuctionHouse.Persistence</AssemblyName>
+    <RootNamespace>AuctionHouse.ServiceBus</RootNamespace>
+    <AssemblyName>AuctionHouse.ServiceBus</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,8 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EventStore.ClientAPI, Version=3.6.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EventStore.Client.3.6.3\lib\net40\EventStore.ClientAPI.dll</HintPath>
+    <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.6.0.0\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -44,22 +47,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventStoreRepository.cs" />
-    <Compile Include="InMemoryRepository.cs" />
-    <Compile Include="IRepository.cs" />
+    <Compile Include="CommandMessageHandler.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AuctionHouse.Application\AuctionHouse.Application.csproj">
+      <Project>{db45cca7-5a1a-40a1-8cd4-42bc7c5974bc}</Project>
+      <Name>AuctionHouse.Application</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
       <Name>AuctionHouse.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AuctionHouse.Domain\AuctionHouse.Domain.csproj">
-      <Project>{bf0b6ad6-b59f-49c1-a7a5-8528edf9d0c7}</Project>
-      <Name>AuctionHouse.Domain</Name>
+    <ProjectReference Include="..\AuctionHouse.Messages\AuctionHouse.Messages.csproj">
+      <Project>{072AD410-1461-479F-8C26-0D90736D7AF6}</Project>
+      <Name>AuctionHouse.Messages</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
