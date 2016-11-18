@@ -1,4 +1,8 @@
 ﻿using System;
+using AuctionHouse.Application;
+using AuctionHouse.Core.Messaging;
+using AuctionHouse.Core.Reflection;
+using Autofac;
 using NServiceBus;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
 using IEvent = AuctionHouse.Core.Messaging.IEvent;
@@ -20,6 +24,16 @@ namespace AuctionHouse.ServiceBus
                 .DefiningCommandsAs(t => typeof(ICommand).IsAssignableFrom(t))
                 .DefiningEventsAs(t => typeof(IEvent).IsAssignableFrom(t))
                 .DefiningMessagesAs(t => typeof(IMessage).IsAssignableFrom(t));
+
+            var containerBuilder = new ContainerBuilder();
+
+            containerBuilder.RegisterAssemblyTypes(typeof(ApplicationAssemblyMarker).Assembly)
+                .AsClosedTypesOf(typeof(ICommandHandler<>)).AsImplementedInterfaces();
+
+            var container = containerBuilder.Build();
+
+            endpointConfiguration.UseContainer<AutofacBuilder>(
+                customizations => { customizations.ExistingLifetimeScope(container); });
 
             var endpointInstance = Endpoint.Start(endpointConfiguration).Result;
 

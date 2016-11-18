@@ -8,9 +8,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("AuctionHouse.ServiceBus")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("KMD A/S")]
 [assembly: AssemblyProduct("AuctionHouse.ServiceBus")]
-[assembly: AssemblyCopyright("Copyright © KMD A/S 2016")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

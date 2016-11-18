@@ -307,6 +307,10 @@
     <Content Include="Scripts\jquery-3.1.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AuctionHouse.Application\AuctionHouse.Application.csproj">
+      <Project>{DB45CCA7-5A1A-40A1-8CD4-42BC7C5974BC}</Project>
+      <Name>AuctionHouse.Application</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
       <Name>AuctionHouse.Core</Name>

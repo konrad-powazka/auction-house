@@ -1,7 +1,9 @@
-﻿namespace AuctionHouse.Core.Messaging
+﻿using System.Threading.Tasks;
+
+namespace AuctionHouse.Core.Messaging
 {
     public interface ICommandHandler<in TCommand> where TCommand : ICommand
     {
-        void Handle(TCommand command);
+        Task Handle(TCommand command);
     }
 }

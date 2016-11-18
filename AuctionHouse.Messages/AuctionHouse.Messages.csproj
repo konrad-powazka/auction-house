@@ -43,6 +43,7 @@
     <Compile Include="Auctions\CancelAuctionCommand.cs" />
     <Compile Include="Auctions\CreateAuctionCommand.cs" />
     <Compile Include="Auctions\MakeBidCommand.cs" />
+    <Compile Include="MessagesAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestQuery.cs" />
   </ItemGroup>

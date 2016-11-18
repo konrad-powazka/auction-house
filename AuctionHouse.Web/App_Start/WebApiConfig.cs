@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
+using AuctionHouse.Application;
 using AuctionHouse.Core.Messaging;
+using AuctionHouse.Core.Reflection;
 using AuctionHouse.Web.Cqrs;
 using Autofac;
 using Autofac.Integration.WebApi;
@@ -37,6 +39,7 @@ namespace AuctionHouse.Web
 
         private static void SetupDependencyInjection(HttpConfiguration config)
         {
+            //typeof(WebApiConfig).Assembly.LoadAllReferencedAssemblies();
             var dynamicCqrsApiControllersAssembly = CqrsApiControllerTypesEmitter.EmitCqrsApiControllersAssembly();
             var httpControllerTypeResolver = new DynamicAssemblyControllerTypeResolver(dynamicCqrsApiControllersAssembly);
             config.Services.Replace(typeof(IHttpControllerTypeResolver), httpControllerTypeResolver);
@@ -48,7 +51,9 @@ namespace AuctionHouse.Web
                 builder.RegisterType(dynamicCqrsApiControllerType).InstancePerRequest();
             }
 
-            RegisterInterfaceImplementations(builder, typeof(ICommandHandler<>), typeof(IQueryHandler<,>));
+            builder.RegisterAssemblyTypes(typeof(ApplicationAssemblyMarker).Assembly)
+                .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces();
+
             var nServiceBusEndpoint = CreateNServiceBusEndpoint();
 
             builder.RegisterInstance(nServiceBusEndpoint)
@@ -59,17 +64,6 @@ namespace AuctionHouse.Web
             builder.RegisterType<NServiceBusCommandQueue>().As<ICommandQueue>().SingleInstance();
             var container = builder.Build();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-        }
-
-        private static void RegisterInterfaceImplementations(ContainerBuilder builder, params Type[] interfaceTypes)
-        {
-            var dependenciesAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-            foreach (var interfaceType in interfaceTypes)
-            {
-                builder.RegisterAssemblyTypes(dependenciesAssemblies)
-                    .AsClosedTypesOf(interfaceType).AsImplementedInterfaces();
-            }
         }
 
         private static IEndpointInstance CreateNServiceBusEndpoint()

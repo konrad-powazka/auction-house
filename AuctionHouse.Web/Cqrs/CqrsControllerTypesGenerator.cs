@@ -7,6 +7,7 @@ using System.Threading;
 using AuctionHouse.Core.Emit;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Reflection;
+using AuctionHouse.Messages;
 using AuctionHouse.Web.Controllers.Api;
 
 namespace AuctionHouse.Web.Cqrs
@@ -17,28 +18,6 @@ namespace AuctionHouse.Web.Cqrs
 
         private static readonly Lazy<Assembly> CqrsApiControllersAssembly =
             new Lazy<Assembly>(EmitCqrsApiControllersAssemblyInternal, LazyThreadSafetyMode.ExecutionAndPublication);
-
-        private static readonly Lazy<Assembly> MessagesAssembly = new Lazy<Assembly>(() =>
-        {
-            const string messagesAssemblyNameText = "AuctionHouse.Messages";
-
-            var messagesAssembly =
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .SingleOrDefault(a => a.GetName().Name == messagesAssemblyNameText);
-
-            if (messagesAssembly == null)
-            {
-                var messagesAssemblyName = typeof(CqrsApiControllerTypesEmitter)
-                    .Assembly
-                    .GetReferencedAssemblies()
-                    .Single(a => a.Name == messagesAssemblyNameText);
-
-                messagesAssembly = Assembly.Load(messagesAssemblyName);
-            }
-
-            return messagesAssembly;
-        }, LazyThreadSafetyMode.ExecutionAndPublication);
-
 
         public static Assembly EmitCqrsApiControllersAssembly()
         {
@@ -95,13 +74,12 @@ namespace AuctionHouse.Web.Cqrs
             Type messagesCommonType,
             Func<Type, IEnumerable<Type>> getControllerBaseTypeGenericArgsForMessageType)
         {
-            var messageTypes = MessagesAssembly.Value.GetTypes()
-                .Where(
-                    t =>
-                        (messagesCommonType.IsAssignableFrom(t) ||
-                         t.GetInterfaces()
-                             .Any(it => it.IsGenericType && it.GetGenericTypeDefinition() == messagesCommonType)) &&
-                        t.CanBeInstantiated());
+            var messageTypes = typeof(MessagesAssemblyMarker).Assembly.GetTypes().Where(
+                t =>
+                    (messagesCommonType.IsAssignableFrom(t) ||
+                     t.GetInterfaces()
+                         .Any(it => it.IsGenericType && it.GetGenericTypeDefinition() == messagesCommonType)) &&
+                    t.CanBeInstantiated());
 
             foreach (var messageType in messageTypes)
             {
