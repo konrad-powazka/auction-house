@@ -2,7 +2,6 @@
 using System.Net;
 using AuctionHouse.Application;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Domain.Auctions;
 using AuctionHouse.Persistence;
 using Autofac;
 using EventStore.ClientAPI;
@@ -33,6 +32,9 @@ namespace AuctionHouse.ServiceBus
                 .Delayed(delayed => { delayed.NumberOfRetries(0); })
                 .Immediate(immediate => { immediate.NumberOfRetries(0); });
 
+            endpointConfiguration.Pipeline.Register(typeof(ErrorHandlingBehavior),
+                "Publishes an event when command processing fails");
+
             var containerBuilder = new ContainerBuilder();
 
             containerBuilder.RegisterAssemblyTypes(typeof(ApplicationAssemblyMarker).Assembly)
@@ -46,6 +48,9 @@ namespace AuctionHouse.ServiceBus
                 customizations => { customizations.ExistingLifetimeScope(container); });
 
             var endpointInstance = Endpoint.Start(endpointConfiguration).Result;
+            var updaterContainerBuilder = new ContainerBuilder();
+            updaterContainerBuilder.RegisterInstance(endpointInstance).As<IEndpointInstance>();
+            updaterContainerBuilder.Update(container);
 
             try
             {

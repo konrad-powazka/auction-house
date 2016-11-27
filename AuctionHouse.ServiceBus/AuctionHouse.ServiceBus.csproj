@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorHandlingBehavior.cs" />
     <Compile Include="NServiceBusCommandMessageHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -81,6 +82,10 @@
     <ProjectReference Include="..\AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj">
       <Project>{3fb528a3-f733-415d-8e46-49b846f8d27c}</Project>
       <Name>AuctionHouse.Messages.Commands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Messages.Events\AuctionHouse.Messages.Events.csproj">
+      <Project>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</Project>
+      <Name>AuctionHouse.Messages.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Persistence\AuctionHouse.Persistence.csproj">
       <Project>{7F543D2A-0A24-4C6E-8C7E-105240D83F6C}</Project>
