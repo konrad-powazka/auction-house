@@ -70,6 +70,10 @@
       <HintPath>..\packages\Autofac.WebApi2.Owin.4.0.0\lib\net45\Autofac.Integration.WebApi.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EventStore.ClientAPI, Version=3.9.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EventStore.Client.3.9.2\lib\net40\EventStore.ClientAPI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.1.2.1\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
@@ -315,9 +319,17 @@
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
       <Name>AuctionHouse.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AuctionHouse.Messages\AuctionHouse.Messages.csproj">
-      <Project>{072ad410-1461-479f-8c26-0d90736d7af6}</Project>
-      <Name>AuctionHouse.Messages</Name>
+    <ProjectReference Include="..\AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj">
+      <Project>{3FB528A3-F733-415D-8E46-49B846F8D27C}</Project>
+      <Name>AuctionHouse.Messages.Commands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Messages.Queries\AuctionHouse.Messages.Queries.csproj">
+      <Project>{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}</Project>
+      <Name>AuctionHouse.Messages.Queries</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.QueryHandling\AuctionHouse.QueryHandling.csproj">
+      <Project>{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}</Project>
+      <Name>AuctionHouse.QueryHandling</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

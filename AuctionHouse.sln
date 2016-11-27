@@ -15,7 +15,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Web", "Auction
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.ServiceBus", "AuctionHouse.ServiceBus\AuctionHouse.ServiceBus.csproj", "{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Messages", "AuctionHouse.Messages\AuctionHouse.Messages.csproj", "{072AD410-1461-479F-8C26-0D90736D7AF6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventStore", "EventStore", "{AA5E1D0B-14F9-4F04-8002-945D1EF2378C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.EventStoreLauncher", "AuctionHouse.EventStoreLauncher\AuctionHouse.EventStoreLauncher.csproj", "{C16953B4-C157-442D-9816-6388C654D05F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Messages.Commands", "AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj", "{3FB528A3-F733-415D-8E46-49B846F8D27C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Messages.Events", "AuctionHouse.Messages.Events\AuctionHouse.Messages.Events.csproj", "{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Messages.Queries", "AuctionHouse.Messages.Queries\AuctionHouse.Messages.Queries.csproj", "{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.QueryHandling", "AuctionHouse.QueryHandling\AuctionHouse.QueryHandling.csproj", "{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +57,26 @@ Global
 		{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}.Release|Any CPU.Build.0 = Release|Any CPU
-		{072AD410-1461-479F-8C26-0D90736D7AF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{072AD410-1461-479F-8C26-0D90736D7AF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{072AD410-1461-479F-8C26-0D90736D7AF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{072AD410-1461-479F-8C26-0D90736D7AF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C16953B4-C157-442D-9816-6388C654D05F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C16953B4-C157-442D-9816-6388C654D05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C16953B4-C157-442D-9816-6388C654D05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C16953B4-C157-442D-9816-6388C654D05F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FB528A3-F733-415D-8E46-49B846F8D27C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FB528A3-F733-415D-8E46-49B846F8D27C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FB528A3-F733-415D-8E46-49B846F8D27C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FB528A3-F733-415D-8E46-49B846F8D27C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

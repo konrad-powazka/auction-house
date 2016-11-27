@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Net;
 using AuctionHouse.Application;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Core.Reflection;
+using AuctionHouse.Domain.Auctions;
+using AuctionHouse.Persistence;
 using Autofac;
+using EventStore.ClientAPI;
 using NServiceBus;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
 using IEvent = AuctionHouse.Core.Messaging.IEvent;
@@ -25,11 +28,18 @@ namespace AuctionHouse.ServiceBus
                 .DefiningEventsAs(t => typeof(IEvent).IsAssignableFrom(t))
                 .DefiningMessagesAs(t => typeof(IMessage).IsAssignableFrom(t));
 
+            endpointConfiguration
+                .Recoverability()
+                .Delayed(delayed => { delayed.NumberOfRetries(0); })
+                .Immediate(immediate => { immediate.NumberOfRetries(0); });
+
             var containerBuilder = new ContainerBuilder();
 
             containerBuilder.RegisterAssemblyTypes(typeof(ApplicationAssemblyMarker).Assembly)
                 .AsClosedTypesOf(typeof(ICommandHandler<>)).AsImplementedInterfaces();
 
+            RegisterEventStoreConnection(containerBuilder);
+            containerBuilder.RegisterGeneric(typeof(EventStoreRepository<>)).As(typeof(IRepository<>));
             var container = containerBuilder.Build();
 
             endpointConfiguration.UseContainer<AutofacBuilder>(
@@ -46,6 +56,20 @@ namespace AuctionHouse.ServiceBus
             {
                 endpointInstance.Stop().Wait();
             }
+        }
+
+        private static void RegisterEventStoreConnection(ContainerBuilder containerBuilder)
+        {
+            containerBuilder.Register(c =>
+            {
+                //TODO: Read from config
+                const int defaultPort = 1113;
+                var settings = ConnectionSettings.Create();
+                var endpoint = new IPEndPoint(IPAddress.Loopback, defaultPort);
+                var connection = EventStoreConnection.Create(settings, endpoint);
+
+                return connection;
+            }).As<IEventStoreConnection>();
         }
     }
 }

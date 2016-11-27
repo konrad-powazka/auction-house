@@ -1,10 +1,11 @@
 ﻿using System;
+using AuctionHouse.Messages.Events.Auctions;
 
 namespace AuctionHouse.Domain.Auctions
 {
     public class Auction : AggregateRoot
     {
-        public Auction(Guid id, string title, string description, DateTime endDate, decimal startingPrice,
+        public static Auction Create(Guid id, string title, string description, DateTime endDate, decimal startingPrice,
             decimal? buyNowPrice)
         {
             if (string.IsNullOrEmpty(title))
@@ -18,6 +19,8 @@ namespace AuctionHouse.Domain.Auctions
                 throw new ArgumentOutOfRangeException(nameof(endDate));
             }
 
+            var auction = new Auction();
+
             var auctionCreatedEvent = new AuctionCreatedEvent
             {
                 AuctionId = id,
@@ -26,7 +29,9 @@ namespace AuctionHouse.Domain.Auctions
                 Price = startingPrice
             };
 
-            ApplyChange(auctionCreatedEvent);
+            auction.ApplyChange(auctionCreatedEvent);
+
+            return auction;
         }
 
         public string Description { get; private set; }

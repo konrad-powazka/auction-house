@@ -1,7 +1,9 @@
-﻿namespace AuctionHouse.Core.Messaging
+﻿using System.Threading.Tasks;
+
+namespace AuctionHouse.Core.Messaging
 {
-    public interface IQueryHandler<in TQuery, out TResult> where TQuery : IQuery<TResult>
+    public interface IQueryHandler<in TQuery, TResult> where TQuery : IQuery<TResult>
     {
-        TResult Handle(TQuery query);
+        Task<TResult> Handle(TQuery query);
     }
 }

@@ -1,10 +1,12 @@
 using System;
 using AuctionHouse.Core.Messaging;
 
-namespace AuctionHouse.Domain.Auctions
+namespace AuctionHouse.Messages.Events.Auctions
 {
     public class AuctionCreatedEvent : IEvent
     {
+        public Guid Id { get; set;  }
+
         public Guid AuctionId { get; set; }
 
         public string Title { get; set; }

@@ -21,7 +21,10 @@ namespace AuctionHouse.Web.Cqrs
 
         public async Task QueueCommand<TCommand>(TCommand command) where TCommand : ICommand
         {
-            await _endpoint.Send("AuctionHouse.ServiceBus", command);
+            var sendOptions = new SendOptions();
+            sendOptions.SetMessageId(command.Id.ToString());
+            sendOptions.SetDestination("AuctionHouse.ServiceBus");
+            await _endpoint.Send(command, sendOptions);
         }
     }
 }

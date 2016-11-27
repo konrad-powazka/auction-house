@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AuctionHouse.ServiceBus</RootNamespace>
-    <AssemblyName>AuctionHouse.ServiceBus</AssemblyName>
+    <RootNamespace>AuctionHouse.Messages.Events</RootNamespace>
+    <AssemblyName>AuctionHouse.Messages.Events</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,20 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\packages\Autofac.4.2.0\lib\net45\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="EventStore.ClientAPI, Version=3.9.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EventStore.Client.3.9.2\lib\net40\EventStore.ClientAPI.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0\lib\net452\NServiceBus.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NServiceBus.ObjectBuilder.Autofac">
-      <HintPath>..\AuctionHouse.Web\Bin\NServiceBus.ObjectBuilder.Autofac.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -57,34 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NServiceBusCommandMessageHandler.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Auctions\AuctionCreatedEvent.cs" />
+    <Compile Include="EventsAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AuctionHouse.Application\AuctionHouse.Application.csproj">
-      <Project>{db45cca7-5a1a-40a1-8cd4-42bc7c5974bc}</Project>
-      <Name>AuctionHouse.Application</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
       <Name>AuctionHouse.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AuctionHouse.Domain\AuctionHouse.Domain.csproj">
-      <Project>{BF0B6AD6-B59F-49C1-A7A5-8528EDF9D0C7}</Project>
-      <Name>AuctionHouse.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj">
-      <Project>{3fb528a3-f733-415d-8e46-49b846f8d27c}</Project>
-      <Name>AuctionHouse.Messages.Commands</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AuctionHouse.Persistence\AuctionHouse.Persistence.csproj">
-      <Project>{7F543D2A-0A24-4C6E-8C7E-105240D83F6C}</Project>
-      <Name>AuctionHouse.Persistence</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

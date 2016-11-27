@@ -7,7 +7,8 @@ using System.Threading;
 using AuctionHouse.Core.Emit;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Reflection;
-using AuctionHouse.Messages;
+using AuctionHouse.Messages.Commands;
+using AuctionHouse.Messages.Queries;
 using AuctionHouse.Web.Controllers.Api;
 
 namespace AuctionHouse.Web.Cqrs
@@ -48,7 +49,8 @@ namespace AuctionHouse.Web.Cqrs
         private static void EmitCommandControllerTypes(ModuleBuilder moduleBuilder)
         {
             var commandsCommonType = typeof(ICommand);
-            EmitControllerTypes(moduleBuilder, typeof(CommandController<>), commandsCommonType, t => new[] {t});
+            EmitControllerTypes(moduleBuilder, typeof(CommandController<>), commandsCommonType,
+                typeof(CommandsAssemblyMarker), t => new[] {t});
         }
 
         private static void EmitQueryControllerTypes(ModuleBuilder moduleBuilder)
@@ -67,14 +69,14 @@ namespace AuctionHouse.Web.Cqrs
             };
 
             EmitControllerTypes(moduleBuilder, typeof(QueryController<,>), queriesCommonType,
-                getControllerBaseTypeGenericArgsForMessageType);
+                typeof(QueriesAssemblyMarker), getControllerBaseTypeGenericArgsForMessageType);
         }
 
         private static void EmitControllerTypes(ModuleBuilder moduleBuilder, Type controllersBaseType,
-            Type messagesCommonType,
+            Type messagesCommonType, Type messagesAssemblyMarkerType,
             Func<Type, IEnumerable<Type>> getControllerBaseTypeGenericArgsForMessageType)
         {
-            var messageTypes = typeof(MessagesAssemblyMarker).Assembly.GetTypes().Where(
+            var messageTypes = messagesAssemblyMarkerType.Assembly.GetTypes().Where(
                 t =>
                     (messagesCommonType.IsAssignableFrom(t) ||
                      t.GetInterfaces()

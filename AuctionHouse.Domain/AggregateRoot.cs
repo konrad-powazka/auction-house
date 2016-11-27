@@ -7,7 +7,7 @@ namespace AuctionHouse.Domain
     public abstract class AggregateRoot : Entity
     {     
         private readonly Dictionary<Type, Action<IEvent>> _eventAppliers = new Dictionary<Type, Action<IEvent>>();
-        private bool _wereEventsReplayed = false;
+        private bool _wereEventsReplayed = false, _wereAppliersRegistered;
         private readonly List<IEvent> _changes = new List<IEvent>();
 
         public void ReplayEvents(IEnumerable<IEvent> eventsToReplay)
@@ -32,6 +32,15 @@ namespace AuctionHouse.Domain
 
         public IReadOnlyCollection<IEvent> Changes => _changes.AsReadOnly();
 
+        private void TryRegisterEventAppliers()
+        {
+            if (!_wereAppliersRegistered)
+            {
+                _wereAppliersRegistered = true;
+                RegisterEventAppliers();
+            }
+        }
+
         protected abstract void RegisterEventAppliers();
 
         protected void RegisterEventApplier<TEvent>(Action<TEvent> eventApplier) where TEvent : IEvent
@@ -48,6 +57,7 @@ namespace AuctionHouse.Domain
 
         protected void ApplyChange(IEvent eventToApply)
         {
+            TryRegisterEventAppliers();
             Apply(eventToApply);
             _changes.Add(eventToApply);
         }

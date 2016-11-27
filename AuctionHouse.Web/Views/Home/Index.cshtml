@@ -44,18 +44,42 @@
     @Scripts.Render("~/bundles/angular")
     @Scripts.Render("~/bundles/app")
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
+        var auctionId;
+
         $('#send-command')
-            .click(function() {
-                $.post('api/CreateAuctionCommand/Handle', { Title: 'Test auction' });
+            .click(function () {
+                auctionId = guid();
+
+                $.post('api/CreateAuctionCommand/Handle',
+                {
+                    Id: guid(),
+                    AuctionId: auctionId,
+                    Title: 'Test auction',
+                    Description: 'bla bla',
+                    StartingPrice: 5,
+                    EndDate: '2020-02-15T00:00:00Z'
+                }, null, 'json');
             });
 
         $('#send-query')
-                .click(function () {
-                    $.get('api/TestQuery/Handle', null, function(data) {
-                        alert(data);
+            .click(function() {
+                $.get('api/GetAuctionDetailsQuery/Handle',
+                    { Id: auctionId },
+                    function(data) {
+                        alert(JSON.stringify(data));
                     });
-                });
+            });
+
+        function guid() {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                  .toString(16)
+                  .substring(1);
+            }
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+              s4() + '-' + s4() + s4() + s4();
+        }
     })
 </script>
 </body>

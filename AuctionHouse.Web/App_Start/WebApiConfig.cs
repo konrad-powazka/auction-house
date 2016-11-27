@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using AuctionHouse.Application;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Core.Reflection;
+using AuctionHouse.QueryHandling;
 using AuctionHouse.Web.Cqrs;
 using Autofac;
 using Autofac.Integration.WebApi;
+using EventStore.ClientAPI;
 using Newtonsoft.Json.Serialization;
 using NServiceBus;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
@@ -51,7 +53,7 @@ namespace AuctionHouse.Web
                 builder.RegisterType(dynamicCqrsApiControllerType).InstancePerRequest();
             }
 
-            builder.RegisterAssemblyTypes(typeof(ApplicationAssemblyMarker).Assembly)
+            builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
                 .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces();
 
             var nServiceBusEndpoint = CreateNServiceBusEndpoint();
@@ -62,6 +64,7 @@ namespace AuctionHouse.Web
                 .OnRelease(instance => instance.Stop().Wait());
 
             builder.RegisterType<NServiceBusCommandQueue>().As<ICommandQueue>().SingleInstance();
+            RegisterEventStoreConnection(builder);
             var container = builder.Build();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
         }
@@ -80,6 +83,20 @@ namespace AuctionHouse.Web
                 .DefiningMessagesAs(t => typeof(IMessage).IsAssignableFrom(t));
 
             return Endpoint.Start(endpointConfiguration).Result;
+        }
+
+        private static void RegisterEventStoreConnection(ContainerBuilder containerBuilder)
+        {
+            containerBuilder.Register(c =>
+            {
+                //TODO: Read from config
+                const int defaultPort = 1113;
+                var settings = ConnectionSettings.Create();
+                var endpoint = new IPEndPoint(IPAddress.Loopback, defaultPort);
+                var connection = EventStoreConnection.Create(settings, endpoint);
+
+                return connection;
+            }).As<IEventStoreConnection>();
         }
 
         private class DynamicAssemblyControllerTypeResolver : DefaultHttpControllerTypeResolver

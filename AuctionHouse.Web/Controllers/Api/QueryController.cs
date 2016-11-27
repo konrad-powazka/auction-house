@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AuctionHouse.Core.Messaging;
 
@@ -19,9 +20,9 @@ namespace AuctionHouse.Web.Controllers.Api
         }
 
         [HttpGet]
-        public TQueryResult Handle(TQuery query)
+        public async Task<TQueryResult> Handle([FromUri] TQuery query)
         {
-            return _handler.Handle(query);
+            return await _handler.Handle(query);
         }
     }
 }
