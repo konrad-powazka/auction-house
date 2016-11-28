@@ -23,6 +23,7 @@ namespace AuctionHouse.Web.Controllers.Api
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<HttpResponseMessage> Handle(TCommand command)
         {
             await _commandQueue.QueueCommand(command);

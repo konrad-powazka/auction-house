@@ -6,11 +6,11 @@ using AuctionHouse.Persistence;
 
 namespace AuctionHouse.Application.Auctions
 {
-    public class AuctionCommandsHandler : ICommandHandler<CreateAuctionCommand>
+    public class AuctionsService : ICommandHandler<CreateAuctionCommand>
     {
         private readonly IRepository<Auction> _auctionsRepository;
 
-        public AuctionCommandsHandler(IRepository<Auction> auctionsRepository)
+        public AuctionsService(IRepository<Auction> auctionsRepository)
         {
             _auctionsRepository = auctionsRepository;
         }

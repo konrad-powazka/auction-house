@@ -34,8 +34,7 @@ namespace AuctionHouse.Web
 
             config.Routes.MapHttpRoute(
                 "DefaultApi",
-                "api/{controller}/{id}",
-                new {id = RouteParameter.Optional}
+                "api/{controller}/{action}"
                 );
         }
 

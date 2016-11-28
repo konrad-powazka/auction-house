@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Auctions\AuctionCommandsHandler.cs" />
+    <Compile Include="Auctions\AuctionsService.cs" />
     <Compile Include="ApplicationAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -61,6 +61,9 @@
       <Project>{7F543D2A-0A24-4C6E-8C7E-105240D83F6C}</Project>
       <Name>AuctionHouse.Persistence</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Security\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

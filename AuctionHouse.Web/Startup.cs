@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Web.Http;
-using System.Web.Http.Dispatcher;
-using AuctionHouse.Messages.Events;
-using Autofac;
-using Autofac.Integration.WebApi;
+﻿using AuctionHouse.Messages.Events;
+using AuctionHouse.Web;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
-using Microsoft.Owin.Logging;
-using Newtonsoft.Json.Serialization;
+using Microsoft.Owin.Security.Cookies;
 using NServiceBus;
 using Owin;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
 using IEvent = AuctionHouse.Core.Messaging.IEvent;
 using IMessage = AuctionHouse.Core.Messaging.IMessage;
 
-[assembly: OwinStartup(typeof(AuctionHouse.Web.Startup))]
+[assembly: OwinStartup(typeof(Startup))]
 
 namespace AuctionHouse.Web
 {
@@ -25,6 +18,12 @@ namespace AuctionHouse.Web
         public void Configuration(IAppBuilder app)
         {
             app.MapSignalR();
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie
+            });
+
             CreateNServiceBusEndpoint();
         }
 

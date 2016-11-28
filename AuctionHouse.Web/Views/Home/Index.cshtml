@@ -30,6 +30,8 @@
         <div>
             <button id="send-command">Send cmd</button>
             <button id="send-query">Send query</button>
+            <button id="login-btn">Login</button>
+            <button id="logoff-btn">Logoff</button>
             <a ui-sref="createAuction" ui-sref-active="active">Create auction</a>
             <ui-view></ui-view>
         </div>
@@ -87,6 +89,17 @@
                     function(data) {
                         alert(JSON.stringify(data));
                     });
+            });
+
+        $('#login-btn')
+            .click(function () {
+                $.post('api/Authentication/LogIn',
+                { UserName: 'asd', Password: 'xxx' });
+            });
+
+        $('#logoff-btn')
+            .click(function () {
+                $.post('api/Authentication/LogOff');
             });
 
         function guid() {
