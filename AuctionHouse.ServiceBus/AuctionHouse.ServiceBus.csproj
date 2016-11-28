@@ -57,7 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ErrorHandlingBehavior.cs" />
+    <Compile Include="CommandHandlingFeedbackBehavior.cs" />
     <Compile Include="NServiceBusCommandMessageHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

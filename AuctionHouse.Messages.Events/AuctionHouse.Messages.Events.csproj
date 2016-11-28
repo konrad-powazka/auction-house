@@ -43,7 +43,9 @@
     <Compile Include="Auctions\AuctionCreatedEvent.cs" />
     <Compile Include="EventsAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Technical\CommandHandlingSucceededEvent.cs" />
     <Compile Include="Technical\CommandHandlingFailedEvent.cs" />
+    <Compile Include="Technical\CommandHandlingFeedbackEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">

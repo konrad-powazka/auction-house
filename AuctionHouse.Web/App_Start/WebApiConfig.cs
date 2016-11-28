@@ -41,7 +41,6 @@ namespace AuctionHouse.Web
 
         private static void SetupDependencyInjection(HttpConfiguration config)
         {
-            //typeof(WebApiConfig).Assembly.LoadAllReferencedAssemblies();
             var dynamicCqrsApiControllersAssembly = CqrsApiControllerTypesEmitter.EmitCqrsApiControllersAssembly();
             var httpControllerTypeResolver = new DynamicAssemblyControllerTypeResolver(dynamicCqrsApiControllersAssembly);
             config.Services.Replace(typeof(IHttpControllerTypeResolver), httpControllerTypeResolver);
@@ -71,7 +70,7 @@ namespace AuctionHouse.Web
 
         private static IEndpointInstance CreateNServiceBusEndpoint()
         {
-            var endpointConfiguration = new EndpointConfiguration("AuctionHouse.Web");
+            var endpointConfiguration = new EndpointConfiguration("AuctionHouse.WebApi");
             endpointConfiguration.SendFailedMessagesTo("error");
             endpointConfiguration.UseSerialization<JsonSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();

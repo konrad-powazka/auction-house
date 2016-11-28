@@ -2,7 +2,7 @@
 <html lang="en" ng-app="auctionHouse">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>Auction House</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @Styles.Render("~/Content/css")
@@ -34,17 +34,35 @@
             <ui-view></ui-view>
         </div>
         <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/angular")
     @Scripts.Render("~/bundles/app")
+    <script src="~/signalr/hubs"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        var commandHandlingFeedbackHub = $.connection.commandHandlingFeedbackHub;
+
+        commandHandlingFeedbackHub.client.handleCommandFailure = function (commandHandlingFailedEvent) {
+            alert('Command #' + commandHandlingFailedEvent.CommandId + ' failed');
+        };
+
+        commandHandlingFeedbackHub.client.handleCommandSuccess = function (commandHandlingSucceededEvent) {
+            alert('Command #' + commandHandlingSucceededEvent.CommandId + ' succeeded');
+        };
+
+        $('#send-command, #send-query').hide();
+
+        $.connection.hub.start().done(function () {
+            $('#send-command, #send-query').show();
+
+            $('#xxx').click(function () {
+                commandHandlingFeedbackHub.server.someMethod({});
+            });
+        });
+
         var auctionId;
 
         $('#send-command')

@@ -102,6 +102,14 @@
       <HintPath>..\packages\Microsoft.ApplicationInsights.2.1.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.1\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -210,16 +218,19 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Controllers\Api\QueryController.cs" />
     <Compile Include="Controllers\Api\CommandController.cs" />
     <Compile Include="Controllers\View\TemplateController.cs" />
     <Compile Include="Controllers\View\HomeController.cs" />
+    <Compile Include="Cqrs\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="Cqrs\CqrsControllerTypesGenerator.cs" />
     <Compile Include="Cqrs\ICommandQueue.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Cqrs\NServiceBusCommandQueue.cs" />
+    <Compile Include="Hubs\CommandHandlingFeedbackHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
@@ -279,6 +290,8 @@
     <Content Include="Scripts\jquery-3.1.1.min.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.1.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.1.min.js" />
     <Content Include="Scripts\spin.js" />
     <Content Include="Scripts\spin.min.js" />
     <Content Include="Scripts\underscore.js" />
@@ -322,6 +335,10 @@
     <ProjectReference Include="..\AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj">
       <Project>{3FB528A3-F733-415D-8E46-49B846F8D27C}</Project>
       <Name>AuctionHouse.Messages.Commands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Messages.Events\AuctionHouse.Messages.Events.csproj">
+      <Project>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</Project>
+      <Name>AuctionHouse.Messages.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Messages.Queries\AuctionHouse.Messages.Queries.csproj">
       <Project>{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}</Project>

@@ -23,7 +23,7 @@ namespace AuctionHouse.Web.Cqrs
         {
             var sendOptions = new SendOptions();
             sendOptions.SetMessageId(command.Id.ToString());
-            sendOptions.SetDestination("AuctionHouse.ServiceBus");
+            sendOptions.SetDestination(Configuration.NServiceBusCommandHandlingDestination);
             await _endpoint.Send(command, sendOptions);
         }
     }

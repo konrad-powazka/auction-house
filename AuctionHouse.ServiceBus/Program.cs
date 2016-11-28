@@ -17,7 +17,7 @@ namespace AuctionHouse.ServiceBus
         public static void Main()
         {
             Console.Title = "AuctionHouse.ServiceBus";
-            var endpointConfiguration = new EndpointConfiguration("AuctionHouse.ServiceBus");
+            var endpointConfiguration = new EndpointConfiguration("AuctionHouse.ServiceBus");          
             endpointConfiguration.SendFailedMessagesTo("error");
             endpointConfiguration.UseSerialization<JsonSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
@@ -32,8 +32,8 @@ namespace AuctionHouse.ServiceBus
                 .Delayed(delayed => { delayed.NumberOfRetries(0); })
                 .Immediate(immediate => { immediate.NumberOfRetries(0); });
 
-            endpointConfiguration.Pipeline.Register(typeof(ErrorHandlingBehavior),
-                "Publishes an event when command processing fails");
+            endpointConfiguration.Pipeline.Register(typeof(CommandHandlingFeedbackBehavior),
+                "Publishes an event indicating the result of command handling");
 
             var containerBuilder = new ContainerBuilder();
 
