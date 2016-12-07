@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Messages.Queri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.QueryHandling", "AuctionHouse.QueryHandling\AuctionHouse.QueryHandling.csproj", "{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.ReadModel", "AuctionHouse.ReadModel\AuctionHouse.ReadModel.csproj", "{BF4E3065-2992-4BAE-8529-77835AA9CE48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF4E3065-2992-4BAE-8529-77835AA9CE48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF4E3065-2992-4BAE-8529-77835AA9CE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF4E3065-2992-4BAE-8529-77835AA9CE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF4E3065-2992-4BAE-8529-77835AA9CE48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

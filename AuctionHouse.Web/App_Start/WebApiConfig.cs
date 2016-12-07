@@ -7,6 +7,7 @@ using System.Web.Http.Dispatcher;
 using AuctionHouse.Application;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.QueryHandling;
+using AuctionHouse.Web.CodeGen;
 using AuctionHouse.Web.Cqrs;
 using Autofac;
 using Autofac.Integration.WebApi;

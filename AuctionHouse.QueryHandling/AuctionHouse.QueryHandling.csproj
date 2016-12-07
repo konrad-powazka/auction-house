@@ -68,6 +68,10 @@
       <Project>{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}</Project>
       <Name>AuctionHouse.Messages.Queries</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.ReadModel\AuctionHouse.ReadModel.csproj">
+      <Project>{BF4E3065-2992-4BAE-8529-77835AA9CE48}</Project>
+      <Name>AuctionHouse.ReadModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

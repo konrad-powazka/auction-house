@@ -5,13 +5,9 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using AuctionHouse.Core.Emit;
-using AuctionHouse.Core.Messaging;
-using AuctionHouse.Core.Reflection;
-using AuctionHouse.Messages.Commands;
-using AuctionHouse.Messages.Queries;
 using AuctionHouse.Web.Controllers.Api;
 
-namespace AuctionHouse.Web.Cqrs
+namespace AuctionHouse.Web.CodeGen
 {
     public static class CqrsApiControllerTypesEmitter
     {
@@ -48,41 +44,31 @@ namespace AuctionHouse.Web.Cqrs
 
         private static void EmitCommandControllerTypes(ModuleBuilder moduleBuilder)
         {
-            var commandsCommonType = typeof(ICommand);
-            EmitControllerTypes(moduleBuilder, typeof(CommandController<>), commandsCommonType,
-                typeof(CommandsAssemblyMarker), t => new[] {t});
+            var commandTypes = CodeGenTypes.GetComandTypes();
+            EmitControllerTypes(moduleBuilder, typeof(CommandController<>), commandTypes, t => new[] {t});
         }
 
         private static void EmitQueryControllerTypes(ModuleBuilder moduleBuilder)
         {
-            var queriesCommonType = typeof(IQuery<>);
+            var queryTypeToQueryResultTypeMap = CodeGenTypes.GetQueryTypeInfos()
+                .ToDictionary(i => i.QueryType, i => i.QueryResultType);
+
 
             Func<Type, IEnumerable<Type>> getControllerBaseTypeGenericArgsForMessageType = queryType =>
             {
-                var queryResultType =
-                    queryType.GetInterfaces()
-                        .Single(t => t.IsGenericType && t.GetGenericTypeDefinition() == queriesCommonType)
-                        .GetGenericArguments()
-                        .Single();
+                var queryResultType = queryTypeToQueryResultTypeMap[queryType];
 
                 return new[] {queryType, queryResultType};
             };
 
-            EmitControllerTypes(moduleBuilder, typeof(QueryController<,>), queriesCommonType,
-                typeof(QueriesAssemblyMarker), getControllerBaseTypeGenericArgsForMessageType);
+            EmitControllerTypes(moduleBuilder, typeof(QueryController<,>), queryTypeToQueryResultTypeMap.Keys,
+                getControllerBaseTypeGenericArgsForMessageType);
         }
 
         private static void EmitControllerTypes(ModuleBuilder moduleBuilder, Type controllersBaseType,
-            Type messagesCommonType, Type messagesAssemblyMarkerType,
+            IEnumerable<Type> messageTypes,
             Func<Type, IEnumerable<Type>> getControllerBaseTypeGenericArgsForMessageType)
         {
-            var messageTypes = messagesAssemblyMarkerType.Assembly.GetTypes().Where(
-                t =>
-                    (messagesCommonType.IsAssignableFrom(t) ||
-                     t.GetInterfaces()
-                         .Any(it => it.IsGenericType && it.GetGenericTypeDefinition() == messagesCommonType)) &&
-                    t.CanBeInstantiated());
-
             foreach (var messageType in messageTypes)
             {
                 var controllerTypeName = $"{AssemblyNameText}.{messageType.Name}Controller";

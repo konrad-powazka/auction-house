@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Messages.Events;
 using AuctionHouse.Messages.Events.Auctions;
-using AuctionHouse.Messages.Queries.Auctions.Details;
+using AuctionHouse.Messages.Queries.Auctions;
+using AuctionHouse.ReadModel.Auctions.Details;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
 
