@@ -253,8 +253,6 @@
     <Compile Include="CodeGen\ReinforcedTypingsConfiguration.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="CodeGen\CodeGenTypes.cs" />
-    <Compile Include="CodeGen\QueryTypeInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -295,6 +293,10 @@
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\api-check.js" />
     <Content Include="Scripts\api-check.min.js" />
+    <Content Include="Scripts\app\CommandHandling\GeneratedCommandHandlers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GeneratedCommandHandlers.ts</LastGenOutput>
+    </Content>
     <Content Include="Scripts\app\QueryHandling\GeneratedQueryHandlers.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GeneratedQueryHandlers.ts</LastGenOutput>
@@ -358,6 +360,10 @@
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
       <Name>AuctionHouse.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.DynamicTypeScanning\AuctionHouse.DynamicTypeScanning.csproj">
+      <Project>{3A0CEB26-786D-49F0-B960-A321434182B5}</Project>
+      <Name>AuctionHouse.DynamicTypeScanning</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj">
       <Project>{3FB528A3-F733-415D-8E46-49B846F8D27C}</Project>
       <Name>AuctionHouse.Messages.Commands</Name>
@@ -381,12 +387,18 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\Application.ts" />
+    <TypeScriptCompile Include="Scripts\app\CommandHandling\GeneratedCommandHandlers.ts">
+      <DependentUpon>GeneratedCommandHandlers.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\app\CommandHandling\CommandHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\QueryHandling\GeneratedQueryHandlers.ts">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>GeneratedQueryHandlers.tt</DependentUpon>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="Scripts\app\QueryHandling\QueryHandler.ts" />
+    <TypeScriptCompile Include="Scripts\app\QueryHandling\aQueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\ViewAuctionCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionCtrl.ts" />

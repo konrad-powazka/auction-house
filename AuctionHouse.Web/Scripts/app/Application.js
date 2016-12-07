@@ -1,10 +1,12 @@
 var AuctionHouse;
 (function (AuctionHouse) {
+    var AngularCommandHandlersRegistry = AuctionHouse.CommandHandling.AngularCommandHandlersRegistry;
     var Application = (function () {
         function Application() {
         }
         Application.bootstrap = function () {
             var module = angular.module('auctionHouse', ['ui.router', 'formly', 'formlyBootstrap']);
+            module.service(AngularCommandHandlersRegistry.commandHandlers);
             for (var _i = 0, _a = Application.components; _i < _a.length; _i++) {
                 var component = _a[_i];
                 module.component(component.registerAs, component);
@@ -16,7 +18,6 @@ var AuctionHouse;
             var states = [
                 {
                     name: 'createAuction',
-                    //templateUrl: 'Template/Auctions/Create'
                     url: '/auction/create',
                     component: 'createAuction'
                 }

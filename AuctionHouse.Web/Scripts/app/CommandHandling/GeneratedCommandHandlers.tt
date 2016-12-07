@@ -1,0 +1,28 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(TargetDir)AuctionHouse.DynamicTypeScanning.dll" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="AuctionHouse.DynamicTypeScanning" #>
+<#@ output extension=".ts" #>
+
+namespace AuctionHouse.CommandHandling {
+<# foreach(var commandType in AuctionHouse.DynamicTypeScanning.DynamicTypeScanner.GetCommandTypes())
+{ #>
+	export class <#= commandType.Name #>Handler extends CommandHandler<<#= commandType.FullName #>> {
+		protected getCommandName(): string {
+			return '<#= commandType.Name #>';
+		}
+	}
+<# } #>
+
+export class AngularCommandHandlersRegistry {
+	static commandHandlers: {[name: string]: ng.Injectable<Function>} = {
+			<# foreach(var commandType in AuctionHouse.DynamicTypeScanning.DynamicTypeScanner.GetCommandTypes())
+			{ #>
+				'<#= commandType.Name #>Handler': <#= commandType.Name #>Handler,
+			<# } #>
+		};
+	}
+}

@@ -16,4 +16,4 @@ var AuctionHouse;
         QueryHandling.QueryHandler = QueryHandler;
     })(QueryHandling = AuctionHouse.QueryHandling || (AuctionHouse.QueryHandling = {}));
 })(AuctionHouse || (AuctionHouse = {}));
-//# sourceMappingURL=QueryHandler.js.map
+//# sourceMappingURL=aQueryHandler.js.map

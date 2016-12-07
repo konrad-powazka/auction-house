@@ -1,7 +1,8 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "commonjs",
+    //"out": "All.ts",
+    "module": "none",
     "noImplicitAny": true,
     "noEmitOnError": true,
     "noImplicitReturns": true,

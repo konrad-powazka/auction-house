@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AuctionHouse.DynamicTypeScanning;
 using Reinforced.Typings.Fluent;
 
 namespace AuctionHouse.Web.CodeGen
@@ -9,9 +10,9 @@ namespace AuctionHouse.Web.CodeGen
         public static void Configure(ConfigurationBuilder builder)
         {
             var typesToExport =
-                CodeGenTypes.GetComandTypes()
-                    .Concat(CodeGenTypes.GetQueryTypes())
-                    .Concat(CodeGenTypes.GetReadModelTypes());
+                DynamicTypeScanner.GetCommandTypes()
+                    .Concat(DynamicTypeScanner.GetQueryTypes())
+                    .Concat(DynamicTypeScanner.GetReadModelTypes());
 
             builder.ExportAsClasses(typesToExport,
                 c =>

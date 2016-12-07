@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using AuctionHouse.Core.Emit;
+using AuctionHouse.DynamicTypeScanning;
 using AuctionHouse.Web.Controllers.Api;
 
 namespace AuctionHouse.Web.CodeGen
@@ -44,13 +45,13 @@ namespace AuctionHouse.Web.CodeGen
 
         private static void EmitCommandControllerTypes(ModuleBuilder moduleBuilder)
         {
-            var commandTypes = CodeGenTypes.GetComandTypes();
+            var commandTypes = DynamicTypeScanner.GetCommandTypes();
             EmitControllerTypes(moduleBuilder, typeof(CommandController<>), commandTypes, t => new[] {t});
         }
 
         private static void EmitQueryControllerTypes(ModuleBuilder moduleBuilder)
         {
-            var queryTypeToQueryResultTypeMap = CodeGenTypes.GetQueryTypeInfos()
+            var queryTypeToQueryResultTypeMap = DynamicTypeScanner.GetQueryTypeInfos()
                 .ToDictionary(i => i.QueryType, i => i.QueryResultType);
 
 

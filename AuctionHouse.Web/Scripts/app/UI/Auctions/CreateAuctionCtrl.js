@@ -2,10 +2,12 @@ var AuctionHouse;
 (function (AuctionHouse) {
     var Auctions;
     (function (Auctions) {
+        var CreateAuctionCommand = AuctionHouse.Messages.Commands.Auctions.CreateAuctionCommand;
         var CreateAuctionCtrl = (function () {
-            function CreateAuctionCtrl() {
-                this.model = {};
-                this.message = 'asdsad';
+            //TODO: inject interface
+            function CreateAuctionCtrl(createAuctionCommandHandler) {
+                this.createAuctionCommandHandler = createAuctionCommandHandler;
+                this.model = new CreateAuctionCommand();
                 this.fields = [
                     {
                         key: 'title',
@@ -22,6 +24,10 @@ var AuctionHouse;
                         }
                     }];
             }
+            CreateAuctionCtrl.prototype.submit = function () {
+                this.createAuctionCommandHandler.handle(this.model);
+            };
+            CreateAuctionCtrl.$inject = ['CreateAuctionCommandHandler'];
             return CreateAuctionCtrl;
         }());
         Auctions.CreateAuctionCtrl = CreateAuctionCtrl;

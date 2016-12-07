@@ -1,4 +1,5 @@
 ﻿namespace AuctionHouse {
+    import AngularCommandHandlersRegistry = CommandHandling.AngularCommandHandlersRegistry;
 
     export class Application {
         private static components: Infrastructure.INamedComponentOptions[] = [
@@ -7,6 +8,8 @@
 
         static bootstrap(): void {
             const module = angular.module('auctionHouse', ['ui.router', 'formly', 'formlyBootstrap'] as string[]);
+
+            module.service(AngularCommandHandlersRegistry.commandHandlers);
 
             for (let component of Application.components) {
                 module.component(component.registerAs, component);
@@ -19,7 +22,6 @@
             const states: ng.ui.IState[] = [
                 {
                     name: 'createAuction',
-                    //templateUrl: 'Template/Auctions/Create'
                     url: '/auction/create',
                     component: 'createAuction'
                 }

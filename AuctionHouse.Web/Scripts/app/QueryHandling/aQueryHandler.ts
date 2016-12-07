@@ -4,9 +4,9 @@
 
         constructor(private httpService: ng.IHttpService) {}
 
-        handle(guery: TQuery): ng.IHttpPromise<TResult> {
+        handle(query: TQuery): ng.IPromise<TResult> {
             const url = `api/${this.getQueryName()}/Handle`;
-            return this.httpService.get<TResult>(url);
+            return this.httpService.get<TResult>(url); //TODO: pass the actual query
         }
 
         protected abstract getQueryName(): string;

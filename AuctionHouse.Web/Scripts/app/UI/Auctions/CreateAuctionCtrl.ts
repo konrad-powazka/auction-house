@@ -1,10 +1,15 @@
 ﻿namespace AuctionHouse.Auctions {
+    import CreateAuctionCommandHandler = CommandHandling.CreateAuctionCommandHandler;
+    import CreateAuctionCommand = Messages.Commands.Auctions.CreateAuctionCommand;
+
     export class CreateAuctionCtrl implements ng.IController {
         fields: AngularFormly.IFieldArray;
-        model: any = {};
-        message: string = 'asdsad';
+        model = new CreateAuctionCommand();
 
-        constructor() {
+        static $inject = ['CreateAuctionCommandHandler'];
+
+        //TODO: inject interface
+        constructor(private createAuctionCommandHandler: CreateAuctionCommandHandler) {
             this.fields = [
             {
                 key: 'title',
@@ -20,6 +25,10 @@
                     label: 'Description'
                 }
             }];
+        }
+
+        submit(): void {
+            this.createAuctionCommandHandler.handle(this.model);
         }
     }
 }

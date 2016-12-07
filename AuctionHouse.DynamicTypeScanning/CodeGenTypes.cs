@@ -7,9 +7,9 @@ using AuctionHouse.Messages.Commands;
 using AuctionHouse.Messages.Queries;
 using AuctionHouse.ReadModel;
 
-namespace AuctionHouse.Web.CodeGen
+namespace AuctionHouse.DynamicTypeScanning
 {
-    public static class CodeGenTypes
+    public static class DynamicTypeScanner
     {
         private static readonly Lazy<IReadOnlyCollection<Type>> GetCommandTypesLazy =
             new Lazy<IReadOnlyCollection<Type>>(
@@ -37,7 +37,7 @@ namespace AuctionHouse.Web.CodeGen
                         .Where(t => t.Name.EndsWith("ReadModel") && t.CanBeInstantiated())
                         .ToList());
 
-        public static IReadOnlyCollection<Type> GetComandTypes() => GetCommandTypesLazy.Value;
+        public static IReadOnlyCollection<Type> GetCommandTypes() => GetCommandTypesLazy.Value;
         public static IReadOnlyCollection<QueryTypeInfo> GetQueryTypeInfos() => QueryTypeInfosLazy.Value;
 
         public static IReadOnlyCollection<Type> GetQueryTypes()

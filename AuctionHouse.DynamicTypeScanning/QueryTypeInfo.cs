@@ -2,7 +2,7 @@
 using System.Linq;
 using AuctionHouse.Core.Messaging;
 
-namespace AuctionHouse.Web.CodeGen
+namespace AuctionHouse.DynamicTypeScanning
 {
     public class QueryTypeInfo
     {

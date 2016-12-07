@@ -1,14 +1,14 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="$(TargetDir)AuctionHouse.Web.dll" #>
+<#@ assembly name="$(TargetDir)AuctionHouse.DynamicTypeScanning.dll" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="AuctionHouse.Web.CodeGen" #>
+<#@ import namespace="AuctionHouse.DynamicTypeScanning" #>
 <#@ output extension=".ts" #>
 
 namespace AuctionHouse.QueryHandling {
-<# foreach(var queryTypeInfo in AuctionHouse.Web.CodeGen.CodeGenTypes.GetQueryTypeInfos())
+<# foreach(var queryTypeInfo in DynamicTypeScanner.GetQueryTypeInfos())
 { #>
 	export class <#= queryTypeInfo.QueryType.Name #>Handler extends QueryHandler<<#= queryTypeInfo.QueryType.FullName #>, <#= queryTypeInfo.QueryResultType.FullName #>> {
 		protected getQueryName(): string {
