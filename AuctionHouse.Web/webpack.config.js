@@ -3,6 +3,7 @@
     output: {
         filename: 'Scripts/app/ApplicationBundle.js'
     },
+    devtool: 'source-map',
     resolve: {
         extensions: ['', '.Webpack.js', '.web.js', '.ts', '.js', '.tsx']
     },
