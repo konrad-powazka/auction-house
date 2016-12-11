@@ -1,16 +1,12 @@
-var AuctionHouse;
-(function (AuctionHouse) {
-    var Auctions;
-    (function (Auctions) {
-        var CreateAuctionComponent = (function () {
-            function CreateAuctionComponent() {
-                this.controller = Auctions.CreateAuctionCtrl;
-                this.templateUrl = 'Template/Auctions/Create';
-                this.registerAs = 'createAuction';
-            }
-            return CreateAuctionComponent;
-        }());
-        Auctions.CreateAuctionComponent = CreateAuctionComponent;
-    })(Auctions = AuctionHouse.Auctions || (AuctionHouse.Auctions = {}));
-})(AuctionHouse || (AuctionHouse = {}));
+"use strict";
+var CreateAuctionCtrl_1 = require('./CreateAuctionCtrl');
+var CreateAuctionComponent = (function () {
+    function CreateAuctionComponent() {
+        this.controller = CreateAuctionCtrl_1.CreateAuctionCtrl;
+        this.templateUrl = 'Template/Auctions/Create';
+        this.registerAs = 'createAuction';
+    }
+    return CreateAuctionComponent;
+}());
+exports.CreateAuctionComponent = CreateAuctionComponent;
 //# sourceMappingURL=CreateAuctionComponent.js.map

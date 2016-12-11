@@ -7,10 +7,12 @@
 <#@ import namespace="AuctionHouse.DynamicTypeScanning" #>
 <#@ output extension=".ts" #>
 
-namespace AuctionHouse.CommandHandling {
+import { CommandHandler } from './CommandHandler';
+import * as Commands from '../Messages/Commands';
+
 <# foreach(var commandType in AuctionHouse.DynamicTypeScanning.DynamicTypeScanner.GetCommandTypes())
 { #>
-	export class <#= commandType.Name #>Handler extends CommandHandler<<#= commandType.FullName #>> {
+	export class <#= commandType.Name #>Handler extends CommandHandler<Commands.<#= commandType.Name #>> {
 		protected getCommandName(): string {
 			return '<#= commandType.Name #>';
 		}
@@ -25,4 +27,3 @@ export class AngularCommandHandlersRegistry {
 			<# } #>
 		};
 	}
-}

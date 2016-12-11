@@ -1,7 +1,8 @@
-﻿namespace AuctionHouse.Auctions {
-    export class CreateAuctionComponent implements Infrastructure.INamedComponentOptions {
-        controller = CreateAuctionCtrl;
-        templateUrl = 'Template/Auctions/Create';
-        registerAs = 'createAuction';
-    }
+﻿import { CreateAuctionCtrl } from './CreateAuctionCtrl';
+import { INamedComponentOptions } from '../../Infrastructure/INamedComponentOptions';
+
+export class CreateAuctionComponent implements INamedComponentOptions {
+    controller = CreateAuctionCtrl;
+    templateUrl = 'Template/Auctions/Create';
+    registerAs = 'createAuction';
 }

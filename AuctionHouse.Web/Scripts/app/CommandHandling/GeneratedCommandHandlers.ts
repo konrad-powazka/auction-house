@@ -1,16 +1,18 @@
 ﻿
-namespace AuctionHouse.CommandHandling {
-	export class CancelAuctionCommandHandler extends CommandHandler<AuctionHouse.Messages.Commands.Auctions.CancelAuctionCommand> {
+import { CommandHandler } from './CommandHandler';
+import * as Commands from '../Messages/Commands';
+
+	export class CancelAuctionCommandHandler extends CommandHandler<Commands.CancelAuctionCommand> {
 		protected getCommandName(): string {
 			return 'CancelAuctionCommand';
 		}
 	}
-	export class CreateAuctionCommandHandler extends CommandHandler<AuctionHouse.Messages.Commands.Auctions.CreateAuctionCommand> {
+	export class CreateAuctionCommandHandler extends CommandHandler<Commands.CreateAuctionCommand> {
 		protected getCommandName(): string {
 			return 'CreateAuctionCommand';
 		}
 	}
-	export class MakeBidCommandHandler extends CommandHandler<AuctionHouse.Messages.Commands.Auctions.MakeBidCommand> {
+	export class MakeBidCommandHandler extends CommandHandler<Commands.MakeBidCommand> {
 		protected getCommandName(): string {
 			return 'MakeBidCommand';
 		}
@@ -23,4 +25,3 @@ export class AngularCommandHandlersRegistry {
 							'MakeBidCommandHandler': MakeBidCommandHandler,
 					};
 	}
-}

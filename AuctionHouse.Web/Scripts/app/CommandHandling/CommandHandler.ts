@@ -1,14 +1,14 @@
-﻿namespace AuctionHouse.CommandHandling {
-    export abstract class CommandHandler<TCommand> {
-        static $inject = ['$http'];
+﻿import { ICommandHandler } from './ICommandHandler';
 
-        constructor(private httpService: ng.IHttpService) {}
+export abstract class CommandHandler<TCommand> implements ICommandHandler<TCommand> {
+    static $inject = ['$http'];
 
-        handle(command: TCommand): ng.IPromise<void> {
-            const url = `api/${this.getCommandName()}/Handle`;
-            return this.httpService.post<void>(url, command).then(() => {});
-        }
+    constructor(private httpService: ng.IHttpService) {}
 
-        protected abstract getCommandName(): string;
+    handle(command: TCommand): ng.IPromise<void> {
+        const url = `api/${this.getCommandName()}/Handle`;
+        return this.httpService.post<void>(url, command).then(() => {});
     }
+
+    protected abstract getCommandName(): string;
 }

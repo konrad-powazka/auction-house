@@ -24,21 +24,9 @@ namespace AuctionHouse.Web
                 "~/Scripts/formly.js",
                 "~/Scripts/angular-formly-templates-bootstrap.js"));
 
-            var appBundle = new ScriptBundle("~/bundles/app").IncludeDirectory("~/Scripts/app", "*.js", true);
-            appBundle.Orderer = new AppBundleOrderer();
-            bundles.Add(appBundle);
-
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap.css",
                 "~/Content/Site.css"));
-        }
-
-        private class AppBundleOrderer : IBundleOrderer
-        {
-            public IEnumerable<BundleFile> OrderFiles(BundleContext context, IEnumerable<BundleFile> files)
-            {
-                return files.OrderBy(f => f.IncludedVirtualPath.EndsWith("Application.js") ? 1 : 0);
-            }
         }
     }
 }

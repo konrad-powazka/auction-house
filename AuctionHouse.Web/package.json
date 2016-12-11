@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "name": "auction-house",
+  "private": true,
+  "dependencies": {
+  },
+  "scripts": {
+    "webpack": "webpack -w"
+  },
+  "devDependencies": {
+    "webpack": "1.14.0",
+    "ts-loader": "1.3.1",
+    "typescript": "2.1.4"
+  },
+  "-vs-binding": { "ProjectOpened": [ "webpack" ] }
+}
