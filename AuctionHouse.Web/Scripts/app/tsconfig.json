@@ -1,5 +1,4 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
     "module": "commonjs",
     "noImplicitAny": true,
@@ -14,5 +13,6 @@
   "include": [
     "**/*",
     "../typings/**/*"
-  ]
+  ],
+  "exclude": ["../typings/signalr/signalr-1.0.d.ts"]
 }

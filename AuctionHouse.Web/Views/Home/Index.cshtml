@@ -28,8 +28,6 @@
     </div>
     <div class="container body-content">
         <div>
-            <button id="send-command">Send cmd</button>
-            <button id="send-query">Send query</button>
             <button id="login-btn">Login</button>
             <button id="logoff-btn">Logoff</button>
             <a ui-sref="createAuction" ui-sref-active="active">Create auction</a>
@@ -45,52 +43,6 @@
     <script src="~/Scripts/app/ApplicationBundle.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        var commandHandlingFeedbackHub = $.connection.commandHandlingFeedbackHub;
-
-        commandHandlingFeedbackHub.client.handleCommandFailure = function (commandHandlingFailedEvent) {
-            alert('Command #' + commandHandlingFailedEvent.CommandId + ' failed');
-        };
-
-        commandHandlingFeedbackHub.client.handleCommandSuccess = function (commandHandlingSucceededEvent) {
-            alert('Command #' + commandHandlingSucceededEvent.CommandId + ' succeeded');
-        };
-
-        $('#send-command, #send-query').hide();
-
-        $.connection.hub.start().done(function () {
-            $('#send-command, #send-query').show();
-
-            $('#xxx').click(function () {
-                commandHandlingFeedbackHub.server.someMethod({});
-            });
-        });
-
-        var auctionId;
-
-        $('#send-command')
-            .click(function () {
-                auctionId = guid();
-
-                $.post('api/CreateAuctionCommand/Handle',
-                {
-                    Id: guid(),
-                    AuctionId: auctionId,
-                    Title: 'Test auction',
-                    Description: 'bla bla',
-                    StartingPrice: 5,
-                    EndDate: '2020-02-15T00:00:00Z'
-                }, null, 'json');
-            });
-
-        $('#send-query')
-            .click(function() {
-                $.get('api/GetAuctionDetailsQuery/Handle',
-                    { Id: auctionId },
-                    function(data) {
-                        alert(JSON.stringify(data));
-                    });
-            });
-
         $('#login-btn')
             .click(function () {
                 $.post('api/Authentication/LogIn',
@@ -101,16 +53,6 @@
             .click(function () {
                 $.post('api/Authentication/LogOff');
             });
-
-        function guid() {
-            function s4() {
-                return Math.floor((1 + Math.random()) * 0x10000)
-                  .toString(16)
-                  .substring(1);
-            }
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-              s4() + '-' + s4() + s4() + s4();
-        }
     })
 </script>
 </body>

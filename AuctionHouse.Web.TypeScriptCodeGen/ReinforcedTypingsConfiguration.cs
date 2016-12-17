@@ -19,6 +19,7 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
 
         private static void ExportTypes(ConfigurationBuilder builder, IEnumerable<Type> typesToExport, string fileName)
         {
+            //TODO: nullable
             builder.ExportAsClasses(typesToExport,
                 c =>
                 {

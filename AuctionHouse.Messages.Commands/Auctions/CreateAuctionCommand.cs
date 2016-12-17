@@ -15,7 +15,7 @@ namespace AuctionHouse.Messages.Commands.Auctions
 
         public decimal StartingPrice { get; set; }
 
-        public decimal BuyNowPrice { get; set; }
+        public decimal? BuyNowPrice { get; set; }
 
         public DateTime EndDate { get; set; }
     }

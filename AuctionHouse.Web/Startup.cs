@@ -1,6 +1,7 @@
 ﻿using AuctionHouse.Messages.Events;
 using AuctionHouse.Web;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using NServiceBus;
@@ -17,11 +18,14 @@ namespace AuctionHouse.Web
     {
         public void Configuration(IAppBuilder app)
         {
-            app.MapSignalR();
-
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie
+            });
+
+            app.MapSignalR(new HubConfiguration
+            {
+                EnableDetailedErrors = true
             });
 
             CreateNServiceBusEndpoint();
