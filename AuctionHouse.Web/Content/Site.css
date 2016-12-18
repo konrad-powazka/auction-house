@@ -82,3 +82,8 @@ textarea {
   opacity: 0;
   top: -10px;
 }
+
+.datetimepicker-wrapper [ng-model=hours], 
+.datetimepicker-wrapper [ng-model=minutes] {
+  width: 50px !important;
+}

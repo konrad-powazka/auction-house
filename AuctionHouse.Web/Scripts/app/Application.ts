@@ -9,7 +9,10 @@ export class Application {
 
     static bootstrap(): void {
         const module = angular.module('auctionHouse',
-        ['ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate'] as string[]);
+        [
+            'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
+            'ui.bootstrap.datetimepicker'
+        ]);
 
         module.service(AngularCommandHandlersRegistry.commandHandlers);
 
@@ -50,9 +53,20 @@ export class Application {
     private static configureFormly(formlyConfig: AngularFormly.IFormlyConfig,
         formlyValidationMessages: AngularFormly.IValidationMessages): void {
 
+        formlyConfig.setType({
+            name: 'dateTimePicker',
+            template: '<div><datetimepicker ng-model="model[options.key]" show-spinners="true" date-format="M/d/yyyy" date-options="dateOptions"></datetimepicker></div>',
+            wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+            defaultOptions: {
+                templateOptions: {
+                    label: 'Time'
+                }
+            }
+        });
+
         formlyConfig.setWrapper({
             name: 'validation',
-            types: ['input', 'textarea'],
+            types: ['input', 'textarea', 'dateTimePicker'],
             templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
         });
 

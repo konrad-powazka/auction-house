@@ -51,7 +51,10 @@
 	    function Application() {
 	    }
 	    Application.bootstrap = function () {
-	        var module = angular.module('auctionHouse', ['ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate']);
+	        var module = angular.module('auctionHouse', [
+	            'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
+	            'ui.bootstrap.datetimepicker'
+	        ]);
 	        module.service(GeneratedCommandHandlers_1.AngularCommandHandlersRegistry.commandHandlers);
 	        for (var _i = 0, _a = Application.components; _i < _a.length; _i++) {
 	            var component = _a[_i];
@@ -85,11 +88,26 @@
 	    ;
 	    // Reference at http://angular-formly.com/#/example/other/error-summary
 	    Application.configureFormly = function (formlyConfig, formlyValidationMessages) {
+	        formlyConfig.setType({
+	            name: 'dateTimePicker',
+	            template: '<div><datetimepicker ng-model="model[options.key]" show-spinners="true" date-format="M/d/yyyy" date-options="dateOptions"></datetimepicker></div>',
+	            wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+	            defaultOptions: {
+	                templateOptions: {
+	                    label: 'Time'
+	                }
+	            }
+	        });
 	        formlyConfig.setWrapper({
 	            name: 'validation',
-	            types: ['input', 'textarea'],
+	            types: ['input', 'textarea', 'dateTimePicker'],
 	            templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
 	        });
+	        //formlyConfig.setWrapper({
+	        //    name: 'dateTimePickerWrapper',
+	        //    types: ['input', 'textarea', 'datetimepicker'],
+	        //    templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
+	        //});
 	        formlyValidationMessages
 	            .addTemplateOptionValueMessage('maxlength', 'maxlength', '', 'is the maximum length', 'Too long');
 	        formlyValidationMessages
@@ -133,16 +151,14 @@
 	var CreateAuctionCtrl = (function () {
 	    function CreateAuctionCtrl(createAuctionCommandHandler) {
 	        this.createAuctionCommandHandler = createAuctionCommandHandler;
-	        var endDate = new Date();
-	        endDate.setDate(endDate.getDate() + 5);
 	        this.model = {
 	            id: this.guid(),
 	            title: '',
 	            description: '',
 	            auctionId: this.guid(),
 	            startingPrice: 5,
-	            endDate: endDate.toISOString(),
-	            buyNowPrice: 3
+	            buyNowPrice: 10,
+	            endDate: ''
 	        };
 	        this.model.id = this.guid();
 	        this.fields = [
@@ -165,10 +181,21 @@
 	                    minlength: 10,
 	                    maxlength: 10000
 	                }
+	            },
+	            {
+	                key: 'endDate',
+	                type: 'dateTimePicker',
+	                templateOptions: {
+	                    label: 'End date and time',
+	                    required: true
+	                }
 	            }
 	        ];
 	    }
 	    CreateAuctionCtrl.prototype.submit = function () {
+	        if (!this.form.$valid) {
+	            return;
+	        }
 	        this.createAuctionCommandHandler
 	            .handle(this.model)
 	            .then(function () { return alert('Success'); })

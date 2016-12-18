@@ -6,20 +6,19 @@ import { CommandHandlingErrorType } from '../../CommandHandling/CommandHandlingE
 export class CreateAuctionCtrl implements ng.IController {
     fields: AngularFormly.IFieldArray;
     model: CreateAuctionCommand;
+    form: ng.IFormController
 
     static $inject = ['CreateAuctionCommandHandler'];
 
     constructor(private createAuctionCommandHandler: ICommandHandler<CreateAuctionCommand>) {
-        let endDate = new Date();
-        endDate.setDate(endDate.getDate() + 5);
         this.model = {
             id: this.guid(),
             title: '',
             description: '',
             auctionId: this.guid(),
             startingPrice: 5,
-            endDate: endDate.toISOString(),
-            buyNowPrice: 3
+            buyNowPrice: 10,
+            endDate: ''
         }
 
         this.model.id = this.guid();
@@ -44,11 +43,23 @@ export class CreateAuctionCtrl implements ng.IController {
                     minlength: 10,
                     maxlength: 10000
                 }
+            },
+            {
+                key: 'endDate',
+                type: 'dateTimePicker',
+                templateOptions: {
+                    label: 'End date and time',
+                    required: true
+                }
             }
         ];
     }
 
     submit(): void {
+        if (!this.form.$valid) {
+            return;
+        }
+
         this.createAuctionCommandHandler
             .handle(this.model)
             .then(() => alert('Success'))
