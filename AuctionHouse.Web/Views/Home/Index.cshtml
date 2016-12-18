@@ -1,59 +1,63 @@
 ﻿<!DOCTYPE html>
 <html lang="en" ng-app="auctionHouse">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>Auction House</title>
-    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @Styles.Render("~/Content/css")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("API", "Index", "Help", new { area = "HelpPage" }, null)</li>
-                </ul>
-            </div>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("Application name", "Index", "Home", new {area = ""}, new {@class = "navbar-brand"})
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("Home", "Index", "Home", new {area = ""}, null)</li>
+                <li>@Html.ActionLink("API", "Index", "Help", new {area = "HelpPage"}, null)</li>
+            </ul>
         </div>
     </div>
-    <div class="container body-content">
-        <div>
-            <button id="login-btn">Login</button>
-            <button id="logoff-btn">Logoff</button>
-            <a ui-sref="createAuction" ui-sref-active="active">Create auction</a>
-            <ui-view></ui-view>
-        </div>
-        <hr />
+</div>
+<div class="container body-content">
+    <div>
+        <button id="login-btn">Login</button>
+        <button id="logoff-btn">Logoff</button>
+        <a ui-sref="createAuction" ui-sref-active="active">Create auction</a>
+        <ui-view></ui-view>
     </div>
+    <hr/>
+</div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/angular")
-    <script src="~/signalr/hubs"></script>
-    <script src="~/Scripts/app/ApplicationBundle.js"></script>
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/angular")
+<script src="~/signalr/hubs"></script>
+<script src="~/Scripts/app/ApplicationBundle.js"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('#login-btn')
-            .click(function () {
-                $.post('api/Authentication/LogIn',
-                { UserName: 'asd', Password: 'xxx' });
-            });
+    $(document)
+        .ready(function() {
+            $('#login-btn')
+                .click(function() {
+                    $.post('api/Authentication/LogIn',
+                    { UserName: 'asd', Password: 'xxx' });
+                });
 
-        $('#logoff-btn')
-            .click(function () {
-                $.post('api/Authentication/LogOff');
-            });
-    })
+            $('#logoff-btn')
+                .click(function() {
+                    $.post('api/Authentication/LogOff');
+                });
+        })
 </script>
+<script type="text/ng-template" id="error-messages.html">
+        
+    </script>
 </body>
 </html>

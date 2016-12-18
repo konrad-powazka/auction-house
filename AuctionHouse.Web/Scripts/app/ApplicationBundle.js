@@ -51,15 +51,24 @@
 	    function Application() {
 	    }
 	    Application.bootstrap = function () {
-	        var module = angular.module('auctionHouse', ['ui.router', 'formly', 'formlyBootstrap']);
+	        var module = angular.module('auctionHouse', ['ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate']);
 	        module.service(GeneratedCommandHandlers_1.AngularCommandHandlersRegistry.commandHandlers);
 	        for (var _i = 0, _a = Application.components; _i < _a.length; _i++) {
 	            var component = _a[_i];
 	            module.component(component.registerAs, component);
 	        }
-	        module.config(Application.configureRouting);
+	        Application.configureModule.$inject = ['$stateProvider'];
+	        module.config(Application.configureModule);
+	        Application.runModule.$inject = ['formlyConfig', 'formlyValidationMessages'];
+	        module.run(Application.runModule);
 	    };
 	    ;
+	    Application.configureModule = function ($stateProvider) {
+	        Application.configureRouting($stateProvider);
+	    };
+	    Application.runModule = function (formlyConfig, formlyValidationMessages) {
+	        Application.configureFormly(formlyConfig, formlyValidationMessages);
+	    };
 	    Application.configureRouting = function ($stateProvider) {
 	        var states = [
 	            {
@@ -72,6 +81,21 @@
 	            var state = states_1[_i];
 	            $stateProvider.state(state);
 	        }
+	    };
+	    ;
+	    // Reference at http://angular-formly.com/#/example/other/error-summary
+	    Application.configureFormly = function (formlyConfig, formlyValidationMessages) {
+	        formlyConfig.setWrapper({
+	            name: 'validation',
+	            types: ['input', 'textarea'],
+	            templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
+	        });
+	        formlyValidationMessages
+	            .addTemplateOptionValueMessage('maxlength', 'maxlength', '', 'is the maximum length', 'Too long');
+	        formlyValidationMessages
+	            .addTemplateOptionValueMessage('minlength', 'minlength', '', 'is the minimum length', 'Too short');
+	        formlyValidationMessages
+	            .addTemplateOptionValueMessage('required', 'label', '', 'is required', 'This field is required');
 	    };
 	    ;
 	    return Application;
@@ -126,14 +150,20 @@
 	                key: 'title',
 	                type: 'input',
 	                templateOptions: {
-	                    label: 'Title'
+	                    label: 'Title',
+	                    required: true,
+	                    minlength: 5,
+	                    maxlength: 200
 	                }
 	            },
 	            {
 	                key: 'description',
 	                type: 'textarea',
 	                templateOptions: {
-	                    label: 'Description'
+	                    label: 'Description',
+	                    required: true,
+	                    minlength: 10,
+	                    maxlength: 10000
 	                }
 	            }
 	        ];

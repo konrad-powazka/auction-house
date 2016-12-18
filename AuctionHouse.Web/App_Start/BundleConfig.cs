@@ -18,6 +18,8 @@ namespace AuctionHouse.Web
 
             bundles.Add(new ScriptBundle("~/bundles/angular").Include(
                 "~/Scripts/angular.js",
+                "~/Scripts/angular-messages.js",
+                "~/Scripts/angular-animate.js",
                 "~/Scripts/angular-ui-router.js",
                 "~/Scripts/angular-ui.js",
                 "~/Scripts/api-check.js",

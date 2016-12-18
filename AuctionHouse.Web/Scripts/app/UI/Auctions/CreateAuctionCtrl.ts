@@ -1,6 +1,5 @@
 ﻿import { CreateAuctionCommand } from '../../Messages/Commands';
 import { CreateAuctionCommandHandler } from '../../CommandHandling/GeneratedCommandHandlers';
-
 import { ICommandHandler } from '../../CommandHandling/ICommandHandler';
 import { CommandHandlingErrorType } from '../../CommandHandling/CommandHandlingErrorType';
 
@@ -30,14 +29,20 @@ export class CreateAuctionCtrl implements ng.IController {
                 key: 'title',
                 type: 'input',
                 templateOptions: {
-                    label: 'Title'
+                    label: 'Title',
+                    required: true,
+                    minlength: 5,
+                    maxlength: 200
                 }
             },
             {
                 key: 'description',
                 type: 'textarea',
                 templateOptions: {
-                    label: 'Description'
+                    label: 'Description',
+                    required: true,
+                    minlength: 10,
+                    maxlength: 10000
                 }
             }
         ];

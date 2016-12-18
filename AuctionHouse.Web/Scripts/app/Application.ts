@@ -8,7 +8,8 @@ export class Application {
     ];
 
     static bootstrap(): void {
-        const module = angular.module('auctionHouse', ['ui.router', 'formly', 'formlyBootstrap'] as string[]);
+        const module = angular.module('auctionHouse',
+        ['ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate'] as string[]);
 
         module.service(AngularCommandHandlersRegistry.commandHandlers);
 
@@ -16,8 +17,20 @@ export class Application {
             module.component(component.registerAs, component);
         }
 
-        module.config(Application.configureRouting);
+        Application.configureModule.$inject = ['$stateProvider'];
+        module.config(Application.configureModule);
+        Application.runModule.$inject = ['formlyConfig', 'formlyValidationMessages'];
+        module.run(Application.runModule);
     };
+
+    private static configureModule($stateProvider: ng.ui.IStateProvider): void {
+        Application.configureRouting($stateProvider);
+    }
+
+    private static runModule(formlyConfig: AngularFormly.IFormlyConfig,
+        formlyValidationMessages: AngularFormly.IValidationMessages): void {
+        Application.configureFormly(formlyConfig, formlyValidationMessages);
+    }
 
     private static configureRouting($stateProvider: ng.ui.IStateProvider): void {
         const states: ng.ui.IState[] = [
@@ -31,6 +44,26 @@ export class Application {
         for (let state of states) {
             $stateProvider.state(state);
         }
+    };
+
+    // Reference at http://angular-formly.com/#/example/other/error-summary
+    private static configureFormly(formlyConfig: AngularFormly.IFormlyConfig,
+        formlyValidationMessages: AngularFormly.IValidationMessages): void {
+
+        formlyConfig.setWrapper({
+            name: 'validation',
+            types: ['input', 'textarea'],
+            templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
+        });
+
+        formlyValidationMessages
+            .addTemplateOptionValueMessage('maxlength', 'maxlength', '', 'is the maximum length', 'Too long');
+
+        formlyValidationMessages
+            .addTemplateOptionValueMessage('minlength', 'minlength', '', 'is the minimum length', 'Too short');
+
+        formlyValidationMessages
+            .addTemplateOptionValueMessage('required', 'label', '', 'is required', 'This field is required');
     };
 }
 

@@ -271,8 +271,12 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Scripts\angular-animate.js" />
+    <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-formly-templates-bootstrap.js" />
     <Content Include="Scripts\angular-formly-templates-bootstrap.min.js" />
+    <Content Include="Scripts\angular-messages.js" />
+    <Content Include="Scripts\angular-messages.min.js" />
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
     <Content Include="Scripts\angular-route.min.js" />
@@ -299,7 +303,6 @@
     </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\angular.min.js.map" />
     <Content Include="Scripts\angular-route.min.js.map" />
     <Content Include="Scripts\app\tsconfig.json" />
     <Content Include="Scripts\angular-spinner.min.js.map" />
@@ -309,6 +312,9 @@
     <Content Include="Scripts\angular-ui-router.min.js.map" />
     <Content Include="package.json" />
     <Content Include="webpack.config.js" />
+    <Content Include="Scripts\angular.min.js.map" />
+    <Content Include="Scripts\angular-messages.min.js.map" />
+    <Content Include="Scripts\angular-animate.min.js.map" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\formly.js" />
     <Content Include="Scripts\formly.min.js" />
@@ -339,6 +345,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\underscore.min.map" />
     <Content Include="Views\Auctions\Create.cshtml" />
+    <Content Include="Views\Shared\AngularFormlyErrorMessagesInputWrapper.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
