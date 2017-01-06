@@ -20,19 +20,19 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li>
-                    <a href ng-click="$ctrl.login()">Login</a>
+                <li></li>
+                <li ng-hide="$ctrl.securityUiService.isUserAuthenticated">
+                    <a href ng-click="$ctrl.securityUiService.showLogInDialog()">Log in</a>
                 </li>
-                <li>@Html.ActionLink("Create auction", "Index", "Home", new {area = ""}, null)</li>
-                <li>@Html.ActionLink("API", "Index", "Help", new {area = "HelpPage"}, null)</li>
+                <li ng-show="$ctrl.securityUiService.isUserAuthenticated">
+                    <a href ng-click="$ctrl.securityUiService.logOut()">Log out</a>
+                </li>
             </ul>
         </div>
     </div>
 </div>
 <div class="container body-content">
     <div>
-        <button id="login-btn">Login</button>
-        <button id="logoff-btn">Logoff</button>
         <a ui-sref="createAuction" ui-sref-active="active">Create auction</a>
         <ui-view></ui-view>
     </div>
@@ -44,23 +44,5 @@
 @Scripts.Render("~/bundles/angular")
 <script src="~/signalr/hubs"></script>
 <script src="~/Scripts/app/ApplicationBundle.js"></script>
-<script type="text/javascript">
-    $(document)
-        .ready(function() {
-            $('#login-btn')
-                .click(function() {
-                    $.post('api/Authentication/LogIn',
-                    { UserName: 'asd', Password: 'xxx' });
-                });
-
-            $('#logoff-btn')
-                .click(function() {
-                    $.post('api/Authentication/LogOut');
-                });
-        })
-</script>
-<script type="text/ng-template" id="error-messages.html">
-        
-    </script>
 </body>
 </html>

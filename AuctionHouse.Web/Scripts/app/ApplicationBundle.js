@@ -411,7 +411,7 @@
 	            _this.currentUserName = userName;
 	        });
 	    };
-	    SecurityService.prototype.logOut = function (userName, password) {
+	    SecurityService.prototype.logOut = function () {
 	        var _this = this;
 	        if (!this.checkIfUserIsAuthenticated()) {
 	            throw new Error('Current user is not authenticated.');
@@ -454,17 +454,27 @@
 	        enumerable: true,
 	        configurable: true
 	    });
+	    Object.defineProperty(SecurityUiService.prototype, "isUserAuthenticated", {
+	        get: function () {
+	            return this.securityService.checkIfUserIsAuthenticated();
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    SecurityUiService.prototype.ensureUserIsAuthenticated = function () {
 	        if (this.securityService.checkIfUserIsAuthenticated()) {
 	            return this.qService.resolve();
 	        }
-	        return this.showLoginDialog();
+	        return this.showLogInDialog();
 	    };
-	    SecurityUiService.prototype.showLoginDialog = function () {
+	    SecurityUiService.prototype.showLogInDialog = function () {
 	        var modalInstance = this.modalService.open({
 	            component: 'loginDialog'
 	        });
 	        return modalInstance.result;
+	    };
+	    SecurityUiService.prototype.logOut = function () {
+	        return this.securityService.logOut();
 	    };
 	    return SecurityUiService;
 	}());
@@ -552,9 +562,6 @@
 	    function ApplicationCtrl(securityUiService) {
 	        this.securityUiService = securityUiService;
 	    }
-	    ApplicationCtrl.prototype.login = function () {
-	        this.securityUiService.showLoginDialog();
-	    };
 	    return ApplicationCtrl;
 	}());
 	ApplicationCtrl.$inject = ['securityUiService'];

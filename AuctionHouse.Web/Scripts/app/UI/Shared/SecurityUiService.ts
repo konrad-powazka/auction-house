@@ -13,19 +13,27 @@ export class SecurityUiService {
         return this.securityService.checkIfUserIsAuthenticated() ? this.securityService.getCurrentUserName() : null;
     }
 
+    get isUserAuthenticated(): boolean {
+        return this.securityService.checkIfUserIsAuthenticated();
+    }
+
     ensureUserIsAuthenticated(): ng.IPromise<void> {
         if (this.securityService.checkIfUserIsAuthenticated()) {
             return this.qService.resolve();
         }
 
-        return this.showLoginDialog();
+        return this.showLogInDialog();
     }
 
-    showLoginDialog(): ng.IPromise<void> {
+    showLogInDialog(): ng.IPromise<void> {
         const modalInstance = this.modalService.open({
             component: 'loginDialog'
         });
 
         return modalInstance.result;
+    }
+
+    logOut(): ng.IPromise<void> {
+        return this.securityService.logOut();
     }
 }

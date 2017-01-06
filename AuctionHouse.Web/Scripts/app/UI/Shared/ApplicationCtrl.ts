@@ -3,10 +3,6 @@
 export class ApplicationCtrl implements ng.IController {
     static $inject = ['securityUiService'];
 
-    constructor(private securityUiService: SecurityUiService) {
-    }
-
-    login(): void {
-        this.securityUiService.showLoginDialog();
+    constructor(public securityUiService: SecurityUiService) {
     }
 }

@@ -18,7 +18,7 @@
             });
     }
 
-    logOut(userName: string, password: string): ng.IPromise<void> {
+    logOut(): ng.IPromise<void> {
         if (!this.checkIfUserIsAuthenticated()) {
             throw new Error('Current user is not authenticated.');
         }
