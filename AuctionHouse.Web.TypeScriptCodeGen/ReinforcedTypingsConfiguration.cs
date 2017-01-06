@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using AuctionHouse.DynamicTypeScanning;
 using Reinforced.Typings;
 using Reinforced.Typings.Ast;
@@ -24,7 +25,7 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
                 c =>
                 {
                     c.PathToFile = fileName;
-                    c.WithCodeGenerator<ReinforcedTypingsExportClassCodeGenerator>();
+                    c.WithCodeGenerator<ExportKeywordPrependingClassCodeGenerator>();
 
                     c.DontIncludeToNamespace().WithProperties(
                         p =>
@@ -39,13 +40,23 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
                 });
         }
 
-        private class ReinforcedTypingsExportClassCodeGenerator : ClassCodeGenerator
+        private class ExportKeywordPrependingClassCodeGenerator : ClassCodeGenerator
         {
             public override RtClass GenerateNode(Type element, RtClass result, TypeResolver resolver)
             {
                 var rtClass = base.GenerateNode(element, result, resolver);
                 Context.Location.CurrentModule.CompilationUnits.Add(new RtRaw("export"));
                 return rtClass;
+            }
+        }
+
+        private class OptionalPropertyCodeGenerator : PropertyCodeGenerator
+        {
+            public override RtField GenerateNode(MemberInfo element, RtField result, TypeResolver resolver)
+            {
+                var baseResult = base.GenerateNode(element, result, resolver);
+                baseResult.Type = new RtSimpleTypeName($"{baseResult.Type} | null");
+                return baseResult;
             }
         }
     }

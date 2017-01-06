@@ -1,3 +1,3 @@
 ﻿export interface ICommand {
-    id: string
+    id: string | null
 }

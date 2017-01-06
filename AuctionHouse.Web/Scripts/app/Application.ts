@@ -78,6 +78,8 @@ export class Application {
 
         formlyValidationMessages
             .addTemplateOptionValueMessage('required', 'label', '', 'is required', 'This field is required');
+
+        formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
     };
 }
 

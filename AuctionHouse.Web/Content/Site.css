@@ -35,6 +35,14 @@ textarea {
     }
 }
 
+.form-group {
+    transition: margin-bottom .3s linear;
+}
+
+.form-group.has-error {
+    margin-bottom: 25px;
+}
+
 .color-error {
   color: #a94442;
 }
@@ -53,7 +61,6 @@ textarea {
 }
 
 .error-message {
-  font-size: .8em;
   position: absolute;
   width: 100%;
   color: #a94442;

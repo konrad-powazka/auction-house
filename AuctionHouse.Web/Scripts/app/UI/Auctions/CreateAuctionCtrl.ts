@@ -6,7 +6,7 @@ import { CommandHandlingErrorType } from '../../CommandHandling/CommandHandlingE
 export class CreateAuctionCtrl implements ng.IController {
     fields: AngularFormly.IFieldArray;
     model: CreateAuctionCommand;
-    form: ng.IFormController
+    form: ng.IFormController;
 
     static $inject = ['CreateAuctionCommandHandler'];
 
@@ -18,10 +18,8 @@ export class CreateAuctionCtrl implements ng.IController {
             auctionId: this.guid(),
             startingPrice: 5,
             buyNowPrice: 10,
-            endDate: ''
+            endDate: undefined as any
         }
-
-        this.model.id = this.guid();
 
         this.fields = [
             {

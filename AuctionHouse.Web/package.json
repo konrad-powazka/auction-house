@@ -3,7 +3,6 @@
   "name": "auction-house",
   "private": true,
   "dependencies": {
-    "angular-ui-bootstrap-datetimepicker": "2.0.2",
     "moment": "2.17.1"
   },
   "scripts": {

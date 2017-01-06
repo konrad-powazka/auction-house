@@ -306,6 +306,7 @@
     <Content Include="Scripts\angular-route.min.js.map" />
     <Content Include="Scripts\app\tsconfig.json" />
     <Content Include="Scripts\angular-spinner.min.js.map" />
+    <Content Include="Scripts\datetimepicker-fixed.js" />
     <Content Include="Scripts\formly.min.js.map" />
     <Content Include="Scripts\api-check.min.js.map" />
     <Content Include="Scripts\angular-formly-templates-bootstrap.min.js.map" />

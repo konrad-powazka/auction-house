@@ -46,7 +46,7 @@
 
 	"use strict";
 	var CreateAuctionComponent_1 = __webpack_require__(1);
-	var GeneratedCommandHandlers_1 = __webpack_require__(5);
+	var GeneratedCommandHandlers_1 = __webpack_require__(4);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -103,17 +103,13 @@
 	            types: ['input', 'textarea', 'dateTimePicker'],
 	            templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
 	        });
-	        //formlyConfig.setWrapper({
-	        //    name: 'dateTimePickerWrapper',
-	        //    types: ['input', 'textarea', 'datetimepicker'],
-	        //    templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
-	        //});
 	        formlyValidationMessages
 	            .addTemplateOptionValueMessage('maxlength', 'maxlength', '', 'is the maximum length', 'Too long');
 	        formlyValidationMessages
 	            .addTemplateOptionValueMessage('minlength', 'minlength', '', 'is the minimum length', 'Too short');
 	        formlyValidationMessages
 	            .addTemplateOptionValueMessage('required', 'label', '', 'is required', 'This field is required');
+	        formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
 	    };
 	    ;
 	    return Application;
@@ -147,7 +143,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var CommandHandlingErrorType_1 = __webpack_require__(4);
+	var CommandHandlingErrorType_1 = __webpack_require__(3);
 	var CreateAuctionCtrl = (function () {
 	    function CreateAuctionCtrl(createAuctionCommandHandler) {
 	        this.createAuctionCommandHandler = createAuctionCommandHandler;
@@ -158,9 +154,8 @@
 	            auctionId: this.guid(),
 	            startingPrice: 5,
 	            buyNowPrice: 10,
-	            endDate: ''
+	            endDate: undefined
 	        };
-	        this.model.id = this.guid();
 	        this.fields = [
 	            {
 	                key: 'title',
@@ -229,8 +224,7 @@
 
 
 /***/ },
-/* 3 */,
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -244,7 +238,7 @@
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -253,7 +247,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandHandler_1 = __webpack_require__(6);
+	var CommandHandler_1 = __webpack_require__(5);
 	var CancelAuctionCommandHandler = (function (_super) {
 	    __extends(CancelAuctionCommandHandler, _super);
 	    function CancelAuctionCommandHandler() {
@@ -301,11 +295,11 @@
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var CommandHandlingErrorType_1 = __webpack_require__(4);
+	var CommandHandlingErrorType_1 = __webpack_require__(3);
 	var CommandHandler = (function () {
 	    function CommandHandler(httpService, qService, timeoutService) {
 	        this.httpService = httpService;
