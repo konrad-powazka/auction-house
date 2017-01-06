@@ -24,7 +24,7 @@ namespace AuctionHouse.Web.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost]
-        public void LogOff()
+        public void LogOut()
         {
             Request.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
         }

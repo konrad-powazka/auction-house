@@ -20,8 +20,8 @@ import * as Commands from '../Messages/Commands';
 
 export class AngularCommandHandlersRegistry {
 	static commandHandlers: {[name: string]: ng.Injectable<Function>} = {
-							'CancelAuctionCommandHandler': CancelAuctionCommandHandler,
-							'CreateAuctionCommandHandler': CreateAuctionCommandHandler,
-							'MakeBidCommandHandler': MakeBidCommandHandler,
+							'cancelAuctionCommandHandler': CancelAuctionCommandHandler,
+							'createAuctionCommandHandler': CreateAuctionCommandHandler,
+							'makeBidCommandHandler': MakeBidCommandHandler,
 					};
 	}

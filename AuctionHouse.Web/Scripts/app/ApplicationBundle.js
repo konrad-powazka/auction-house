@@ -47,6 +47,10 @@
 	"use strict";
 	var CreateAuctionComponent_1 = __webpack_require__(1);
 	var GeneratedCommandHandlers_1 = __webpack_require__(4);
+	var SecurityService_1 = __webpack_require__(6);
+	var SecurityUiService_1 = __webpack_require__(7);
+	var LoginDialogComponent_1 = __webpack_require__(8);
+	var ApplicationCtrl_1 = __webpack_require__(10);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -55,7 +59,8 @@
 	            'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
 	            'ui.bootstrap.datetimepicker'
 	        ]);
-	        module.service(GeneratedCommandHandlers_1.AngularCommandHandlersRegistry.commandHandlers);
+	        module.controller('applicationCtrl', ApplicationCtrl_1.ApplicationCtrl);
+	        this.registerSerivces(module);
 	        for (var _i = 0, _a = Application.components; _i < _a.length; _i++) {
 	            var component = _a[_i];
 	            module.component(component.registerAs, component);
@@ -66,6 +71,11 @@
 	        module.run(Application.runModule);
 	    };
 	    ;
+	    Application.registerSerivces = function (module) {
+	        module.service(GeneratedCommandHandlers_1.AngularCommandHandlersRegistry.commandHandlers);
+	        module.service('securityService', SecurityService_1.SecurityService);
+	        module.service('securityUiService', SecurityUiService_1.SecurityUiService);
+	    };
 	    Application.configureModule = function ($stateProvider) {
 	        Application.configureRouting($stateProvider);
 	    };
@@ -115,7 +125,8 @@
 	    return Application;
 	}());
 	Application.components = [
-	    new CreateAuctionComponent_1.CreateAuctionComponent()
+	    new CreateAuctionComponent_1.CreateAuctionComponent(),
+	    new LoginDialogComponent_1.LoginDialogComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -219,7 +230,7 @@
 	    };
 	    return CreateAuctionCtrl;
 	}()); //
-	CreateAuctionCtrl.$inject = ['CreateAuctionCommandHandler'];
+	CreateAuctionCtrl.$inject = ['createAuctionCommandHandler'];
 	exports.CreateAuctionCtrl = CreateAuctionCtrl;
 
 
@@ -287,9 +298,9 @@
 	    return AngularCommandHandlersRegistry;
 	}());
 	AngularCommandHandlersRegistry.commandHandlers = {
-	    'CancelAuctionCommandHandler': CancelAuctionCommandHandler,
-	    'CreateAuctionCommandHandler': CreateAuctionCommandHandler,
-	    'MakeBidCommandHandler': MakeBidCommandHandler,
+	    'cancelAuctionCommandHandler': CancelAuctionCommandHandler,
+	    'createAuctionCommandHandler': CreateAuctionCommandHandler,
+	    'makeBidCommandHandler': MakeBidCommandHandler,
 	};
 	exports.AngularCommandHandlersRegistry = AngularCommandHandlersRegistry;
 
@@ -377,6 +388,177 @@
 	CommandHandler.commandHandlingFailureCallbacks = $.Callbacks();
 	CommandHandler.$inject = ['$http', '$q', '$timeout'];
 	exports.CommandHandler = CommandHandler;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var SecurityService = (function () {
+	    function SecurityService(httpService) {
+	        this.httpService = httpService;
+	        this.currentUserName = null;
+	    }
+	    SecurityService.prototype.logIn = function (userName, password) {
+	        var _this = this;
+	        var loginCommand = {
+	            userName: userName,
+	            password: password
+	        };
+	        return this.httpService.post('api/Authentication/LogIn', loginCommand)
+	            .then(function () {
+	            _this.currentUserName = userName;
+	        });
+	    };
+	    SecurityService.prototype.logOut = function (userName, password) {
+	        var _this = this;
+	        if (!this.checkIfUserIsAuthenticated()) {
+	            throw new Error('Current user is not authenticated.');
+	        }
+	        return this.httpService.post('api/Authentication/LogOut', {})
+	            .then(function () {
+	            _this.currentUserName = null;
+	        });
+	    };
+	    SecurityService.prototype.checkIfUserIsAuthenticated = function () {
+	        return this.currentUserName !== null;
+	    };
+	    SecurityService.prototype.getCurrentUserName = function () {
+	        if (!this.checkIfUserIsAuthenticated()) {
+	            throw new Error('Current user is not authenticated.');
+	        }
+	        return this.currentUserName;
+	    };
+	    return SecurityService;
+	}());
+	SecurityService.$inject = ['$http'];
+	exports.SecurityService = SecurityService;
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var SecurityUiService = (function () {
+	    function SecurityUiService(securityService, modalService, qService) {
+	        this.securityService = securityService;
+	        this.modalService = modalService;
+	        this.qService = qService;
+	    }
+	    Object.defineProperty(SecurityUiService.prototype, "currentUserName", {
+	        get: function () {
+	            return this.securityService.checkIfUserIsAuthenticated() ? this.securityService.getCurrentUserName() : null;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    SecurityUiService.prototype.ensureUserIsAuthenticated = function () {
+	        if (this.securityService.checkIfUserIsAuthenticated()) {
+	            return this.qService.resolve();
+	        }
+	        return this.showLoginDialog();
+	    };
+	    SecurityUiService.prototype.showLoginDialog = function () {
+	        var modalInstance = this.modalService.open({
+	            component: 'loginDialog'
+	        });
+	        return modalInstance.result;
+	    };
+	    return SecurityUiService;
+	}());
+	SecurityUiService.$inject = ['securityService', '$uibModal', '$q'];
+	exports.SecurityUiService = SecurityUiService;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var LoginDialogCtrl_1 = __webpack_require__(9);
+	var LoginDialogComponent = (function () {
+	    function LoginDialogComponent() {
+	        this.controller = LoginDialogCtrl_1.LoginDialogCtrl;
+	        this.templateUrl = 'Template/Security/LoginDialog';
+	        this.registerAs = 'loginDialog';
+	        this.bindings = {
+	            modalInstance: '<'
+	        };
+	    }
+	    return LoginDialogComponent;
+	}());
+	exports.LoginDialogComponent = LoginDialogComponent;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var LoginDialogCtrl = (function () {
+	    function LoginDialogCtrl(securityService) {
+	        this.securityService = securityService;
+	        this.fields = [
+	            {
+	                key: 'userName',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'User name',
+	                    required: true
+	                }
+	            },
+	            {
+	                key: 'password',
+	                type: 'input',
+	                templateOptions: {
+	                    type: 'password',
+	                    label: 'Password',
+	                    required: true
+	                }
+	            }
+	        ];
+	    }
+	    LoginDialogCtrl.prototype.login = function () {
+	        var _this = this;
+	        if (!this.form.$valid) {
+	            return;
+	        }
+	        this.securityService
+	            .logIn(this.model.userName, this.model.password)
+	            .then(function () {
+	            _this.modalInstance.close();
+	        }, function () {
+	            // TODO: create generic notification dialogs
+	            alert('error');
+	        });
+	    };
+	    LoginDialogCtrl.prototype.cancel = function () {
+	        this.modalInstance.dismiss();
+	    };
+	    return LoginDialogCtrl;
+	}());
+	LoginDialogCtrl.$inject = ['securityService'];
+	exports.LoginDialogCtrl = LoginDialogCtrl;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var ApplicationCtrl = (function () {
+	    function ApplicationCtrl(securityUiService) {
+	        this.securityUiService = securityUiService;
+	    }
+	    ApplicationCtrl.prototype.login = function () {
+	        this.securityUiService.showLoginDialog();
+	    };
+	    return ApplicationCtrl;
+	}());
+	ApplicationCtrl.$inject = ['securityUiService'];
+	exports.ApplicationCtrl = ApplicationCtrl;
 
 
 /***/ }

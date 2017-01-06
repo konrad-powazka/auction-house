@@ -347,6 +347,7 @@
     <Content Include="Scripts\underscore.min.map" />
     <Content Include="Views\Auctions\Create.cshtml" />
     <Content Include="Views\Shared\AngularFormlyErrorMessagesInputWrapper.cshtml" />
+    <Content Include="Views\Security\LoginDialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -415,9 +416,14 @@
     <TypeScriptCompile Include="Scripts\app\Infrastructure\INamedComponentOptions.ts" />
     <TypeScriptCompile Include="Scripts\app\QueryHandling\QueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\ReadModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\Security\SecurityService.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\ViewAuctionCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\LoginDialogComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\ApplicationCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\LoginDialogCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\SecurityUiService.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-formly\angular-formly.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />

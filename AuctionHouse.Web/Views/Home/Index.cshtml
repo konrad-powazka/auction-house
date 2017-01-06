@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @Styles.Render("~/Content/css")
 </head>
-<body>
+<body ng-controller="applicationCtrl as $ctrl">
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -16,11 +16,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            @Html.ActionLink("Application name", "Index", "Home", new {area = ""}, new {@class = "navbar-brand"})
+            @Html.ActionLink("Auction House", "Index", "Home", new {area = ""}, new {@class = "navbar-brand"})
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li>@Html.ActionLink("Home", "Index", "Home", new {area = ""}, null)</li>
+                <li>
+                    <a href ng-click="$ctrl.login()">Login</a>
+                </li>
+                <li>@Html.ActionLink("Create auction", "Index", "Home", new {area = ""}, null)</li>
                 <li>@Html.ActionLink("API", "Index", "Help", new {area = "HelpPage"}, null)</li>
             </ul>
         </div>
@@ -52,7 +55,7 @@
 
             $('#logoff-btn')
                 .click(function() {
-                    $.post('api/Authentication/LogOff');
+                    $.post('api/Authentication/LogOut');
                 });
         })
 </script>

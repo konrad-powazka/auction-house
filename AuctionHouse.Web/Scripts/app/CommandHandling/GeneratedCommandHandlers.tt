@@ -23,7 +23,7 @@ export class AngularCommandHandlersRegistry {
 	static commandHandlers: {[name: string]: ng.Injectable<Function>} = {
 			<# foreach(var commandType in AuctionHouse.DynamicTypeScanning.DynamicTypeScanner.GetCommandTypes())
 			{ #>
-				'<#= commandType.Name #>Handler': <#= commandType.Name #>Handler,
+				'<#= commandType.Name.First().ToString().ToLower() + commandType.Name.Substring(1) #>Handler': <#= commandType.Name #>Handler,
 			<# } #>
 		};
 	}

@@ -8,7 +8,7 @@ export class CreateAuctionCtrl implements ng.IController {
     model: CreateAuctionCommand;
     form: ng.IFormController;
 
-    static $inject = ['CreateAuctionCommandHandler'];
+    static $inject = ['createAuctionCommandHandler'];
 
     constructor(private createAuctionCommandHandler: ICommandHandler<CreateAuctionCommand>) {
         this.model = {
