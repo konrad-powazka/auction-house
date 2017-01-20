@@ -61,7 +61,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements Handl
                         };
 
                         deferred.promise.finally(removeCallbacks);
-                        const commandHandlingTimeoutMilliseconds = 4 * 1000;
+                        const commandHandlingTimeoutMilliseconds = 15 * 1000;
 
                         this.timeoutService(commandHandlingTimeoutMilliseconds)
                             .then(() => {

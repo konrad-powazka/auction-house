@@ -5,10 +5,12 @@ using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using AuctionHouse.Application;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.QueryHandling;
 using AuctionHouse.Web.CodeGen;
 using AuctionHouse.Web.Cqrs;
+using AuctionHouse.Web.Cqrs.Queries;
 using Autofac;
 using Autofac.Integration.WebApi;
 using EventStore.ClientAPI;
@@ -55,6 +57,12 @@ namespace AuctionHouse.Web
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
                 .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces();
 
+            builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
+                .AsClosedTypesOf(typeof(IResultChangedNotifyingQueryHandler<,>)).AsImplementedInterfaces();
+
+            builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
+                .As<IEventSourcedBuilder>();
+
             var nServiceBusEndpoint = CreateNServiceBusEndpoint();
 
             builder.RegisterInstance(nServiceBusEndpoint)
@@ -64,8 +72,10 @@ namespace AuctionHouse.Web
 
             builder.RegisterType<NServiceBusCommandQueue>().As<ICommandQueue>().SingleInstance();
             RegisterEventStoreConnection(builder);
+            builder.RegisterType<EventStoreSubscriber>().AsSelf().SingleInstance();
             var container = builder.Build();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            container.Resolve<EventStoreSubscriber>().Start();
         }
 
         private static IEndpointInstance CreateNServiceBusEndpoint()
@@ -91,8 +101,10 @@ namespace AuctionHouse.Web
                 //TODO: Read from config
                 const int defaultPort = 1113;
                 var settings = ConnectionSettings.Create();
+                settings.KeepReconnecting();
                 var endpoint = new IPEndPoint(IPAddress.Loopback, defaultPort);
                 var connection = EventStoreConnection.Create(settings, endpoint);
+                connection.ConnectAsync().Wait();
 
                 return connection;
             }).As<IEventStoreConnection>();

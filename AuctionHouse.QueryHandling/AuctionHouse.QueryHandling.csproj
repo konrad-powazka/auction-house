@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="Auctions\GetAuctionDetailsQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueriesAssemblyMarker.cs" />
+    <Compile Include="QueryHandlingAssemblyMarker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

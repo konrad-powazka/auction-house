@@ -240,12 +240,17 @@
     <Compile Include="Cqrs\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="CodeGen\CqrsControllerTypesGenerator.cs" />
     <Compile Include="Cqrs\ICommandQueue.cs" />
+    <Compile Include="Cqrs\Queries\EventStoreSubscriber.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Cqrs\NServiceBusCommandQueue.cs" />
     <Compile Include="Hubs\CommandHandlingFeedbackHub.cs" />
+    <Compile Include="Hubs\QueryResultChangeNotificationHub.cs" />
+    <Compile Include="Hubs\QueryResultChangeNotificationHubClient.cs" />
     <Compile Include="Models\LoginCommand.cs" />
+    <Compile Include="Models\NotifyOnQueryResultChangedResponse.cs" />
+    <Compile Include="Models\NotifyOnQueryResultChangedCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
@@ -403,9 +408,15 @@
       <DependentUpon>GeneratedCommandHandlers.tt</DependentUpon>
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\app\CommandHandling\ICommandHandler.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\IPushNotificationsService.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\IQueryResultChangeNotificationHubServer.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\NotifyOnQueryResultChangedResponse.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsService.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsSubscription.ts" />
     <TypeScriptCompile Include="Scripts\app\Messages\Commands.ts" />
     <TypeScriptCompile Include="Scripts\app\Messages\ICommand.ts" />
     <TypeScriptCompile Include="Scripts\app\Messages\Queries.ts" />
+    <TypeScriptCompile Include="Scripts\app\QueryHandling\QueryResultChangedSubscriptionErrorType.ts" />
     <TypeScriptCompile Include="Scripts\app\QueryHandling\GeneratedQueryHandlers.ts">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -414,6 +425,7 @@
     <TypeScriptCompile Include="Scripts\app\Application.ts" />
     <TypeScriptCompile Include="Scripts\app\CommandHandling\CommandHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\INamedComponentOptions.ts" />
+    <TypeScriptCompile Include="Scripts\app\QueryHandling\IQueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\QueryHandling\QueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\ReadModel.ts" />
     <TypeScriptCompile Include="Scripts\app\Security\SecurityService.ts" />

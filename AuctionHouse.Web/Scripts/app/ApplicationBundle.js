@@ -355,7 +355,7 @@
 	                    CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
 	                };
 	                deferred.promise.finally(removeCallbacks);
-	                var commandHandlingTimeoutMilliseconds = 4 * 1000;
+	                var commandHandlingTimeoutMilliseconds = 15 * 1000;
 	                _this.timeoutService(commandHandlingTimeoutMilliseconds)
 	                    .then(function () {
 	                    if (!wasPromiseResolvedOrRejected) {

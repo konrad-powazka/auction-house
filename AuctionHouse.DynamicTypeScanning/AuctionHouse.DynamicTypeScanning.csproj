@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeGenTypes.cs" />
+    <Compile Include="DynamicTypeScanner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryTypeInfo.cs" />
   </ItemGroup>

@@ -8,15 +8,11 @@ namespace AuctionHouse.Web
     {
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+            bundles.Add(new ScriptBundle("~/bundles/libs").Include(
                 "~/Scripts/jquery-{version}.js",
-                "~/Scripts/jquery.signalR-2.2.1.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
+                "~/Scripts/jquery.signalR-2.2.1.js",
                 "~/Scripts/bootstrap.js",
-                "~/Scripts/respond.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/angular").Include(
+                "~/Scripts/respond.js",
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-messages.js",
                 "~/Scripts/angular-animate.js",
@@ -26,9 +22,9 @@ namespace AuctionHouse.Web
                 "~/Scripts/formly.js",
                 "~/Scripts/angular-formly-templates-bootstrap.js",
                 "~/node_modules/moment/moment.js",
-                "~/Scripts/datetimepicker-fixed.js")); 
+                "~/Scripts/datetimepicker-fixed.js"));
 
-              bundles.Add(new StyleBundle("~/Content/css").Include(
+            bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap.css",
                 "~/node_modules/angular-ui-bootstrap-datetimepicker/datetimepicker.css",
                 "~/Content/Site.css"));
