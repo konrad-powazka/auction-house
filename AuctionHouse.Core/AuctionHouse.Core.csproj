@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventSourcing\IEventSourcedBuilder.cs" />
+    <Compile Include="EventSourcing\IEventSourcedEntity.cs" />
     <Compile Include="Messaging\ICommand.cs" />
     <Compile Include="Messaging\ICommandHandler.cs" />
     <Compile Include="Messaging\IEvent.cs" />

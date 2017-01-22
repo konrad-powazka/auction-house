@@ -2,8 +2,8 @@
 
 namespace AuctionHouse.Core.EventSourcing
 {
-    public interface IEventSourcedBuilder
+    public interface IEventSourcedEntity
     {
-        void Apply(IEvent @event, bool isLiveEvent);
+        void Apply(IEvent @event);
     }
 }

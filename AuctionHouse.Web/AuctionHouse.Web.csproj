@@ -240,7 +240,9 @@
     <Compile Include="Cqrs\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="CodeGen\CqrsControllerTypesGenerator.cs" />
     <Compile Include="Cqrs\ICommandQueue.cs" />
-    <Compile Include="Cqrs\Queries\EventStoreSubscriber.cs" />
+    <Compile Include="Cqrs\Queries\EventAppliedEventArgs.cs" />
+    <Compile Include="Cqrs\Queries\ContinuousEventSourcedEntitiesBuilder.cs" />
+    <Compile Include="Cqrs\Queries\IContinuousEventSourcedEntitiesBuilder.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -387,6 +389,10 @@
     <ProjectReference Include="..\AuctionHouse.Messages.Queries\AuctionHouse.Messages.Queries.csproj">
       <Project>{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}</Project>
       <Name>AuctionHouse.Messages.Queries</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Persistence\AuctionHouse.Persistence.csproj">
+      <Project>{7F543D2A-0A24-4C6E-8C7E-105240D83F6C}</Project>
+      <Name>AuctionHouse.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.QueryHandling\AuctionHouse.QueryHandling.csproj">
       <Project>{CBBB46C1-B084-4F27-AD81-85E42F98FBA6}</Project>

@@ -23,11 +23,8 @@ namespace AuctionHouse.Persistence
 
         public async Task Create(TAggregateRoot aggregateRoot)
         {
-            var eventEnvelopes = aggregateRoot.Changes.Select(e => new MessageEnvelope<IEvent>
-            {
-                Message = e,
-                MessageId = Guid.NewGuid() //TODO: Event GUIDs should be deterministic
-            });
+            //TODO: Event GUIDs should be deterministic
+            var eventEnvelopes = aggregateRoot.Changes.Select(e => new MessageEnvelope<IEvent>(Guid.NewGuid(), e));
 
             await
                 _eventsDatabase.AppendToStream(GetAggregateRootStreamName(aggregateRoot),

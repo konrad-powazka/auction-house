@@ -12,7 +12,7 @@ export abstract class QueryHandler<TQuery, TResult> implements IQueryHandler<TQu
 
     handle(query: TQuery): ng.IPromise<TResult> {
         const url = `api/${this.getQueryName()}/Handle`;
-        return this.httpService.get<TResult>(url, { params: query });
+        return this.httpService.get<TResult>(url, { params: query }).then(response => response.data);
     }
 
     // TODO: add timeout

@@ -42,7 +42,7 @@ namespace AuctionHouse.Web.Hubs
                 queryType.GetInterfaces()
                     .Single(
                         i =>
-                            i.GetGenericTypeDefinition() == typeof(IResultChangedNotifyingQueryHandler<,>) &&
+                            i.GetGenericTypeDefinition() == typeof(IEventAppliedNotifyingQueryHandler<,>) &&
                             i.GetGenericArguments().Any() && i.GetGenericArguments().First() == queryType)
                     .GetGenericArguments()
                     .First();
@@ -59,7 +59,7 @@ namespace AuctionHouse.Web.Hubs
             where TQuery : IQuery<TQueryResult>
         {
             var resultChangedNotifyingQueryHandler =
-                _componentContext.Resolve<IResultChangedNotifyingQueryHandler<TQuery, TQueryResult>>();
+                _componentContext.Resolve<IEventAppliedNotifyingQueryHandler<TQuery, TQueryResult>>();
 
             var connectionId = Context.ConnectionId;
             var subscriptionId = Guid.NewGuid();

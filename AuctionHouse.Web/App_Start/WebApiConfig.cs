@@ -7,6 +7,7 @@ using System.Web.Http.Dispatcher;
 using AuctionHouse.Application;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
+using AuctionHouse.Persistence;
 using AuctionHouse.QueryHandling;
 using AuctionHouse.Web.CodeGen;
 using AuctionHouse.Web.Cqrs;
@@ -58,10 +59,10 @@ namespace AuctionHouse.Web
                 .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces();
 
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
-                .AsClosedTypesOf(typeof(IResultChangedNotifyingQueryHandler<,>)).AsImplementedInterfaces();
+                .AsClosedTypesOf(typeof(IEventAppliedNotifyingQueryHandler<,>)).AsImplementedInterfaces();
 
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
-                .As<IEventSourcedBuilder>();
+                .As<IEventSourcedEntity>();
 
             var nServiceBusEndpoint = CreateNServiceBusEndpoint();
 
@@ -72,10 +73,16 @@ namespace AuctionHouse.Web
 
             builder.RegisterType<NServiceBusCommandQueue>().As<ICommandQueue>().SingleInstance();
             RegisterEventStoreConnection(builder);
-            builder.RegisterType<EventStoreSubscriber>().AsSelf().SingleInstance();
+
+            builder.RegisterType<EventStoreEventsDatabase>().As<IEventsDatabase>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ContinuousEventSourcedEntitiesBuilder>()
+                .As<IContinuousEventSourcedEntitiesBuilder>()
+                .SingleInstance();
+
             var container = builder.Build();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-            container.Resolve<EventStoreSubscriber>().Start();
+            container.Resolve<IContinuousEventSourcedEntitiesBuilder>().Start();
         }
 
         private static IEndpointInstance CreateNServiceBusEndpoint()

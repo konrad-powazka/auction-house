@@ -660,7 +660,7 @@
 	    }
 	    QueryHandler.prototype.handle = function (query) {
 	        var url = "api/" + this.getQueryName() + "/Handle";
-	        return this.httpService.get(url, { params: query });
+	        return this.httpService.get(url, { params: query }).then(function (response) { return response.data; });
 	    };
 	    // TODO: add timeout
 	    QueryHandler.prototype.notifyOnceOnResultChanged = function (query) {

@@ -31,5 +31,11 @@ namespace AuctionHouse.ServiceBus
             await _eventsDatabase.AppendToStream(streamName, expectedStreamVersion, eventEnvelopesToAppend);
             _writtenEventEnvelopes.AddRange(eventEnvelopesToAppend);
         }
+
+        public Task<IDisposable> ReadAllExistingEventsAndSubscribe(
+            Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback)
+        {
+            return _eventsDatabase.ReadAllExistingEventsAndSubscribe(handleEventEnvelopeCallback);
+        }
     }
 }

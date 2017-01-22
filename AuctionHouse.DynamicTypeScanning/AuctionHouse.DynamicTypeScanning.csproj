@@ -53,6 +53,10 @@
       <Project>{3FB528A3-F733-415D-8E46-49B846F8D27C}</Project>
       <Name>AuctionHouse.Messages.Commands</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Messages.Events\AuctionHouse.Messages.Events.csproj">
+      <Project>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</Project>
+      <Name>AuctionHouse.Messages.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Messages.Queries\AuctionHouse.Messages.Queries.csproj">
       <Project>{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}</Project>
       <Name>AuctionHouse.Messages.Queries</Name>

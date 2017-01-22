@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using AuctionHouse.Core.Messaging;
+using AuctionHouse.DynamicTypeScanning;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
 
@@ -18,7 +20,8 @@ namespace AuctionHouse.Persistence
             _eventStoreConnection = eventStoreConnection;
         }
 
-        public async Task AppendToStream(string streamName, int? expectedStreamVersion, IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend)
+        public async Task AppendToStream(string streamName, int? expectedStreamVersion,
+            IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend)
         {
             if (eventEnvelopesToAppend == null)
             {
@@ -38,12 +41,42 @@ namespace AuctionHouse.Persistence
                     eventDataList);
         }
 
+        public async Task<IDisposable> ReadAllExistingEventsAndSubscribe(
+            Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback)
+        {
+            if (handleEventEnvelopeCallback == null)
+            {
+                throw new ArgumentNullException(nameof(handleEventEnvelopeCallback));
+            }
+
+            var subscription = _eventStoreConnection.SubscribeToAllFrom(Position.Start, CatchUpSubscriptionSettings.Default,
+                (s, e) =>
+                {
+                    var eventType =
+                        DynamicTypeScanner.GetEventTypes().Single(t => t.Name == e.Event.EventType);
+
+                    var @event = DeserializeEvent(e.Event.Data, eventType);
+                    var eventEnvelope = new MessageEnvelope<IEvent>(e.Event.EventId, @event);
+                    handleEventEnvelopeCallback(eventEnvelope);
+                });
+
+            return Disposable.Create(() => subscription.Stop());
+        }
+
         private static byte[] SerializeEvent(IEvent eventToSerialize)
         {
             var textSerializedEvent = JsonConvert.SerializeObject(eventToSerialize);
             var binarySerializedEvent = Encoding.UTF8.GetBytes(textSerializedEvent);
 
             return binarySerializedEvent;
+        }
+
+        private static IEvent DeserializeEvent(byte[] eventBytes, Type eventType)
+        {
+            var textSerializedEvent = Encoding.UTF8.GetString(eventBytes);
+            var @event = (IEvent)JsonConvert.DeserializeObject(textSerializedEvent, eventType);
+
+            return @event;
         }
     }
 }

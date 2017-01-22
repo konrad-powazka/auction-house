@@ -4,6 +4,7 @@ using System.Linq;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Reflection;
 using AuctionHouse.Messages.Commands;
+using AuctionHouse.Messages.Events;
 using AuctionHouse.Messages.Queries;
 using AuctionHouse.ReadModel;
 
@@ -37,6 +38,13 @@ namespace AuctionHouse.DynamicTypeScanning
                         .Where(t => t.Name.EndsWith("ReadModel") && t.CanBeInstantiated())
                         .ToList());
 
+        private static readonly Lazy<IReadOnlyCollection<Type>> GetEventTypesLazy =
+            new Lazy<IReadOnlyCollection<Type>>(
+                () =>
+                    typeof(EventsAssemblyMarker).Assembly.GetTypes()
+                        .Where(t => typeof(IEvent).IsAssignableFrom(t) && t.CanBeInstantiated())
+                        .ToList());
+
         public static IReadOnlyCollection<Type> GetCommandTypes() => GetCommandTypesLazy.Value;
         public static IReadOnlyCollection<QueryTypeInfo> GetQueryTypeInfos() => QueryTypeInfosLazy.Value;
 
@@ -44,5 +52,7 @@ namespace AuctionHouse.DynamicTypeScanning
             => QueryTypeInfosLazy.Value.Select(t => t.QueryType).ToList();
 
         public static IReadOnlyCollection<Type> GetReadModelTypes() => GetReadModelTypesLazy.Value;
+
+        public static IReadOnlyCollection<Type> GetEventTypes() => GetEventTypesLazy.Value;
     }
 }

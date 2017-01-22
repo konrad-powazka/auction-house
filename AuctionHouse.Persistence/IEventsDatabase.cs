@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AuctionHouse.Core.Messaging;
 
@@ -8,5 +9,7 @@ namespace AuctionHouse.Persistence
     {
         Task AppendToStream(string streamName, int? expectedStreamVersion,
             IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend);
+
+        Task<IDisposable> ReadAllExistingEventsAndSubscribe(Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback);
     }
 }
