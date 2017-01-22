@@ -2,15 +2,20 @@
 import { CreateAuctionCommandHandler } from '../../CommandHandling/GeneratedCommandHandlers';
 import { ICommandHandler } from '../../CommandHandling/ICommandHandler';
 import { CommandHandlingErrorType } from '../../CommandHandling/CommandHandlingErrorType';
+import {IQueryHandler as QueryHandler} from '../../QueryHandling/IQueryHandler';
+import {GetAuctionDetailsQuery as AuctionDetailsQuery} from '../../Messages/Queries';
+import {AuctionDetailsReadModel} from '../../ReadModel';
 
 export class CreateAuctionCtrl implements ng.IController {
     fields: AngularFormly.IFieldArray;
     model: CreateAuctionCommand;
     form: ng.IFormController;
 
-    static $inject = ['createAuctionCommandHandler'];
+    static $inject = ['createAuctionCommandHandler', 'getAuctionDetailsQueryHandler', '$state'];
 
-    constructor(private createAuctionCommandHandler: ICommandHandler<CreateAuctionCommand>) {
+    constructor(private createAuctionCommandHandler: ICommandHandler<CreateAuctionCommand>,
+        private getAuctionDetailsQueryHandler: QueryHandler<AuctionDetailsQuery, AuctionDetailsReadModel>,
+        private stateService: ng.ui.IStateService) {
         this.model = {
             id: this.guid(),
             title: '',
@@ -19,8 +24,7 @@ export class CreateAuctionCtrl implements ng.IController {
             startingPrice: 5,
             buyNowPrice: 10,
             endDate: undefined as any
-        }
-
+        };
         this.fields = [
             {
                 key: 'title',
@@ -60,7 +64,10 @@ export class CreateAuctionCtrl implements ng.IController {
 
         this.createAuctionCommandHandler
             .handle(this.model)
-            .then(() => alert('Success'))
+            .then(() => {
+                alert('Success');
+                this.stateService.go('displayAuction', { auctionId: this.model.auctionId });
+            })
             .catch((commandHandlingErrorType: CommandHandlingErrorType) =>
                 alert(`Command processing error: ${CommandHandlingErrorType[commandHandlingErrorType]}`));
     }
@@ -85,4 +92,4 @@ export class CreateAuctionCtrl implements ng.IController {
             s4() +
             s4();
     }
-}//
+} //

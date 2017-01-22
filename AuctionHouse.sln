@@ -33,8 +33,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.DynamicTypeSca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Web.TypeScriptCodeGen", "AuctionHouse.Web.TypeScriptCodeGen\AuctionHouse.Web.TypeScriptCodeGen.csproj", "{E832CB05-F712-4813-A452-8095B4206FD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.QueryHandlingNode", "AuctionHouse.QueryHandlingNode\AuctionHouse.QueryHandlingNode.csproj", "{950BFCF7-8B61-4AE3-8FA8-718EAAFFB32C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,10 +95,6 @@ Global
 		{E832CB05-F712-4813-A452-8095B4206FD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E832CB05-F712-4813-A452-8095B4206FD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E832CB05-F712-4813-A452-8095B4206FD6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{950BFCF7-8B61-4AE3-8FA8-718EAAFFB32C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{950BFCF7-8B61-4AE3-8FA8-718EAAFFB32C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{950BFCF7-8B61-4AE3-8FA8-718EAAFFB32C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{950BFCF7-8B61-4AE3-8FA8-718EAAFFB32C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -353,6 +353,7 @@
     <Content Include="Views\Auctions\Create.cshtml" />
     <Content Include="Views\Shared\AngularFormlyErrorMessagesInputWrapper.cshtml" />
     <Content Include="Views\Security\LoginDialog.cshtml" />
+    <Content Include="Views\Auctions\Display.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -428,7 +429,10 @@
     <TypeScriptCompile Include="Scripts\app\QueryHandling\IQueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\QueryHandling\QueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\ReadModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\Routing.ts" />
     <TypeScriptCompile Include="Scripts\app\Security\SecurityService.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Auctions\DisplayAuctionCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Auctions\DisplayAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\ViewAuctionCtrl.ts" />

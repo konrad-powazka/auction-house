@@ -51,6 +51,9 @@
 	var SecurityUiService_1 = __webpack_require__(7);
 	var LoginDialogComponent_1 = __webpack_require__(8);
 	var ApplicationCtrl_1 = __webpack_require__(10);
+	var Routing_1 = __webpack_require__(11);
+	var GeneratedQueryHandlers_1 = __webpack_require__(12);
+	var DisplayAuctionComponent_1 = __webpack_require__(15);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -73,29 +76,16 @@
 	    ;
 	    Application.registerSerivces = function (module) {
 	        module.service(GeneratedCommandHandlers_1.AngularCommandHandlersRegistry.commandHandlers);
+	        module.service(GeneratedQueryHandlers_1.AngularQueryHandlersRegistry.queryHandlers);
 	        module.service('securityService', SecurityService_1.SecurityService);
 	        module.service('securityUiService', SecurityUiService_1.SecurityUiService);
 	    };
 	    Application.configureModule = function ($stateProvider) {
-	        Application.configureRouting($stateProvider);
+	        Routing_1.Routing.configure($stateProvider);
 	    };
 	    Application.runModule = function (formlyConfig, formlyValidationMessages) {
 	        Application.configureFormly(formlyConfig, formlyValidationMessages);
 	    };
-	    Application.configureRouting = function ($stateProvider) {
-	        var states = [
-	            {
-	                name: 'createAuction',
-	                url: '/auction/create',
-	                component: 'createAuction'
-	            }
-	        ];
-	        for (var _i = 0, states_1 = states; _i < states_1.length; _i++) {
-	            var state = states_1[_i];
-	            $stateProvider.state(state);
-	        }
-	    };
-	    ;
 	    // Reference at http://angular-formly.com/#/example/other/error-summary
 	    Application.configureFormly = function (formlyConfig, formlyValidationMessages) {
 	        formlyConfig.setType({
@@ -126,6 +116,7 @@
 	}());
 	Application.components = [
 	    new CreateAuctionComponent_1.CreateAuctionComponent(),
+	    new DisplayAuctionComponent_1.DisplayAuctionComponent(),
 	    new LoginDialogComponent_1.LoginDialogComponent()
 	];
 	exports.Application = Application;
@@ -156,8 +147,10 @@
 	"use strict";
 	var CommandHandlingErrorType_1 = __webpack_require__(3);
 	var CreateAuctionCtrl = (function () {
-	    function CreateAuctionCtrl(createAuctionCommandHandler) {
+	    function CreateAuctionCtrl(createAuctionCommandHandler, getAuctionDetailsQueryHandler, stateService) {
 	        this.createAuctionCommandHandler = createAuctionCommandHandler;
+	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
+	        this.stateService = stateService;
 	        this.model = {
 	            id: this.guid(),
 	            title: '',
@@ -199,12 +192,16 @@
 	        ];
 	    }
 	    CreateAuctionCtrl.prototype.submit = function () {
+	        var _this = this;
 	        if (!this.form.$valid) {
 	            return;
 	        }
 	        this.createAuctionCommandHandler
 	            .handle(this.model)
-	            .then(function () { return alert('Success'); })
+	            .then(function () {
+	            alert('Success');
+	            _this.stateService.go('displayAuction', { auctionId: _this.model.auctionId });
+	        })
 	            .catch(function (commandHandlingErrorType) {
 	            return alert("Command processing error: " + CommandHandlingErrorType_1.CommandHandlingErrorType[commandHandlingErrorType]);
 	        });
@@ -230,7 +227,7 @@
 	    };
 	    return CreateAuctionCtrl;
 	}()); //
-	CreateAuctionCtrl.$inject = ['createAuctionCommandHandler'];
+	CreateAuctionCtrl.$inject = ['createAuctionCommandHandler', 'getAuctionDetailsQueryHandler', '$state'];
 	exports.CreateAuctionCtrl = CreateAuctionCtrl;
 
 
@@ -566,6 +563,171 @@
 	}());
 	ApplicationCtrl.$inject = ['securityUiService'];
 	exports.ApplicationCtrl = ApplicationCtrl;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var Routing = (function () {
+	    function Routing() {
+	    }
+	    Routing.configure = function ($stateProvider) {
+	        var states = [
+	            {
+	                name: 'createAuction',
+	                url: '/auction/create',
+	                component: 'createAuction'
+	            },
+	            {
+	                name: 'displayAuction',
+	                url: '/auction/{auctionId}',
+	                component: 'displayAuction',
+	                resolve: {
+	                    auctionId: function ($stateParams) {
+	                        return $stateParams.auctionId;
+	                    }
+	                }
+	            }
+	        ];
+	        for (var _i = 0, states_1 = states; _i < states_1.length; _i++) {
+	            var state = states_1[_i];
+	            $stateProvider.state(state);
+	        }
+	    };
+	    return Routing;
+	}());
+	exports.Routing = Routing;
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var QueryHandler_1 = __webpack_require__(13);
+	var GetAuctionDetailsQueryHandler = (function (_super) {
+	    __extends(GetAuctionDetailsQueryHandler, _super);
+	    function GetAuctionDetailsQueryHandler() {
+	        return _super.apply(this, arguments) || this;
+	    }
+	    GetAuctionDetailsQueryHandler.prototype.getQueryName = function () {
+	        return 'GetAuctionDetailsQuery';
+	    };
+	    return GetAuctionDetailsQueryHandler;
+	}(QueryHandler_1.QueryHandler));
+	exports.GetAuctionDetailsQueryHandler = GetAuctionDetailsQueryHandler;
+	var GetAuctionListQueryHandler = (function (_super) {
+	    __extends(GetAuctionListQueryHandler, _super);
+	    function GetAuctionListQueryHandler() {
+	        return _super.apply(this, arguments) || this;
+	    }
+	    GetAuctionListQueryHandler.prototype.getQueryName = function () {
+	        return 'GetAuctionListQuery';
+	    };
+	    return GetAuctionListQueryHandler;
+	}(QueryHandler_1.QueryHandler));
+	exports.GetAuctionListQueryHandler = GetAuctionListQueryHandler;
+	var AngularQueryHandlersRegistry = (function () {
+	    function AngularQueryHandlersRegistry() {
+	    }
+	    return AngularQueryHandlersRegistry;
+	}());
+	AngularQueryHandlersRegistry.queryHandlers = {
+	    'getAuctionDetailsQueryHandler': GetAuctionDetailsQueryHandler,
+	    'getAuctionListQueryHandler': GetAuctionListQueryHandler,
+	};
+	exports.AngularQueryHandlersRegistry = AngularQueryHandlersRegistry;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var QueryResultChangedSubscriptionErrorType_1 = __webpack_require__(14);
+	var QueryHandler = (function () {
+	    function QueryHandler(httpService, qService, pushNotificationsService) {
+	        this.httpService = httpService;
+	        this.qService = qService;
+	        this.pushNotificationsService = pushNotificationsService;
+	    }
+	    QueryHandler.prototype.handle = function (query) {
+	        var url = "api/" + this.getQueryName() + "/Handle";
+	        return this.httpService.get(url, { params: query });
+	    };
+	    // TODO: add timeout
+	    QueryHandler.prototype.notifyOnceOnResultChanged = function (query) {
+	        var deferred = this.qService.defer();
+	        var subscription = this.pushNotificationsService.notifyOnQueryResultChanged(query, this.getQueryName(), function (result) {
+	            subscription.cancel();
+	            deferred.resolve(result);
+	        });
+	        subscription.activatedPromise.catch(function () { return deferred
+	            .reject(QueryResultChangedSubscriptionErrorType_1.QueryResultChangedSubscriptionErrorType.FailedToConnectToServer); });
+	        return deferred.promise;
+	    };
+	    return QueryHandler;
+	}());
+	QueryHandler.$inject = ['$http', '$q'];
+	exports.QueryHandler = QueryHandler;
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var QueryResultChangedSubscriptionErrorType;
+	(function (QueryResultChangedSubscriptionErrorType) {
+	    QueryResultChangedSubscriptionErrorType[QueryResultChangedSubscriptionErrorType["FailedToConnectToServer"] = 0] = "FailedToConnectToServer";
+	    QueryResultChangedSubscriptionErrorType[QueryResultChangedSubscriptionErrorType["ResultChangeAwaitingTimeout"] = 1] = "ResultChangeAwaitingTimeout";
+	})(QueryResultChangedSubscriptionErrorType = exports.QueryResultChangedSubscriptionErrorType || (exports.QueryResultChangedSubscriptionErrorType = {}));
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var DisplayAuctionCtrl_1 = __webpack_require__(16);
+	var DisplayAuctionComponent = (function () {
+	    function DisplayAuctionComponent() {
+	        this.controller = DisplayAuctionCtrl_1.DisplayAuctionCtrl;
+	        this.templateUrl = 'Template/Auctions/Display';
+	        this.registerAs = 'displayAuction';
+	        this.bindings = {
+	            auctionId: '<'
+	        };
+	    }
+	    return DisplayAuctionComponent;
+	}());
+	exports.DisplayAuctionComponent = DisplayAuctionComponent;
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var DisplayAuctionCtrl = (function () {
+	    function DisplayAuctionCtrl(getAuctionDetailsQueryHandler) {
+	        var _this = this;
+	        getAuctionDetailsQueryHandler.handle({
+	            id: this.auctionId
+	        })
+	            .then(function (auction) { return _this.auction = auction; });
+	    }
+	    return DisplayAuctionCtrl;
+	}());
+	DisplayAuctionCtrl.$inject = ['getAuctionDetailsQueryHandler'];
+	exports.DisplayAuctionCtrl = DisplayAuctionCtrl;
 
 
 /***/ }

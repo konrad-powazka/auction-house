@@ -1,13 +1,22 @@
 ﻿
-namespace AuctionHouse.QueryHandling {
-	//export class GetAuctionDetailsQueryHandler extends QueryHandler<AuctionHouse.Messages.Queries.Auctions.GetAuctionDetailsQuery, AuctionHouse.ReadModel.Auctions.Details.AuctionDetailsReadModel> {
-		//protected getQueryName(): string {
-		//	return 'GetAuctionDetailsQuery';
-		//}
-	//}
-	//export class GetAuctionListQueryHandler extends QueryHandler<AuctionHouse.Messages.Queries.Auctions.GetAuctionListQuery, AuctionHouse.ReadModel.Auctions.List.AuctionListReadModel> {
-		//protected getQueryName(): string {
-		//	return 'GetAuctionListQuery';
-		//}
-	//}
+import { QueryHandler } from './QueryHandler';
+import * as Queries from '../Messages/Queries';
+import * as ReadModel from '../ReadModel';
+
+export class GetAuctionDetailsQueryHandler extends QueryHandler<Queries.GetAuctionDetailsQuery, ReadModel.AuctionDetailsReadModel> {
+	protected getQueryName(): string {
+		return 'GetAuctionDetailsQuery';
+	}
 }
+export class GetAuctionListQueryHandler extends QueryHandler<Queries.GetAuctionListQuery, ReadModel.AuctionListReadModel> {
+	protected getQueryName(): string {
+		return 'GetAuctionListQuery';
+	}
+}
+
+export class AngularQueryHandlersRegistry {
+	static queryHandlers: {[name: string]: ng.Injectable<Function>} = {
+							'getAuctionDetailsQueryHandler': GetAuctionDetailsQueryHandler,
+							'getAuctionListQueryHandler': GetAuctionListQueryHandler,
+					};
+	}

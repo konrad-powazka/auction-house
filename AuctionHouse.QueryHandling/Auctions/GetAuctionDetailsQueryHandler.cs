@@ -24,7 +24,6 @@ namespace AuctionHouse.QueryHandling.Auctions
 
         public async Task<AuctionDetailsReadModel> Handle(GetAuctionDetailsQuery query)
         {
-            await _eventStoreConnection.ConnectAsync(); // TODO: connect before injecting
             var streamId = $"Auction-{query.Id}"; //TODO: To common code
             var auctionDetails = new AuctionDetailsReadModel();
             await ReadEventStream(streamId, @event =>
@@ -32,7 +31,7 @@ namespace AuctionHouse.QueryHandling.Auctions
                 if (@event is AuctionCreatedEvent)
                 {
                     var auctionCreatedEvent = (AuctionCreatedEvent) @event;
-                    auctionDetails.Id = auctionCreatedEvent.Id;
+                    auctionDetails.Id = auctionCreatedEvent.AuctionId;
                     auctionDetails.Title = auctionCreatedEvent.Title;
                     auctionDetails.Description = auctionCreatedEvent.Description;
                 }
