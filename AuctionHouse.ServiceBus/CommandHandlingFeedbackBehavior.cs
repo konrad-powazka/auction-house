@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Messages.Events.Technical;
 using NServiceBus;
@@ -39,7 +40,13 @@ namespace AuctionHouse.ServiceBus
 
             if (wasMessageHandledSuccessfully)
             {
-                commandHandlingFeedbackEvent = new CommandHandlingSucceededEvent();
+                var trackingEventsDatabase = context.Builder.Build<ITrackingEventsDatabase>();
+                var publishedEventIds = trackingEventsDatabase.WrittenEventEnvelopes.Select(e => e.MessageId).ToList();
+
+                commandHandlingFeedbackEvent = new CommandHandlingSucceededEvent()
+                {
+                    PublishedEventIds = publishedEventIds
+                };
             }
             else
             {

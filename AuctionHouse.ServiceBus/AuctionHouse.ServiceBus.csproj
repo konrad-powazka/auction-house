@@ -59,9 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandHandlingFeedbackBehavior.cs" />
+    <Compile Include="ITrackingEventsDatabase.cs" />
     <Compile Include="NServiceBusCommandMessageHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrackingEventsDatabase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Domain;
-using EventStore.ClientAPI;
-using Newtonsoft.Json;
 
 namespace AuctionHouse.Persistence
 {
     public class EventStoreRepository<TAggregateRoot> : IRepository<TAggregateRoot>
         where TAggregateRoot : AggregateRoot, new()
     {
-        private readonly IEventStoreConnection _eventStoreConnection;
+        private readonly IEventsDatabase _eventsDatabase;
 
-        public EventStoreRepository(IEventStoreConnection eventStoreConnection)
+        public EventStoreRepository(IEventsDatabase eventsDatabase)
         {
-            _eventStoreConnection = eventStoreConnection;
+            _eventsDatabase = eventsDatabase;
         }
 
         public async Task Save(TAggregateRoot aggregateRoot, int previousAggregateRootVersion)
@@ -26,20 +23,15 @@ namespace AuctionHouse.Persistence
 
         public async Task Create(TAggregateRoot aggregateRoot)
         {
-            // TODO: connect before injecting
-            await _eventStoreConnection.ConnectAsync();
-
-            var eventDataList =
-                aggregateRoot.Changes.Select(e =>
-                {
-                    var eventId = Guid.NewGuid(); //TODO: Event GUIDs should be deterministic
-                    var serializedEvent = SerializeEvent(e);
-                    return new EventData(eventId, e.GetType().Name, true, serializedEvent, null);
-                });
+            var eventEnvelopes = aggregateRoot.Changes.Select(e => new MessageEnvelope<IEvent>
+            {
+                Message = e,
+                MessageId = Guid.NewGuid() //TODO: Event GUIDs should be deterministic
+            });
 
             await
-                _eventStoreConnection.AppendToStreamAsync(GetAggregateRootStreamName(aggregateRoot),
-                    ExpectedVersion.EmptyStream, eventDataList);
+                _eventsDatabase.AppendToStream(GetAggregateRootStreamName(aggregateRoot),
+                    null, eventEnvelopes);
         }
 
         public async Task<TAggregateRoot> Get(Guid aggregateRootId)
@@ -54,14 +46,6 @@ namespace AuctionHouse.Persistence
         private string GetAggregateRootStreamName(TAggregateRoot aggregateRoot)
         {
             return $"{aggregateRoot.GetType().Name}-{aggregateRoot.Id}";
-        }
-
-        private static byte[] SerializeEvent(IEvent eventToSerialize)
-        {
-            var textSerializedEvent = JsonConvert.SerializeObject(eventToSerialize);
-            var binarySerializedEvent = Encoding.UTF8.GetBytes(textSerializedEvent);
-
-            return binarySerializedEvent;
         }
     }
 }

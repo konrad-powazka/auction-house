@@ -41,7 +41,22 @@ namespace AuctionHouse.ServiceBus
                 .AsClosedTypesOf(typeof(ICommandHandler<>)).AsImplementedInterfaces();
 
             RegisterEventStoreConnection(containerBuilder);
-            containerBuilder.RegisterGeneric(typeof(EventStoreRepository<>)).As(typeof(IRepository<>));
+
+            containerBuilder.RegisterGeneric(typeof(EventStoreRepository<>))
+                .As(typeof(IRepository<>))
+                .InstancePerLifetimeScope();
+
+            containerBuilder.RegisterType<EventStoreEventsDatabase>()
+                .Named<IEventsDatabase>("EventsDatabase")
+                .InstancePerLifetimeScope();
+
+            containerBuilder.RegisterDecorator<IEventsDatabase>(
+                (context, eventsDatabaseToDecorate) =>
+                    new TrackingEventsDatabase(eventsDatabaseToDecorate), "EventsDatabase")
+                    .As<IEventsDatabase>()
+                    .As<ITrackingEventsDatabase>()
+                    .InstancePerLifetimeScope();
+
             var container = containerBuilder.Build();
 
             endpointConfiguration.UseContainer<AutofacBuilder>(
@@ -72,6 +87,7 @@ namespace AuctionHouse.ServiceBus
                 var settings = ConnectionSettings.Create();
                 var endpoint = new IPEndPoint(IPAddress.Loopback, defaultPort);
                 var connection = EventStoreConnection.Create(settings, endpoint);
+                connection.ConnectAsync().Wait();
 
                 return connection;
             }).As<IEventStoreConnection>();

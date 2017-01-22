@@ -49,6 +49,7 @@
     <Compile Include="Messaging\IResultChangedNotifyingQueryHandler.cs" />
     <Compile Include="Messaging\IQueryHandler.cs" />
     <Compile Include="Emit\TypeBuilderExtensions.cs" />
+    <Compile Include="Messaging\MessageEnvelope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\TypeExtensions.cs" />
   </ItemGroup>
