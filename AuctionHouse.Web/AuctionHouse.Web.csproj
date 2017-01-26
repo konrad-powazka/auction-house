@@ -63,6 +63,10 @@
       <HintPath>..\packages\Autofac.Owin.4.0.0\lib\net45\Autofac.Integration.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Autofac.Integration.SignalR, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.SignalR.3.0.2\lib\net40\Autofac.Integration.SignalR.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Autofac.Integration.WebApi, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.WebApi2.4.0.1\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
       <Private>True</Private>
@@ -242,7 +246,6 @@
     <Compile Include="Cqrs\ICommandQueue.cs" />
     <Compile Include="EventSourcing\EventAppliedEventArgs.cs" />
     <Compile Include="EventSourcing\ContinuousEventSourcedEntitiesBuilder.cs" />
-    <Compile Include="EventSourcing\EventsAppliedToReadModelRegistry.cs" />
     <Compile Include="EventSourcing\IContinuousEventSourcedEntitiesBuilder.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -417,7 +420,7 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\app\CommandHandling\ICommandHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\IPushNotificationsService.ts" />
-    <TypeScriptCompile Include="Scripts\app\Infrastructure\IEventAppliedToReadModelNotificationHub.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\IEventAppliedToReadModelNotificationHubServer.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\NotifyOnEventsAppliedToReadModelResponse.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsService.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsSubscription.ts" />

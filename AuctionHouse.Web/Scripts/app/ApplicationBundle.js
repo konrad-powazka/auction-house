@@ -197,7 +197,7 @@
 	            return;
 	        }
 	        this.createAuctionCommandHandler
-	            .handle(this.model)
+	            .handle(this.model, true)
 	            .then(function () {
 	            alert('Success');
 	            _this.stateService.go('displayAuction', { auctionId: _this.model.auctionId });
@@ -240,8 +240,9 @@
 	(function (CommandHandlingErrorType) {
 	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToConnectToFeedbackHub"] = 0] = "FailedToConnectToFeedbackHub";
 	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToQueue"] = 1] = "FailedToQueue";
-	    CommandHandlingErrorType[CommandHandlingErrorType["FeedbackTimeout"] = 2] = "FeedbackTimeout";
+	    CommandHandlingErrorType[CommandHandlingErrorType["Timeout"] = 2] = "Timeout";
 	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToProcess"] = 3] = "FailedToProcess";
+	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToSubscribeToReadModelChangeNotification"] = 4] = "FailedToSubscribeToReadModelChangeNotification";
 	})(CommandHandlingErrorType = exports.CommandHandlingErrorType || (exports.CommandHandlingErrorType = {}));
 
 
@@ -255,7 +256,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandHandler_1 = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./CommandHandler\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var CommandHandler_1 = __webpack_require__(5);
 	var CancelAuctionCommandHandler = (function (_super) {
 	    __extends(CancelAuctionCommandHandler, _super);
 	    function CancelAuctionCommandHandler() {
@@ -303,7 +304,128 @@
 
 
 /***/ },
-/* 5 */,
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var CommandHandlingErrorType_1 = __webpack_require__(3);
+	var CommandHandler = (function () {
+	    function CommandHandler(httpService, qService, timeoutService) {
+	        this.httpService = httpService;
+	        this.qService = qService;
+	        this.timeoutService = timeoutService;
+	        if (!CommandHandler.wasSignalrRInitialized) {
+	            var connection = $.connection;
+	            var commandHandlingFeedbackHub = connection.commandHandlingFeedbackHub;
+	            commandHandlingFeedbackHub.client.handleCommandSuccess = function (commandHandlingSucceededEvent) {
+	                CommandHandler.commandHandlingSuccessCallbacks.fire(commandHandlingSucceededEvent);
+	            };
+	            commandHandlingFeedbackHub.client.handleCommandFailure = function (commandHandlingFailedEvent) {
+	                CommandHandler.commandHandlingFailureCallbacks.fire(commandHandlingFailedEvent);
+	            };
+	            var eventAppliedToReadModelNotificationHub = connection.eventAppliedToReadModelNotificationHub;
+	            eventAppliedToReadModelNotificationHub.client.handleEventsAppliedToReadModel = function (subscriptionId) {
+	                CommandHandler.eventsAppliedToReadModelCallbacks.fire(subscriptionId);
+	            };
+	            CommandHandler
+	                .eventAppliedToReadModelNotificationHubServer = eventAppliedToReadModelNotificationHub.server;
+	            CommandHandler.wasSignalrRInitialized = true;
+	        }
+	    }
+	    CommandHandler.prototype.handle = function (command, shouldWaitForEventsApplicationToReadModel) {
+	        var _this = this;
+	        var url = "api/" + this.getCommandName() + "/Handle";
+	        var deferred = this.qService.defer();
+	        this.connectSignalR()
+	            .then(function () {
+	            _this.httpService.post(url, command)
+	                .then(function () {
+	                var wasPromiseResolvedOrRejected = false;
+	                var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
+	                    if (commandHandlingSucceededEvent.CommandId === command.id) {
+	                        wasPromiseResolvedOrRejected = true;
+	                        if (!shouldWaitForEventsApplicationToReadModel) {
+	                            deferred.resolve();
+	                        }
+	                        else {
+	                            _this
+	                                .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
+	                                .publishedEventIds, deferred);
+	                        }
+	                    }
+	                };
+	                var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
+	                    if (commandHandlingFailedEvent.CommandId === command.id) {
+	                        wasPromiseResolvedOrRejected = true;
+	                        deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
+	                    }
+	                };
+	                CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
+	                CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
+	                var removeCallbacks = function () {
+	                    CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
+	                    CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
+	                };
+	                deferred.promise.finally(removeCallbacks);
+	                var commandHandlingTimeoutMilliseconds = 15 * 1000;
+	                _this.timeoutService(commandHandlingTimeoutMilliseconds)
+	                    .then(function () {
+	                    if (!wasPromiseResolvedOrRejected) {
+	                        deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.Timeout);
+	                    }
+	                });
+	            })
+	                .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
+	        })
+	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
+	        return deferred.promise;
+	    };
+	    CommandHandler.prototype.waitForEventsApplicationToReadModel = function (publishedEventIds, deferred) {
+	        CommandHandler
+	            .eventAppliedToReadModelNotificationHubServer
+	            .notifyOnEventsApplied(publishedEventIds)
+	            .done(function (notifyOnEventsAppliedToReadModelResponse) {
+	            if (notifyOnEventsAppliedToReadModelResponse.wereAllEventsAlreadyApplied) {
+	                deferred.resolve();
+	                return;
+	            }
+	            var eventsAppliedCallback = function (currentSubscriptionId) {
+	                if (currentSubscriptionId === notifyOnEventsAppliedToReadModelResponse.subscriptionId) {
+	                    deferred.resolve();
+	                }
+	            };
+	            CommandHandler.eventsAppliedToReadModelCallbacks.add(eventsAppliedCallback);
+	            deferred.promise.finally(function () { return CommandHandler.eventsAppliedToReadModelCallbacks.remove(eventsAppliedCallback); });
+	            deferred.promise.catch(function () {
+	                // TODO: cancel subscription on timeout
+	            });
+	        })
+	            .fail(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToSubscribeToReadModelChangeNotification); });
+	    };
+	    CommandHandler.prototype.connectSignalR = function () {
+	        var deferred = this.qService.defer();
+	        if ($.connection.hub.state === 1 /* Connected */) {
+	            deferred.resolve();
+	        }
+	        else {
+	            $.connection.hub
+	                .start()
+	                .done(function () { return deferred.resolve(); })
+	                .fail(function () { return deferred.reject(); });
+	        }
+	        return deferred.promise;
+	    };
+	    return CommandHandler;
+	}());
+	CommandHandler.wasSignalrRInitialized = false;
+	CommandHandler.commandHandlingSuccessCallbacks = $.Callbacks();
+	CommandHandler.commandHandlingFailureCallbacks = $.Callbacks();
+	CommandHandler.eventsAppliedToReadModelCallbacks = $.Callbacks();
+	CommandHandler.$inject = ['$http', '$q', '$timeout'];
+	exports.CommandHandler = CommandHandler;
+
+
+/***/ },
 /* 6 */
 /***/ function(module, exports) {
 

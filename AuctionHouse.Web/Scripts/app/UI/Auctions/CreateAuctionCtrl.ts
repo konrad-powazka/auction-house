@@ -63,7 +63,7 @@ export class CreateAuctionCtrl implements ng.IController {
         }
 
         this.createAuctionCommandHandler
-            .handle(this.model)
+            .handle(this.model, true)
             .then(() => {
                 alert('Success');
                 this.stateService.go('displayAuction', { auctionId: this.model.auctionId });

@@ -1,3 +1,4 @@
 ﻿export interface ICommandHandler<TCommand> {
-    handle(command: TCommand): ng.IPromise<void>;
+    // TODO: Add an enum to define asynchronity level (Full, WaitForHandling, WaitForHandlingAndReadModelChange
+    handle(command: TCommand, shouldWaitForEventsApplicationToReadModel?: boolean): ng.IPromise<void>;
 }

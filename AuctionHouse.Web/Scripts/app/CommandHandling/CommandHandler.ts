@@ -1,12 +1,15 @@
-﻿import { ICommandHandler, ICommandHandler as Handler } from './ICommandHandler';
+﻿import { ICommandHandler } from './ICommandHandler';
 import { CommandHandlingErrorType } from './CommandHandlingErrorType'
 import {ICommand } from '../Messages/ICommand';
+import { IEventAppliedToReadModelNotificationHubServer } from '../Infrastructure/IEventAppliedToReadModelNotificationHubServer';
+import { NotifyOnEventsAppliedToReadModelResponse } from '../Infrastructure/NotifyOnEventsAppliedToReadModelResponse';
 
-export abstract class CommandHandler<TCommand extends ICommand> implements Handler<TCommand> {
+export abstract class CommandHandler<TCommand extends ICommand> implements ICommandHandler<TCommand> {
     private static wasSignalrRInitialized = false;
     private static commandHandlingSuccessCallbacks = $.Callbacks();
     private static commandHandlingFailureCallbacks = $.Callbacks();
     private static eventsAppliedToReadModelCallbacks = $.Callbacks();
+    private static eventAppliedToReadModelNotificationHubServer: IEventAppliedToReadModelNotificationHubServer;
 
     static $inject = ['$http', '$q', '$timeout'];
 
@@ -28,9 +31,12 @@ export abstract class CommandHandler<TCommand extends ICommand> implements Handl
 
             const eventAppliedToReadModelNotificationHub = connection.eventAppliedToReadModelNotificationHub;
 
-            eventAppliedToReadModelNotificationHub.client.handleQueryResultChanged = (subscriptionId: string): void => {
+            eventAppliedToReadModelNotificationHub.client.handleEventsAppliedToReadModel = (subscriptionId: string): void => {
                 CommandHandler.eventsAppliedToReadModelCallbacks.fire(subscriptionId);
             };
+
+            CommandHandler
+                .eventAppliedToReadModelNotificationHubServer = eventAppliedToReadModelNotificationHub.server as any;
 
             CommandHandler.wasSignalrRInitialized = true;
         }
@@ -53,7 +59,10 @@ export abstract class CommandHandler<TCommand extends ICommand> implements Handl
                                 if (!shouldWaitForEventsApplicationToReadModel) {
                                     deferred.resolve();
                                 } else {
-                                    
+                                    this
+                                        .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
+                                            .publishedEventIds,
+                                            deferred);
                                 }
                             }
                         };
@@ -78,7 +87,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements Handl
                         this.timeoutService(commandHandlingTimeoutMilliseconds)
                             .then(() => {
                                 if (!wasPromiseResolvedOrRejected) {
-                                    deferred.reject(CommandHandlingErrorType.FeedbackTimeout);
+                                    deferred.reject(CommandHandlingErrorType.Timeout);
                                 }
                             });
 
@@ -90,27 +99,29 @@ export abstract class CommandHandler<TCommand extends ICommand> implements Handl
         return deferred.promise;
     }
 
-    private waitForEventsApplicationToReadModel(deferred: ng.IDeferred<void>): void {
-        const eventsAppliedCallback = (commandHandlingSucceededEvent: any) => {
-            if (commandHandlingSucceededEvent.CommandId === command.id) {
-                wasPromiseResolvedOrRejected = true;
-
-                if (!shouldWaitForEventsApplicationToReadModel) {
+    private waitForEventsApplicationToReadModel(publishedEventIds: string[], deferred: ng.IDeferred<void>): void {
+        CommandHandler
+            .eventAppliedToReadModelNotificationHubServer
+            .notifyOnEventsApplied(publishedEventIds)
+            .done((notifyOnEventsAppliedToReadModelResponse: NotifyOnEventsAppliedToReadModelResponse) => {
+                if (notifyOnEventsAppliedToReadModelResponse.wereAllEventsAlreadyApplied) {
                     deferred.resolve();
-                } else {
-
+                    return;
                 }
-            }
-        };
 
-        const commandHandlingFailureCallback = (commandHandlingFailedEvent: any) => {
-            if (commandHandlingFailedEvent.CommandId === command.id) {
-                wasPromiseResolvedOrRejected = true;
-                deferred.reject(CommandHandlingErrorType.FailedToProcess);
-            }
-        };
-        CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
-        CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
+                const eventsAppliedCallback = (currentSubscriptionId: string) => {
+                    if (currentSubscriptionId === notifyOnEventsAppliedToReadModelResponse.subscriptionId) {
+                        deferred.resolve();
+                    }
+                };
+
+                CommandHandler.eventsAppliedToReadModelCallbacks.add(eventsAppliedCallback);
+                deferred.promise.finally(() => CommandHandler.eventsAppliedToReadModelCallbacks.remove(eventsAppliedCallback));
+                deferred.promise.catch(() => {
+                    // TODO: cancel subscription on timeout
+                });
+            })
+            .fail(() => deferred.reject(CommandHandlingErrorType.FailedToSubscribeToReadModelChangeNotification));
     }
 
     private connectSignalR(): ng.IPromise<void> {
