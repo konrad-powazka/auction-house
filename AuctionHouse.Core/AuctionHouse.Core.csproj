@@ -46,7 +46,6 @@
     <Compile Include="Messaging\IEvent.cs" />
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\IQuery.cs" />
-    <Compile Include="Messaging\IResultChangedNotifyingQueryHandler.cs" />
     <Compile Include="Messaging\IQueryHandler.cs" />
     <Compile Include="Emit\TypeBuilderExtensions.cs" />
     <Compile Include="Messaging\MessageEnvelope.cs" />

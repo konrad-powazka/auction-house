@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AuctionHouse.Web.Cqrs.Queries
+namespace AuctionHouse.Web.EventSourcing
 {
     public interface IContinuousEventSourcedEntitiesBuilder : IDisposable
     {
@@ -8,5 +8,6 @@ namespace AuctionHouse.Web.Cqrs.Queries
 
         void Start();
         void Stop();
+        bool CheckIfEventWasApplied(Guid eventId);
     }
 }

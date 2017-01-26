@@ -240,18 +240,19 @@
     <Compile Include="Cqrs\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="CodeGen\CqrsControllerTypesGenerator.cs" />
     <Compile Include="Cqrs\ICommandQueue.cs" />
-    <Compile Include="Cqrs\Queries\EventAppliedEventArgs.cs" />
-    <Compile Include="Cqrs\Queries\ContinuousEventSourcedEntitiesBuilder.cs" />
-    <Compile Include="Cqrs\Queries\IContinuousEventSourcedEntitiesBuilder.cs" />
+    <Compile Include="EventSourcing\EventAppliedEventArgs.cs" />
+    <Compile Include="EventSourcing\ContinuousEventSourcedEntitiesBuilder.cs" />
+    <Compile Include="EventSourcing\EventsAppliedToReadModelRegistry.cs" />
+    <Compile Include="EventSourcing\IContinuousEventSourcedEntitiesBuilder.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Cqrs\NServiceBusCommandQueue.cs" />
     <Compile Include="Hubs\CommandHandlingFeedbackHub.cs" />
-    <Compile Include="Hubs\QueryResultChangeNotificationHub.cs" />
-    <Compile Include="Hubs\QueryResultChangeNotificationHubClient.cs" />
+    <Compile Include="Hubs\EventAppliedToReadModelNotificationHub.cs" />
+    <Compile Include="Hubs\IEventAppliedToReadModelNotificationHubClient.cs" />
     <Compile Include="Models\LoginCommand.cs" />
-    <Compile Include="Models\NotifyOnQueryResultChangedResponse.cs" />
+    <Compile Include="Models\NotifyOnEventsAppliedToReadModelResponse.cs" />
     <Compile Include="Models\NotifyOnQueryResultChangedCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
@@ -416,8 +417,8 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\app\CommandHandling\ICommandHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\IPushNotificationsService.ts" />
-    <TypeScriptCompile Include="Scripts\app\Infrastructure\IQueryResultChangeNotificationHubServer.ts" />
-    <TypeScriptCompile Include="Scripts\app\Infrastructure\NotifyOnQueryResultChangedResponse.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\IEventAppliedToReadModelNotificationHub.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\NotifyOnEventsAppliedToReadModelResponse.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsService.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsSubscription.ts" />
     <TypeScriptCompile Include="Scripts\app\Messages\Commands.ts" />

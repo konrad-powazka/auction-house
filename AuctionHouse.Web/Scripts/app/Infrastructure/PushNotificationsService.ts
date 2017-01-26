@@ -1,10 +1,10 @@
 ﻿import {PushNotificationsSubscription} from './PushNotificationsSubscription';
 import {IPushNotificationsService } from './IPushNotificationsService';
-import {IQueryResultChangeNotificationHubServer } from './IQueryResultChangeNotificationHubServer';
+import { IEventAppliedToReadModelNotificationHub } from './IEventAppliedToReadModelNotificationHub';
 import {NotifyOnQueryResultChangedResponse} from './NotifyOnQueryResultChangedResponse';
 
 export class PushNotificationsService implements IPushNotificationsService {
-    private queryResultChangeNotificationHubServer: IQueryResultChangeNotificationHubServer;
+    private eventAppliedToReadModelNotificationHub: IEventAppliedToReadModelNotificationHub;
     private wasSignalrRInitialized = false;
     private commandHandlingSuccessCallbacks = $.Callbacks();
     private commandHandlingFailureCallbacks = $.Callbacks();
@@ -28,7 +28,7 @@ export class PushNotificationsService implements IPushNotificationsService {
             };
 
             const queryResultChangeNotificationHub = connection.queryResultChangeNotificationHub;
-            this.queryResultChangeNotificationHubServer = queryResultChangeNotificationHub.server;
+            this.eventAppliedToReadModelNotificationHub = queryResultChangeNotificationHub.server;
 
             queryResultChangeNotificationHub.client.handleQueryResultChanged = (subscriptionId: string, queryResult: any): void => {
                 this.handleQueryResultChangedCallbacks.fire(subscriptionId, queryResult);
@@ -46,7 +46,7 @@ export class PushNotificationsService implements IPushNotificationsService {
             this.handleQueryResultChangedCallbacks.remove(handleQueryResultChangedCallback);
 
             // This call may fail, but notifications sent by server from now on will be ignored anyway
-            this.queryResultChangeNotificationHubServer
+            this.eventAppliedToReadModelNotificationHub
                 .cancelNotificationOnResultChanged(currentSubscriptionId);
         };
 
@@ -55,7 +55,7 @@ export class PushNotificationsService implements IPushNotificationsService {
                 .then(() => {
                     const activateSubscriptionDeferred = this.qService.defer<void>();
 
-                    this.queryResultChangeNotificationHubServer
+                    this.eventAppliedToReadModelNotificationHub
                         .notifyOnResultChanged(queryName, serializedQuery)
                         .done((response: NotifyOnQueryResultChangedResponse) => {
                             currentSubscriptionId = response.subscriptionId;

@@ -1,7 +1,7 @@
 ﻿using System;
 using AuctionHouse.Core.Messaging;
 
-namespace AuctionHouse.Web.Cqrs.Queries
+namespace AuctionHouse.Web.EventSourcing
 {
     public class EventAppliedEventArgs : EventArgs
     {

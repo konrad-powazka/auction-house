@@ -1,22 +1,21 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Messages.Events;
 using AuctionHouse.Persistence;
-using EventStore.ClientAPI;
-using Newtonsoft.Json;
 
-namespace AuctionHouse.Web.Cqrs.Queries
+namespace AuctionHouse.Web.EventSourcing
 {
     public class ContinuousEventSourcedEntitiesBuilder : IContinuousEventSourcedEntitiesBuilder
     {
         private readonly IEventsDatabase _eventsDatabase;
         private readonly IEnumerable<IEventSourcedEntity> _eventSourcedBuilders;
         private IDisposable _subscription;
-        private bool _wasDisposed = false;
+        private bool _wasDisposed;
+
+        private readonly ConcurrentDictionary<Guid, object> _idsOfEventsAppliedToReadModel =
+            new ConcurrentDictionary<Guid, object>();
 
         public event EventHandler<EventAppliedEventArgs> EventApplied;
 
@@ -49,13 +48,23 @@ namespace AuctionHouse.Web.Cqrs.Queries
                 eventSourcedBuilder.Apply(eventEnvelope.Message);
             }
 
+            if (!_idsOfEventsAppliedToReadModel.TryAdd(eventEnvelope.MessageId, null))
+            {
+                throw new ArgumentException(nameof(eventEnvelope));
+            }
+
             EventApplied?.Invoke(this, new EventAppliedEventArgs(eventEnvelope));
         }
 
         public void Stop()
         {
-            _subscription?.Dispose();
             _wasDisposed = true;
+            _subscription?.Dispose();
+        }
+
+        public bool CheckIfEventWasApplied(Guid eventId)
+        {
+            return _idsOfEventsAppliedToReadModel.ContainsKey(eventId);
         }
     }
 }

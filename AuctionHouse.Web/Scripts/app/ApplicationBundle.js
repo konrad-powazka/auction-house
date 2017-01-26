@@ -53,7 +53,7 @@
 	var ApplicationCtrl_1 = __webpack_require__(10);
 	var Routing_1 = __webpack_require__(11);
 	var GeneratedQueryHandlers_1 = __webpack_require__(12);
-	var DisplayAuctionComponent_1 = __webpack_require__(15);
+	var DisplayAuctionComponent_1 = __webpack_require__(14);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -255,7 +255,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandHandler_1 = __webpack_require__(5);
+	var CommandHandler_1 = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./CommandHandler\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	var CancelAuctionCommandHandler = (function (_super) {
 	    __extends(CancelAuctionCommandHandler, _super);
 	    function CancelAuctionCommandHandler() {
@@ -303,91 +303,7 @@
 
 
 /***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var CommandHandlingErrorType_1 = __webpack_require__(3);
-	var CommandHandler = (function () {
-	    function CommandHandler(httpService, qService, timeoutService) {
-	        this.httpService = httpService;
-	        this.qService = qService;
-	        this.timeoutService = timeoutService;
-	        if (!CommandHandler.wasSignalrRInitialized) {
-	            var commandHandlingFeedbackHub = $.connection.commandHandlingFeedbackHub;
-	            commandHandlingFeedbackHub.client.handleCommandSuccess = function (commandHandlingSucceededEvent) {
-	                CommandHandler.commandHandlingSuccessCallbacks.fire(commandHandlingSucceededEvent);
-	            };
-	            commandHandlingFeedbackHub.client.handleCommandFailure = function (commandHandlingFailedEvent) {
-	                CommandHandler.commandHandlingFailureCallbacks.fire(commandHandlingFailedEvent);
-	            };
-	            CommandHandler.wasSignalrRInitialized = true;
-	        }
-	    }
-	    CommandHandler.prototype.handle = function (command) {
-	        var _this = this;
-	        var url = "api/" + this.getCommandName() + "/Handle";
-	        var deferred = this.qService.defer();
-	        this.connectSignalR()
-	            .then(function () {
-	            _this.httpService.post(url, command)
-	                .then(function () {
-	                var wasPromiseResolvedOrRejected = false;
-	                var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
-	                    if (commandHandlingSucceededEvent.CommandId === command.id) {
-	                        wasPromiseResolvedOrRejected = true;
-	                        deferred.resolve();
-	                    }
-	                };
-	                var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
-	                    if (commandHandlingFailedEvent.CommandId === command.id) {
-	                        wasPromiseResolvedOrRejected = true;
-	                        deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
-	                    }
-	                };
-	                CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
-	                CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
-	                var removeCallbacks = function () {
-	                    CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
-	                    CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
-	                };
-	                deferred.promise.finally(removeCallbacks);
-	                var commandHandlingTimeoutMilliseconds = 15 * 1000;
-	                _this.timeoutService(commandHandlingTimeoutMilliseconds)
-	                    .then(function () {
-	                    if (!wasPromiseResolvedOrRejected) {
-	                        deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FeedbackTimeout);
-	                    }
-	                });
-	            })
-	                .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
-	        })
-	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
-	        return deferred.promise;
-	    };
-	    CommandHandler.prototype.connectSignalR = function () {
-	        var deferred = this.qService.defer();
-	        if ($.connection.hub.state === 1 /* Connected */) {
-	            deferred.resolve();
-	        }
-	        else {
-	            $.connection.hub
-	                .start()
-	                .done(function () { return deferred.resolve(); })
-	                .fail(function () { return deferred.reject(); });
-	        }
-	        return deferred.promise;
-	    };
-	    return CommandHandler;
-	}());
-	CommandHandler.wasSignalrRInitialized = false;
-	CommandHandler.commandHandlingSuccessCallbacks = $.Callbacks();
-	CommandHandler.commandHandlingFailureCallbacks = $.Callbacks();
-	CommandHandler.$inject = ['$http', '$q', '$timeout'];
-	exports.CommandHandler = CommandHandler;
-
-
-/***/ },
+/* 5 */,
 /* 6 */
 /***/ function(module, exports) {
 
@@ -648,10 +564,9 @@
 
 /***/ },
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	var QueryResultChangedSubscriptionErrorType_1 = __webpack_require__(14);
 	var QueryHandler = (function () {
 	    function QueryHandler(httpService, qService, pushNotificationsService) {
 	        this.httpService = httpService;
@@ -662,17 +577,6 @@
 	        var url = "api/" + this.getQueryName() + "/Handle";
 	        return this.httpService.get(url, { params: query }).then(function (response) { return response.data; });
 	    };
-	    // TODO: add timeout
-	    QueryHandler.prototype.notifyOnceOnResultChanged = function (query) {
-	        var deferred = this.qService.defer();
-	        var subscription = this.pushNotificationsService.notifyOnQueryResultChanged(query, this.getQueryName(), function (result) {
-	            subscription.cancel();
-	            deferred.resolve(result);
-	        });
-	        subscription.activatedPromise.catch(function () { return deferred
-	            .reject(QueryResultChangedSubscriptionErrorType_1.QueryResultChangedSubscriptionErrorType.FailedToConnectToServer); });
-	        return deferred.promise;
-	    };
 	    return QueryHandler;
 	}());
 	QueryHandler.$inject = ['$http', '$q'];
@@ -681,22 +585,10 @@
 
 /***/ },
 /* 14 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var QueryResultChangedSubscriptionErrorType;
-	(function (QueryResultChangedSubscriptionErrorType) {
-	    QueryResultChangedSubscriptionErrorType[QueryResultChangedSubscriptionErrorType["FailedToConnectToServer"] = 0] = "FailedToConnectToServer";
-	    QueryResultChangedSubscriptionErrorType[QueryResultChangedSubscriptionErrorType["ResultChangeAwaitingTimeout"] = 1] = "ResultChangeAwaitingTimeout";
-	})(QueryResultChangedSubscriptionErrorType = exports.QueryResultChangedSubscriptionErrorType || (exports.QueryResultChangedSubscriptionErrorType = {}));
-
-
-/***/ },
-/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var DisplayAuctionCtrl_1 = __webpack_require__(16);
+	var DisplayAuctionCtrl_1 = __webpack_require__(15);
 	var DisplayAuctionComponent = (function () {
 	    function DisplayAuctionComponent() {
 	        this.controller = DisplayAuctionCtrl_1.DisplayAuctionCtrl;
@@ -712,7 +604,7 @@
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	"use strict";

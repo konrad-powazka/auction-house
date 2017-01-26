@@ -4,14 +4,13 @@ using System.Net;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using AuctionHouse.Application;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Persistence;
 using AuctionHouse.QueryHandling;
 using AuctionHouse.Web.CodeGen;
 using AuctionHouse.Web.Cqrs;
-using AuctionHouse.Web.Cqrs.Queries;
+using AuctionHouse.Web.EventSourcing;
 using Autofac;
 using Autofac.Integration.WebApi;
 using EventStore.ClientAPI;
@@ -57,9 +56,6 @@ namespace AuctionHouse.Web
 
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
                 .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces();
-
-            builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
-                .AsClosedTypesOf(typeof(IEventAppliedNotifyingQueryHandler<,>)).AsImplementedInterfaces();
 
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
                 .As<IEventSourcedEntity>();

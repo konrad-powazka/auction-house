@@ -15,22 +15,5 @@ export abstract class QueryHandler<TQuery, TResult> implements IQueryHandler<TQu
         return this.httpService.get<TResult>(url, { params: query }).then(response => response.data);
     }
 
-    // TODO: add timeout
-    notifyOnceOnResultChanged(query: TQuery): ng.IPromise<TResult> {
-        const deferred = this.qService.defer<TResult>();
-
-        var subscription = this.pushNotificationsService.notifyOnQueryResultChanged<TQuery, TResult>(query,
-            this.getQueryName(),
-            result => {
-                subscription.cancel();
-                deferred.resolve(result);
-            });
-
-        subscription.activatedPromise.catch(() => deferred
-            .reject(QueryResultChangedSubscriptionErrorType.FailedToConnectToServer));
-
-        return deferred.promise;
-    }
-
     protected abstract getQueryName(): string;
 }
