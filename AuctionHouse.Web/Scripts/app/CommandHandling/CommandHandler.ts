@@ -53,7 +53,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
                         var wasPromiseResolvedOrRejected = false;
 
                         const commandHandlingSuccessCallback = (commandHandlingSucceededEvent: any) => {
-                            if (commandHandlingSucceededEvent.CommandId === command.id) {
+                            if (commandHandlingSucceededEvent.commandId === command.id) {
                                 wasPromiseResolvedOrRejected = true;
 
                                 if (!shouldWaitForEventsApplicationToReadModel) {
@@ -61,7 +61,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
                                 } else {
                                     this
                                         .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
-                                            .PublishedEventIds,
+                                            .publishedEventIds,
                                             deferred);
                                 }
                             }

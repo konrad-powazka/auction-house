@@ -342,7 +342,7 @@
 	                .then(function () {
 	                var wasPromiseResolvedOrRejected = false;
 	                var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
-	                    if (commandHandlingSucceededEvent.CommandId === command.id) {
+	                    if (commandHandlingSucceededEvent.commandId === command.id) {
 	                        wasPromiseResolvedOrRejected = true;
 	                        if (!shouldWaitForEventsApplicationToReadModel) {
 	                            deferred.resolve();
@@ -350,7 +350,7 @@
 	                        else {
 	                            _this
 	                                .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
-	                                .PublishedEventIds, deferred);
+	                                .publishedEventIds, deferred);
 	                        }
 	                    }
 	                };

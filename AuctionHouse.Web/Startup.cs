@@ -23,12 +23,14 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NServiceBus;
 using Owin;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
 using IEvent = AuctionHouse.Core.Messaging.IEvent;
 using IMessage = AuctionHouse.Core.Messaging.IMessage;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 [assembly: OwinStartup(typeof(Startup))]
 
@@ -45,12 +47,10 @@ namespace AuctionHouse.Web
                 EnableDetailedErrors = true
             };
 
-            var container = SetupDependencyInjection(httpConfig, hubConfig);
-
-            // TODO: use camel case for SignalR too
             httpConfig.Formatters.JsonFormatter.SerializerSettings.ContractResolver =
                 new CamelCasePropertyNamesContractResolver();
 
+            var container = SetupDependencyInjection(httpConfig, hubConfig);
             httpConfig.MapHttpAttributeRoutes();
 
             httpConfig.Routes.MapHttpRoute(
@@ -113,6 +113,14 @@ namespace AuctionHouse.Web
                 .As<IHubContext<ICommandHandlingFeedbackHubClient>>()
                 .ExternallyOwned();
 
+            var jsonSerializer =
+                JsonSerializer.Create(new JsonSerializerSettings
+                {
+                    ContractResolver = new SignalRContractResolver()
+                });
+
+            builder.RegisterInstance(jsonSerializer).As<JsonSerializer>();
+
             var container = builder.Build();
             httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);
             container.Resolve<IContinuousEventSourcedEntitiesBuilder>().Start();
@@ -127,7 +135,7 @@ namespace AuctionHouse.Web
         {
             var endpointConfiguration = new EndpointConfiguration("AuctionHouse.WebApi");
             endpointConfiguration.SendFailedMessagesTo("error");
-            endpointConfiguration.UseSerialization<JsonSerializer>();
+            endpointConfiguration.UseSerialization<NServiceBus.JsonSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
             endpointConfiguration.SendOnly();
 
@@ -141,25 +149,21 @@ namespace AuctionHouse.Web
 
         private static void RegisterEventStoreConnection(ContainerBuilder containerBuilder)
         {
-            containerBuilder.Register(c =>
-            {
-                //TODO: Read from config
-                const int defaultPort = 1113;
-                var settings = ConnectionSettings.Create();
-                settings.KeepReconnecting();
-                var endpoint = new IPEndPoint(IPAddress.Loopback, defaultPort);
-                var connection = EventStoreConnection.Create(settings, endpoint);
-                connection.ConnectAsync().Wait();
-
-                return connection;
-            }).As<IEventStoreConnection>();
+            //TODO: Read from config
+            const int defaultPort = 1113;
+            var settings = ConnectionSettings.Create();
+            settings.KeepReconnecting();
+            var endpoint = new IPEndPoint(IPAddress.Loopback, defaultPort);
+            var connection = EventStoreConnection.Create(settings, endpoint);
+            connection.ConnectAsync().Wait();
+            containerBuilder.RegisterInstance(connection).As<IEventStoreConnection>();
         }
 
         private static IEndpointInstance StartSignalRNServiceBusEndpoint(IContainer container)
         {
             var endpointConfiguration = new EndpointConfiguration("AuctionHouse.SignalR");
             endpointConfiguration.SendFailedMessagesTo("error");
-            endpointConfiguration.UseSerialization<JsonSerializer>();
+            endpointConfiguration.UseSerialization<NServiceBus.JsonSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
 
             endpointConfiguration.UseTransport<MsmqTransport>()
@@ -173,10 +177,7 @@ namespace AuctionHouse.Web
                 .DefiningMessagesAs(t => typeof(IMessage).IsAssignableFrom(t));
 
             endpointConfiguration.UseContainer<AutofacBuilder>(
-                customizations =>
-                {
-                    customizations.ExistingLifetimeScope(container);
-                });
+                customizations => { customizations.ExistingLifetimeScope(container); });
 
             return Endpoint.Start(endpointConfiguration).Result;
         }
@@ -206,6 +207,27 @@ namespace AuctionHouse.Web
                 }
 
                 return controllerTypes;
+            }
+        }
+
+        public class SignalRContractResolver : IContractResolver
+        {
+            private readonly Assembly _assembly;
+            private readonly IContractResolver _camelCaseContractResolver;
+            private readonly IContractResolver _defaultContractSerializer;
+
+            public SignalRContractResolver()
+            {
+                _defaultContractSerializer = new DefaultContractResolver();
+                _camelCaseContractResolver = new CamelCasePropertyNamesContractResolver();
+                _assembly = typeof(Connection).Assembly;
+            }
+
+            public JsonContract ResolveContract(Type type)
+            {
+                return type.Assembly.Equals(_assembly)
+                    ? _defaultContractSerializer.ResolveContract(type)
+                    : _camelCaseContractResolver.ResolveContract(type);
             }
         }
     }
