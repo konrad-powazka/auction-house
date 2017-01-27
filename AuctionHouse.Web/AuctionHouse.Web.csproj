@@ -153,8 +153,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceBus.6.0.0\lib\net452\NServiceBus.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NServiceBus.ObjectBuilder.Autofac, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.Autofac.6.0.1\lib\net452\NServiceBus.ObjectBuilder.Autofac.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -234,7 +238,6 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Controllers\Api\AuthenticationController.cs" />
     <Compile Include="Controllers\Api\QueryController.cs" />
@@ -253,6 +256,7 @@
     <Compile Include="Cqrs\NServiceBusCommandQueue.cs" />
     <Compile Include="Hubs\CommandHandlingFeedbackHub.cs" />
     <Compile Include="Hubs\EventAppliedToReadModelNotificationHub.cs" />
+    <Compile Include="Hubs\ICommandHandlingFeedbackHubContext.cs" />
     <Compile Include="Hubs\IEventAppliedToReadModelNotificationHubClient.cs" />
     <Compile Include="Models\LoginCommand.cs" />
     <Compile Include="Models\NotifyOnEventsAppliedToReadModelResponse.cs" />

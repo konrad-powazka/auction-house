@@ -61,7 +61,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
                                 } else {
                                     this
                                         .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
-                                            .publishedEventIds,
+                                            .PublishedEventIds,
                                             deferred);
                                 }
                             }

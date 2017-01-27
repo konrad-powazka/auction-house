@@ -350,7 +350,7 @@
 	                        else {
 	                            _this
 	                                .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
-	                                .publishedEventIds, deferred);
+	                                .PublishedEventIds, deferred);
 	                        }
 	                    }
 	                };

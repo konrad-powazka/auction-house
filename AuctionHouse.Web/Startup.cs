@@ -13,12 +13,14 @@ using AuctionHouse.Web;
 using AuctionHouse.Web.CodeGen;
 using AuctionHouse.Web.Cqrs;
 using AuctionHouse.Web.EventSourcing;
+using AuctionHouse.Web.Hubs;
 using Autofac;
 using Autofac.Integration.SignalR;
 using Autofac.Integration.WebApi;
 using EventStore.ClientAPI;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Infrastructure;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Newtonsoft.Json.Serialization;
@@ -36,17 +38,22 @@ namespace AuctionHouse.Web
     {
         public void Configuration(IAppBuilder app)
         {
-            var config = new HttpConfiguration();
-            var container = SetupDependencyInjection(config);
+            var httpConfig = new HttpConfiguration();
 
-            // Use camel case for JSON data.
-            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver =
+            var hubConfig = new HubConfiguration
+            {
+                EnableDetailedErrors = true
+            };
+
+            var container = SetupDependencyInjection(httpConfig, hubConfig);
+
+            // TODO: use camel case for SignalR too
+            httpConfig.Formatters.JsonFormatter.SerializerSettings.ContractResolver =
                 new CamelCasePropertyNamesContractResolver();
 
-            // Web API routes
-            config.MapHttpAttributeRoutes();
+            httpConfig.MapHttpAttributeRoutes();
 
-            config.Routes.MapHttpRoute(
+            httpConfig.Routes.MapHttpRoute(
                 "DefaultApi",
                 "api/{controller}/{action}"
                 );
@@ -57,39 +64,16 @@ namespace AuctionHouse.Web
             });
 
             app.UseAutofacMiddleware(container);
-            app.UseWebApi(config);
-
-            app.MapSignalR(new HubConfiguration
-            {
-                EnableDetailedErrors = true,
-                Resolver = new AutofacDependencyResolver(container)
-            });
-
-            StartSignalRNServiceBusEndpoint();
+            app.UseWebApi(httpConfig);
+            app.MapSignalR(hubConfig);
+            StartSignalRNServiceBusEndpoint(container);
         }
 
-        public static void Register(HttpConfiguration config)
-        {
-            SetupDependencyInjection(config);
-
-            // Use camel case for JSON data.
-            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver =
-                new CamelCasePropertyNamesContractResolver();
-
-            // Web API routes
-            config.MapHttpAttributeRoutes();
-
-            config.Routes.MapHttpRoute(
-                "DefaultApi",
-                "api/{controller}/{action}"
-                );
-        }
-
-        private static IContainer SetupDependencyInjection(HttpConfiguration config)
+        private static IContainer SetupDependencyInjection(HttpConfiguration httpConfig, HubConfiguration hubConfig)
         {
             var dynamicCqrsApiControllersAssembly = CqrsApiControllerTypesEmitter.EmitCqrsApiControllersAssembly();
             var httpControllerTypeResolver = new DynamicAssemblyControllerTypeResolver(dynamicCqrsApiControllersAssembly);
-            config.Services.Replace(typeof(IHttpControllerTypeResolver), httpControllerTypeResolver);
+            httpConfig.Services.Replace(typeof(IHttpControllerTypeResolver), httpControllerTypeResolver);
 
             var builder = new ContainerBuilder();
 
@@ -104,7 +88,7 @@ namespace AuctionHouse.Web
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
                 .As<IEventSourcedEntity>();
 
-            var nServiceBusEndpoint = CreateNServiceBusEndpoint();
+            var nServiceBusEndpoint = StartWebApiNServiceBusEndpoint();
 
             builder.RegisterInstance(nServiceBusEndpoint)
                 .As<IEndpointInstance>()
@@ -120,14 +104,26 @@ namespace AuctionHouse.Web
                 .As<IContinuousEventSourcedEntitiesBuilder>()
                 .SingleInstance();
 
+            builder.RegisterHubs(Assembly.GetExecutingAssembly());
+
+            builder.Register(
+                c =>
+                    hubConfig.Resolver.Resolve<IConnectionManager>()
+                        .GetHubContext<CommandHandlingFeedbackHub, ICommandHandlingFeedbackHubClient>())
+                .As<IHubContext<ICommandHandlingFeedbackHubClient>>()
+                .ExternallyOwned();
+
             var container = builder.Build();
-            config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);
             container.Resolve<IContinuousEventSourcedEntitiesBuilder>().Start();
+
+            var signalRDependencyResolver = new AutofacDependencyResolver(container);
+            hubConfig.Resolver = signalRDependencyResolver;
 
             return container;
         }
 
-        private static IEndpointInstance CreateNServiceBusEndpoint()
+        private static IEndpointInstance StartWebApiNServiceBusEndpoint()
         {
             var endpointConfiguration = new EndpointConfiguration("AuctionHouse.WebApi");
             endpointConfiguration.SendFailedMessagesTo("error");
@@ -159,7 +155,7 @@ namespace AuctionHouse.Web
             }).As<IEventStoreConnection>();
         }
 
-        private static IEndpointInstance StartSignalRNServiceBusEndpoint()
+        private static IEndpointInstance StartSignalRNServiceBusEndpoint(IContainer container)
         {
             var endpointConfiguration = new EndpointConfiguration("AuctionHouse.SignalR");
             endpointConfiguration.SendFailedMessagesTo("error");
@@ -175,6 +171,12 @@ namespace AuctionHouse.Web
                 .DefiningCommandsAs(t => typeof(ICommand).IsAssignableFrom(t))
                 .DefiningEventsAs(t => typeof(IEvent).IsAssignableFrom(t))
                 .DefiningMessagesAs(t => typeof(IMessage).IsAssignableFrom(t));
+
+            endpointConfiguration.UseContainer<AutofacBuilder>(
+                customizations =>
+                {
+                    customizations.ExistingLifetimeScope(container);
+                });
 
             return Endpoint.Start(endpointConfiguration).Result;
         }
