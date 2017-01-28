@@ -23,7 +23,7 @@ namespace AuctionHouse.Domain.Auctions
 
             var auctionCreatedEvent = new AuctionCreatedEvent
             {
-                AuctionId = id,
+                Id = id,
                 Title = title,
                 Description = description,
                 Price = startingPrice
@@ -47,7 +47,7 @@ namespace AuctionHouse.Domain.Auctions
 
         private void Apply(AuctionCreatedEvent auctionCreatedEvent)
         {
-            Id = auctionCreatedEvent.AuctionId;
+            Id = auctionCreatedEvent.Id;
             Title = auctionCreatedEvent.Title;
             Description = auctionCreatedEvent.Description;
         }

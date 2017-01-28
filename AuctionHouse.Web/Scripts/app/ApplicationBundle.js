@@ -46,14 +46,14 @@
 
 	"use strict";
 	var CreateAuctionComponent_1 = __webpack_require__(1);
-	var GeneratedCommandHandlers_1 = __webpack_require__(4);
-	var SecurityService_1 = __webpack_require__(6);
-	var SecurityUiService_1 = __webpack_require__(7);
-	var LoginDialogComponent_1 = __webpack_require__(8);
-	var ApplicationCtrl_1 = __webpack_require__(10);
-	var Routing_1 = __webpack_require__(11);
-	var GeneratedQueryHandlers_1 = __webpack_require__(12);
-	var DisplayAuctionComponent_1 = __webpack_require__(14);
+	var GeneratedCommandHandlers_1 = __webpack_require__(5);
+	var SecurityService_1 = __webpack_require__(7);
+	var SecurityUiService_1 = __webpack_require__(8);
+	var LoginDialogComponent_1 = __webpack_require__(9);
+	var ApplicationCtrl_1 = __webpack_require__(11);
+	var Routing_1 = __webpack_require__(12);
+	var GeneratedQueryHandlers_1 = __webpack_require__(13);
+	var DisplayAuctionComponent_1 = __webpack_require__(15);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -146,16 +146,17 @@
 
 	"use strict";
 	var CommandHandlingErrorType_1 = __webpack_require__(3);
+	var GuidGenerator_1 = __webpack_require__(4);
 	var CreateAuctionCtrl = (function () {
 	    function CreateAuctionCtrl(createAuctionCommandHandler, getAuctionDetailsQueryHandler, stateService) {
 	        this.createAuctionCommandHandler = createAuctionCommandHandler;
 	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
 	        this.stateService = stateService;
 	        this.model = {
-	            id: this.guid(),
+	            id: GuidGenerator_1.default.generateGuid(),
+	            auctionId: GuidGenerator_1.default.generateGuid(),
 	            title: '',
 	            description: '',
-	            auctionId: this.guid(),
 	            startingPrice: 5,
 	            buyNowPrice: 10,
 	            endDate: undefined
@@ -206,27 +207,8 @@
 	            return alert("Command processing error: " + CommandHandlingErrorType_1.CommandHandlingErrorType[commandHandlingErrorType]);
 	        });
 	    };
-	    CreateAuctionCtrl.prototype.guid = function () {
-	        function s4() {
-	            return Math.floor((1 + Math.random()) * 0x10000)
-	                .toString(16)
-	                .substring(1);
-	        }
-	        return s4() +
-	            s4() +
-	            '-' +
-	            s4() +
-	            '-' +
-	            s4() +
-	            '-' +
-	            s4() +
-	            '-' +
-	            s4() +
-	            s4() +
-	            s4();
-	    };
 	    return CreateAuctionCtrl;
-	}()); //
+	}());
 	CreateAuctionCtrl.$inject = ['createAuctionCommandHandler', 'getAuctionDetailsQueryHandler', '$state'];
 	exports.CreateAuctionCtrl = CreateAuctionCtrl;
 
@@ -248,6 +230,39 @@
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var GuidGenerator = (function () {
+	    function GuidGenerator() {
+	    }
+	    GuidGenerator.generateGuid = function () {
+	        function s4() {
+	            return Math.floor((1 + Math.random()) * 0x10000)
+	                .toString(16)
+	                .substring(1);
+	        }
+	        return s4() +
+	            s4() +
+	            '-' +
+	            s4() +
+	            '-' +
+	            s4() +
+	            '-' +
+	            s4() +
+	            '-' +
+	            s4() +
+	            s4() +
+	            s4();
+	    };
+	    return GuidGenerator;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = GuidGenerator;
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -256,7 +271,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandHandler_1 = __webpack_require__(5);
+	var CommandHandler_1 = __webpack_require__(6);
 	var CancelAuctionCommandHandler = (function (_super) {
 	    __extends(CancelAuctionCommandHandler, _super);
 	    function CancelAuctionCommandHandler() {
@@ -304,7 +319,7 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -334,51 +349,55 @@
 	    }
 	    CommandHandler.prototype.handle = function (command, shouldWaitForEventsApplicationToReadModel) {
 	        var _this = this;
-	        var url = "api/" + this.getCommandName() + "/Handle";
 	        var deferred = this.qService.defer();
 	        this.connectSignalR()
 	            .then(function () {
-	            _this.httpService.post(url, command)
-	                .then(function () {
-	                var wasPromiseResolvedOrRejected = false;
-	                var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
-	                    if (commandHandlingSucceededEvent.commandId === command.id) {
-	                        wasPromiseResolvedOrRejected = true;
-	                        if (!shouldWaitForEventsApplicationToReadModel) {
-	                            deferred.resolve();
-	                        }
-	                        else {
-	                            _this
-	                                .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
-	                                .publishedEventIds, deferred);
-	                        }
-	                    }
-	                };
-	                var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
-	                    if (commandHandlingFailedEvent.commandId === command.id) {
-	                        wasPromiseResolvedOrRejected = true;
-	                        deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
-	                    }
-	                };
-	                CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
-	                CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
-	                var removeCallbacks = function () {
-	                    CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
-	                    CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
-	                };
-	                deferred.promise.finally(removeCallbacks);
-	                var commandHandlingTimeoutMilliseconds = 15 * 1000;
-	                _this.timeoutService(commandHandlingTimeoutMilliseconds)
-	                    .then(function () {
-	                    if (!wasPromiseResolvedOrRejected) {
-	                        deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.Timeout);
-	                    }
-	                });
-	            })
-	                .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
+	            _this.sendCommand(command, shouldWaitForEventsApplicationToReadModel, deferred);
 	        })
 	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
 	        return deferred.promise;
+	    };
+	    CommandHandler.prototype.sendCommand = function (command, shouldWaitForEventsApplicationToReadModel, deferred) {
+	        var _this = this;
+	        var url = "api/" + this.getCommandName() + "/Handle";
+	        this.httpService.post(url, command)
+	            .then(function () {
+	            // TODO: Generate command id internally, it does not need to be visible outside
+	            _this.waitForCommandHandling(command.id, shouldWaitForEventsApplicationToReadModel, deferred);
+	        })
+	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
+	    };
+	    CommandHandler.prototype.waitForCommandHandling = function (commandId, shouldWaitForEventsApplicationToReadModel, deferred) {
+	        var _this = this;
+	        var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
+	            if (commandHandlingSucceededEvent.commandId === commandId) {
+	                if (!shouldWaitForEventsApplicationToReadModel) {
+	                    deferred.resolve();
+	                }
+	                else {
+	                    _this
+	                        .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
+	                        .publishedEventIds, deferred);
+	                }
+	            }
+	        };
+	        var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
+	            if (commandHandlingFailedEvent.commandId === commandId) {
+	                deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
+	            }
+	        };
+	        CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
+	        CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
+	        var removeCallbacks = function () {
+	            CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
+	            CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
+	        };
+	        deferred.promise.finally(removeCallbacks);
+	        var commandHandlingTimeoutMilliseconds = 15 * 1000;
+	        this.timeoutService(commandHandlingTimeoutMilliseconds)
+	            .then(function () {
+	            deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.Timeout);
+	        });
 	    };
 	    CommandHandler.prototype.waitForEventsApplicationToReadModel = function (publishedEventIds, deferred) {
 	        CommandHandler
@@ -426,7 +445,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -472,7 +491,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -518,11 +537,11 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var LoginDialogCtrl_1 = __webpack_require__(9);
+	var LoginDialogCtrl_1 = __webpack_require__(10);
 	var LoginDialogComponent = (function () {
 	    function LoginDialogComponent() {
 	        this.controller = LoginDialogCtrl_1.LoginDialogCtrl;
@@ -538,7 +557,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -589,7 +608,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -604,7 +623,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -640,7 +659,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -649,7 +668,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var QueryHandler_1 = __webpack_require__(13);
+	var QueryHandler_1 = __webpack_require__(14);
 	var GetAuctionDetailsQueryHandler = (function (_super) {
 	    __extends(GetAuctionDetailsQueryHandler, _super);
 	    function GetAuctionDetailsQueryHandler() {
@@ -685,7 +704,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -706,11 +725,11 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var DisplayAuctionCtrl_1 = __webpack_require__(15);
+	var DisplayAuctionCtrl_1 = __webpack_require__(16);
 	var DisplayAuctionComponent = (function () {
 	    function DisplayAuctionComponent() {
 	        this.controller = DisplayAuctionCtrl_1.DisplayAuctionCtrl;
@@ -726,7 +745,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	"use strict";

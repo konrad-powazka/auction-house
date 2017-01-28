@@ -5,6 +5,7 @@ import { CommandHandlingErrorType } from '../../CommandHandling/CommandHandlingE
 import {IQueryHandler as QueryHandler} from '../../QueryHandling/IQueryHandler';
 import {GetAuctionDetailsQuery as AuctionDetailsQuery} from '../../Messages/Queries';
 import {AuctionDetailsReadModel} from '../../ReadModel';
+import GuidGenerator from '../../Infrastructure/GuidGenerator';
 
 export class CreateAuctionCtrl implements ng.IController {
     fields: AngularFormly.IFieldArray;
@@ -17,10 +18,10 @@ export class CreateAuctionCtrl implements ng.IController {
         private getAuctionDetailsQueryHandler: QueryHandler<AuctionDetailsQuery, AuctionDetailsReadModel>,
         private stateService: ng.ui.IStateService) {
         this.model = {
-            id: this.guid(),
+            id: GuidGenerator.generateGuid(),
+            auctionId: GuidGenerator.generateGuid(),
             title: '',
             description: '',
-            auctionId: this.guid(),
             startingPrice: 5,
             buyNowPrice: 10,
             endDate: undefined as any
@@ -70,26 +71,5 @@ export class CreateAuctionCtrl implements ng.IController {
             })
             .catch((commandHandlingErrorType: CommandHandlingErrorType) =>
                 alert(`Command processing error: ${CommandHandlingErrorType[commandHandlingErrorType]}`));
-    }
-
-    private guid(): string {
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-
-        return s4() +
-            s4() +
-            '-' +
-            s4() +
-            '-' +
-            s4() +
-            '-' +
-            s4() +
-            '-' +
-            s4() +
-            s4() +
-            s4();
-    }
-} //
+    } 
+}

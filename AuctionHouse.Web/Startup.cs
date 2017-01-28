@@ -84,7 +84,7 @@ namespace AuctionHouse.Web
             }
 
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
-                .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces();
+                .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces().SingleInstance();
 
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
                 .As<IEventSourcedEntity>();

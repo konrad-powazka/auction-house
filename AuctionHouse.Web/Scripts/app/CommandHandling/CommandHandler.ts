@@ -1,8 +1,9 @@
 ﻿import { ICommandHandler } from './ICommandHandler';
 import { CommandHandlingErrorType } from './CommandHandlingErrorType'
-import {ICommand } from '../Messages/ICommand';
+import { ICommand } from '../Messages/ICommand';
 import { IEventAppliedToReadModelNotificationHubServer } from '../Infrastructure/IEventAppliedToReadModelNotificationHubServer';
 import { NotifyOnEventsAppliedToReadModelResponse } from '../Infrastructure/NotifyOnEventsAppliedToReadModelResponse';
+import { CommandHandlingSucceededEvent, CommandHandlingFailedEvent } from '../Events';
 
 export abstract class CommandHandler<TCommand extends ICommand> implements ICommandHandler<TCommand> {
     private static wasSignalrRInitialized = false;
@@ -43,60 +44,66 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
     }
 
     handle(command: TCommand, shouldWaitForEventsApplicationToReadModel: boolean): ng.IPromise<void> {
-        const url = `api/${this.getCommandName()}/Handle`;
         const deferred = this.qService.defer<void>();
         
         this.connectSignalR()
             .then(() => {
-                this.httpService.post<void>(url, command)
-                    .then(() => {
-                        var wasPromiseResolvedOrRejected = false;
-
-                        const commandHandlingSuccessCallback = (commandHandlingSucceededEvent: any) => {
-                            if (commandHandlingSucceededEvent.commandId === command.id) {
-                                wasPromiseResolvedOrRejected = true;
-
-                                if (!shouldWaitForEventsApplicationToReadModel) {
-                                    deferred.resolve();
-                                } else {
-                                    this
-                                        .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
-                                            .publishedEventIds,
-                                            deferred);
-                                }
-                            }
-                        };
-
-                        const commandHandlingFailureCallback = (commandHandlingFailedEvent: any) => {
-                            if (commandHandlingFailedEvent.commandId === command.id) {
-                                wasPromiseResolvedOrRejected = true;
-                                deferred.reject(CommandHandlingErrorType.FailedToProcess);
-                            }
-                        };
-                        CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
-                        CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
-
-                        const removeCallbacks = () => {
-                            CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
-                            CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
-                        };
-
-                        deferred.promise.finally(removeCallbacks);
-                        const commandHandlingTimeoutMilliseconds = 15 * 1000;
-
-                        this.timeoutService(commandHandlingTimeoutMilliseconds)
-                            .then(() => {
-                                if (!wasPromiseResolvedOrRejected) {
-                                    deferred.reject(CommandHandlingErrorType.Timeout);
-                                }
-                            });
-
-                    })
-                    .catch(() => deferred.reject(CommandHandlingErrorType.FailedToQueue));
+                this.sendCommand(command, shouldWaitForEventsApplicationToReadModel, deferred);
             })
             .catch(() => deferred.reject(CommandHandlingErrorType.FailedToConnectToFeedbackHub));
 
         return deferred.promise;
+    }
+
+    private sendCommand(command: TCommand, shouldWaitForEventsApplicationToReadModel: boolean, deferred: ng.IDeferred<void>): void {
+        const url = `api/${this.getCommandName()}/Handle`;
+
+        this.httpService.post<void>(url, command)
+            .then(() => {
+                // TODO: Generate command id internally, it does not need to be visible outside
+                this.waitForCommandHandling(command.id as string, shouldWaitForEventsApplicationToReadModel, deferred);
+            })
+            .catch(() => deferred.reject(CommandHandlingErrorType.FailedToQueue));
+    }
+
+    private waitForCommandHandling(commandId: string,
+        shouldWaitForEventsApplicationToReadModel: boolean,
+        deferred: ng.IDeferred<void>): void {
+
+        const commandHandlingSuccessCallback = (commandHandlingSucceededEvent: CommandHandlingSucceededEvent) => {
+            if (commandHandlingSucceededEvent.commandId === commandId) {
+
+                if (!shouldWaitForEventsApplicationToReadModel) {
+                    deferred.resolve();
+                } else {
+                    this
+                        .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
+                            .publishedEventIds,
+                            deferred);
+                }
+            }
+        };
+
+        const commandHandlingFailureCallback = (commandHandlingFailedEvent: CommandHandlingFailedEvent) => {
+            if (commandHandlingFailedEvent.commandId === commandId) {
+                deferred.reject(CommandHandlingErrorType.FailedToProcess);
+            }
+        };
+        CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
+        CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
+
+        const removeCallbacks = () => {
+            CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
+            CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
+        };
+
+        deferred.promise.finally(removeCallbacks);
+        const commandHandlingTimeoutMilliseconds = 15 * 1000;
+
+        this.timeoutService(commandHandlingTimeoutMilliseconds)
+            .then(() => {
+                deferred.reject(CommandHandlingErrorType.Timeout);
+            });
     }
 
     private waitForEventsApplicationToReadModel(publishedEventIds: string[], deferred: ng.IDeferred<void>): void {

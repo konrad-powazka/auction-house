@@ -423,6 +423,8 @@
       <DependentUpon>GeneratedCommandHandlers.tt</DependentUpon>
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\app\CommandHandling\ICommandHandler.ts" />
+    <TypeScriptCompile Include="Scripts\app\Events.ts" />
+    <TypeScriptCompile Include="Scripts\app\Infrastructure\GuidGenerator.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\IPushNotificationsService.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\IEventAppliedToReadModelNotificationHubServer.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\NotifyOnEventsAppliedToReadModelResponse.ts" />

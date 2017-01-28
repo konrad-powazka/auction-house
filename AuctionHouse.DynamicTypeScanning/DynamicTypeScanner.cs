@@ -10,6 +10,7 @@ using AuctionHouse.ReadModel;
 
 namespace AuctionHouse.DynamicTypeScanning
 {
+    // TODO: Move it to assembly markers
     public static class DynamicTypeScanner
     {
         private static readonly Lazy<IReadOnlyCollection<Type>> GetCommandTypesLazy =

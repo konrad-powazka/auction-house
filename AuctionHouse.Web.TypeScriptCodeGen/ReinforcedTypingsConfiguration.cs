@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using AuctionHouse.DynamicTypeScanning;
 using Reinforced.Typings;
@@ -11,15 +13,28 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
 {
     public static class ReinforcedTypingsConfiguration
     {
+        private static readonly Dictionary<Type, Type> TypeOverrides = new Dictionary<Type, Type>
+        {
+            [typeof(Guid)] = typeof(string),
+            [typeof(DateTime)] = typeof(string),
+            [typeof(IReadOnlyCollection<Guid>)] = typeof(string[])
+        };
+
         public static void Configure(ConfigurationBuilder builder)
         {
             ExportTypes(builder, DynamicTypeScanner.GetCommandTypes(), "Messages/Commands.ts");
             ExportTypes(builder, DynamicTypeScanner.GetQueryTypes(), "Messages/Queries.ts");
             ExportTypes(builder, DynamicTypeScanner.GetReadModelTypes(), "ReadModel.ts");
+            ExportTypes(builder, DynamicTypeScanner.GetEventTypes(), "Events.ts");
         }
 
-        private static void ExportTypes(ConfigurationBuilder builder, IEnumerable<Type> typesToExport, string fileName)
+        private static void ExportTypes(ConfigurationBuilder builder, IReadOnlyCollection<Type> typesToExport,
+            string fileName)
         {
+            // We need to do this becase of a bug in ReinforcedTypings which causes a
+            // "A class must be declared after its base class." TS compiler error
+            typesToExport = GetOrderedInheritanceHierarchy(typesToExport);
+
             //TODO: nullable
             builder.ExportAsClasses(typesToExport,
                 c =>
@@ -29,15 +44,54 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
 
                     c.DontIncludeToNamespace().WithProperties(
                         p =>
-                            p.PropertyType != typeof(Guid) && p.PropertyType != typeof(DateTime) &&
-                            p.GetGetMethod() != null,
-                        pc => pc.CamelCase())
-                        .WithProperties(
-                            p =>
-                                (p.PropertyType == typeof(Guid) || p.PropertyType == typeof(DateTime)) &&
-                                p.GetGetMethod() != null,
-                            pc => pc.CamelCase().Type<string>());
+                            !TypeOverrides.ContainsKey(p.PropertyType) && p.GetGetMethod() != null,
+                        pc => pc.CamelCase());
+
+                    foreach (var typeOverride in TypeOverrides)
+                    {
+                        c.WithProperties(
+                            p => p.PropertyType == typeOverride.Key && p.GetGetMethod() != null,
+                            pc => pc.CamelCase().Type(typeOverride.Value));
+                    }
                 });
+        }
+
+        private static IReadOnlyCollection<Type> GetOrderedInheritanceHierarchy(IReadOnlyCollection<Type> types)
+        {
+            var unorderedTypesHierarchy =
+                types.SelectMany(GetTypeInheritanceChain).Where(t => t != typeof(object)).Distinct().ToList();
+
+            var typesOrderedInLastIteration = unorderedTypesHierarchy.Where(t => t.BaseType == typeof(object)).ToList();
+            var orderedTypesHierarchy = new List<Type>();
+            var typesLeftToOrder = new HashSet<Type>(unorderedTypesHierarchy);
+
+            while (typesLeftToOrder.Any())
+            {
+                foreach (var typeOrderedInLastIteration in typesOrderedInLastIteration)
+                {
+                    typesLeftToOrder.Remove(typeOrderedInLastIteration);
+                    orderedTypesHierarchy.Add(typeOrderedInLastIteration);
+                }
+
+                typesOrderedInLastIteration =
+                    typesLeftToOrder.Where(
+                        derivedType => typesOrderedInLastIteration.Any(baseType => derivedType.BaseType == baseType))
+                        .ToList();
+            }
+
+            Debug.Assert(!typesLeftToOrder.Any());
+
+            return orderedTypesHierarchy;
+        }
+
+        private static IEnumerable<Type> GetTypeInheritanceChain(Type type)
+        {
+            if (type == typeof(object))
+            {
+                return new[] {type};
+            }
+
+            return GetTypeInheritanceChain(type.BaseType).Concat(new[] {type});
         }
 
         private class ExportKeywordPrependingClassCodeGenerator : ClassCodeGenerator

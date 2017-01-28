@@ -1,70 +1,89 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
+using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Messages.Events;
 using AuctionHouse.Messages.Events.Auctions;
 using AuctionHouse.Messages.Queries.Auctions;
 using AuctionHouse.ReadModel.Auctions.Details;
-using EventStore.ClientAPI;
 using Newtonsoft.Json;
 
 namespace AuctionHouse.QueryHandling.Auctions
 {
     // TODO: Extract base class
-    public class GetAuctionDetailsQueryHandler : IQueryHandler<GetAuctionDetailsQuery, AuctionDetailsReadModel>
+    // TODO: For fast prototyping automapping from events to RM could be introduced
+    public class GetAuctionDetailsQueryHandler : IQueryHandler<GetAuctionDetailsQuery, AuctionDetailsReadModel>,
+        IEventSourcedEntity
     {
-        private readonly IEventStoreConnection _eventStoreConnection;
+        private readonly ConcurrentDictionary<Guid, CachedReadModel<AuctionDetailsReadModel>> _readModelsCache =
+            new ConcurrentDictionary<Guid, CachedReadModel<AuctionDetailsReadModel>>();
 
-        public GetAuctionDetailsQueryHandler(IEventStoreConnection eventStoreConnection)
+        public void Apply(IEvent @event)
         {
-            _eventStoreConnection = eventStoreConnection;
+            if (@event is AuctionCreatedEvent)
+            {
+                var auctionDetails = new AuctionDetailsReadModel();
+                var auctionCreatedEvent = (AuctionCreatedEvent) @event;
+                auctionDetails.Id = auctionCreatedEvent.Id;
+                auctionDetails.Title = auctionCreatedEvent.Title;
+                auctionDetails.Description = auctionCreatedEvent.Description;
+                AddCachedReadModel(auctionCreatedEvent.Id, auctionDetails);
+            }
         }
 
         public async Task<AuctionDetailsReadModel> Handle(GetAuctionDetailsQuery query)
         {
-            var streamId = $"Auction-{query.Id}"; //TODO: To common code
-            var auctionDetails = new AuctionDetailsReadModel();
-            await ReadEventStream(streamId, @event =>
+            if (query == null)
             {
-                if (@event is AuctionCreatedEvent)
-                {
-                    var auctionCreatedEvent = (AuctionCreatedEvent) @event;
-                    auctionDetails.Id = auctionCreatedEvent.AuctionId;
-                    auctionDetails.Title = auctionCreatedEvent.Title;
-                    auctionDetails.Description = auctionCreatedEvent.Description;
-                }
-            });
+                throw new ArgumentNullException(nameof(query));
+            }
 
-            return auctionDetails;
+            CachedReadModel<AuctionDetailsReadModel> cachedReadModel;
+
+            return _readModelsCache.TryGetValue(query.Id, out cachedReadModel) ? cachedReadModel.GetReadModel() : null;
         }
 
-        private async Task ReadEventStream(string streamName, Action<IEvent> handleEvent)
+        private void AddCachedReadModel(Guid id, AuctionDetailsReadModel readModel)
         {
-            StreamEventsSlice currentSlice;
-            var nextSliceStart = StreamPosition.Start;
-            do
+            if (!_readModelsCache.TryAdd(id, new CachedReadModel<AuctionDetailsReadModel>(readModel)))
             {
-                currentSlice =
-                    await _eventStoreConnection.ReadStreamEventsForwardAsync(streamName, nextSliceStart,
-                        200, false);
+                throw new InvalidOperationException();
+            }
+        }
 
-                nextSliceStart = currentSlice.NextEventNumber;
+        private class CachedReadModel<TReadModel> where TReadModel : class
+        {
+            // We do not lock on reads, because we expect eventual consistency
+            private readonly object _writeLock = new object();
+            private TReadModel _readModel;
 
-                foreach (var eventStoreEvent in currentSlice.Events)
+            public CachedReadModel(TReadModel readModel)
+            {
+                _readModel = readModel;
+            }
+
+            public void Mutate(Action<TReadModel> mutator)
+            {
+                lock (_writeLock)
                 {
-                    var textSerializedEvent = Encoding.UTF8.GetString(eventStoreEvent.Event.Data);
-
-                    //TODO: Create a cached dictionary
-                    var eventType =
-                        typeof(EventsAssemblyMarker).Assembly.GetTypes()
-                            .Single(t => t.Name == eventStoreEvent.Event.EventType);
-
-                    var @event = (IEvent) JsonConvert.DeserializeObject(textSerializedEvent, eventType);
-                    handleEvent(@event);
+                    var clonedReadModel = GetReadModel();
+                    mutator(clonedReadModel);
+                    Interlocked.Exchange(ref _readModel, clonedReadModel);
                 }
-            } while (!currentSlice.IsEndOfStream);
+            }
+
+            public TReadModel GetReadModel()
+            {
+                return DeepClone(_readModel);
+            }
+
+            private static T DeepClone<T>(T source)
+            {
+                // This is not pretty, but does its job:
+                var serialized = JsonConvert.SerializeObject(source);
+                return JsonConvert.DeserializeObject<T>(serialized);
+            }
         }
     }
 }
