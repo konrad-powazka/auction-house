@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
+﻿using System.Configuration;
 
 namespace AuctionHouse.Web
 {
@@ -11,5 +7,21 @@ namespace AuctionHouse.Web
     {
         public static string NServiceBusCommandHandlingDestination
             => ConfigurationManager.AppSettings["NServiceBusCommandHandlingDestination"];
+
+        public static int? EventsApplicationToReadModelDelayInMilliseconds
+        {
+            get
+            {
+                {
+                    var rawValue = ConfigurationManager.AppSettings["EventsApplicationToReadModelDelayInMilliseconds"];
+                    if (string.IsNullOrEmpty(rawValue))
+                    {
+                        return null;
+                    }
+
+                    return int.Parse(rawValue);
+                }
+            }
+        }
     }
 }

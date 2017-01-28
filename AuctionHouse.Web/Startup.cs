@@ -114,6 +114,13 @@ namespace AuctionHouse.Web
                 .As<IHubContext<ICommandHandlingFeedbackHubClient>>()
                 .ExternallyOwned();
 
+            builder.Register(
+                c =>
+                    hubConfig.Resolver.Resolve<IConnectionManager>()
+                        .GetHubContext<EventAppliedToReadModelNotificationHub, IEventAppliedToReadModelNotificationHubClient>())
+                .As<IHubContext<IEventAppliedToReadModelNotificationHubClient>>()
+                .ExternallyOwned();
+
             var jsonSerializer =
                 JsonSerializer.Create(new JsonSerializerSettings
                 {

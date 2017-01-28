@@ -709,10 +709,9 @@
 
 	"use strict";
 	var QueryHandler = (function () {
-	    function QueryHandler(httpService, qService, pushNotificationsService) {
+	    function QueryHandler(httpService, qService) {
 	        this.httpService = httpService;
 	        this.qService = qService;
-	        this.pushNotificationsService = pushNotificationsService;
 	    }
 	    QueryHandler.prototype.handle = function (query) {
 	        var url = "api/" + this.getQueryName() + "/Handle";

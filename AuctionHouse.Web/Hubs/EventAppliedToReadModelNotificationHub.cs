@@ -13,20 +13,19 @@ namespace AuctionHouse.Web.Hubs
 {
     public class EventAppliedToReadModelNotificationHub : Hub<IEventAppliedToReadModelNotificationHubClient>
     {
-        private static readonly IHubContext<IEventAppliedToReadModelNotificationHubClient> HubContext =
-            GlobalHost.ConnectionManager
-                .GetHubContext<CommandHandlingFeedbackHub, IEventAppliedToReadModelNotificationHubClient>();
-
         private static readonly ConcurrentDictionary<string, ConcurrentDictionary<Guid, Subscription>>
             ConnectionIdToSubscriptionIdToSubscriptionMapMap =
                 new ConcurrentDictionary<string, ConcurrentDictionary<Guid, Subscription>>();
 
         private readonly IContinuousEventSourcedEntitiesBuilder _continuousEventSourcedEntitiesBuilder;
+        private readonly IHubContext<IEventAppliedToReadModelNotificationHubClient> _hubContext;
 
         public EventAppliedToReadModelNotificationHub(
-            IContinuousEventSourcedEntitiesBuilder continuousEventSourcedEntitiesBuilder)
+            IContinuousEventSourcedEntitiesBuilder continuousEventSourcedEntitiesBuilder,
+            IHubContext<IEventAppliedToReadModelNotificationHubClient> hubContext)
         {
             _continuousEventSourcedEntitiesBuilder = continuousEventSourcedEntitiesBuilder;
+            _hubContext = hubContext;
         }
 
         public NotifyOnEventsAppliedToReadModelResponse NotifyOnEventsApplied(
@@ -36,7 +35,6 @@ namespace AuctionHouse.Web.Hubs
             {
                 throw new ArgumentNullException(nameof(eventIds));
             }
-
 
             var unappliedEventIds =
                 eventIds.Where(i => !_continuousEventSourcedEntitiesBuilder.CheckIfEventWasApplied(i)).ToArray();
@@ -50,7 +48,7 @@ namespace AuctionHouse.Web.Hubs
             var subscriptionId = Guid.NewGuid();
 
             var subscription = new Subscription(subscriptionId, connectionId, unappliedEventIds,
-                _continuousEventSourcedEntitiesBuilder);
+                _continuousEventSourcedEntitiesBuilder, _hubContext);
 
             var clientSubscriptionIdToSubscriptionMap =
                 ConnectionIdToSubscriptionIdToSubscriptionMapMap[connectionId];
@@ -125,6 +123,7 @@ namespace AuctionHouse.Web.Hubs
         {
             private readonly string _connectionId;
             private readonly IContinuousEventSourcedEntitiesBuilder _continuousEventSourcedEntitiesBuilder;
+            private readonly IHubContext<IEventAppliedToReadModelNotificationHubClient> _hubContext;
             private readonly ConcurrentDictionary<Guid, object> _eventIdsToNotifyOnReadModelApplication;
             private readonly Guid _id;
             private readonly object _startLock = new object();
@@ -134,11 +133,12 @@ namespace AuctionHouse.Web.Hubs
             private Action _actionOnStopped;
 
             public Subscription(Guid id, string connectionId, IEnumerable<Guid> eventIdsToNotifyOnReadModelApplication,
-                IContinuousEventSourcedEntitiesBuilder continuousEventSourcedEntitiesBuilder)
+                IContinuousEventSourcedEntitiesBuilder continuousEventSourcedEntitiesBuilder, IHubContext<IEventAppliedToReadModelNotificationHubClient> hubContext)
             {
                 _id = id;
                 _connectionId = connectionId;
                 _continuousEventSourcedEntitiesBuilder = continuousEventSourcedEntitiesBuilder;
+                _hubContext = hubContext;
 
                 _eventIdsToNotifyOnReadModelApplication =
                     new ConcurrentDictionary<Guid, object>(eventIdsToNotifyOnReadModelApplication.ToDictionary(i => i,
@@ -212,7 +212,7 @@ namespace AuctionHouse.Web.Hubs
 
                     if (!isPremature)
                     {
-                        var client = HubContext.Clients.Client(_connectionId);
+                        var client = _hubContext.Clients.Client(_connectionId);
                         client.HandleEventsAppliedToReadModel(_id);
                     }
 

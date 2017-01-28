@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Persistence;
@@ -43,6 +44,12 @@ namespace AuctionHouse.Web.EventSourcing
 
         private void HandleEventEnvelope(MessageEnvelope<IEvent> eventEnvelope)
         {
+            // In real life this would be handled by a decorator
+            if (Configuration.EventsApplicationToReadModelDelayInMilliseconds.HasValue)
+            {
+                Thread.Sleep(Configuration.EventsApplicationToReadModelDelayInMilliseconds.Value);
+            }
+
             foreach (var eventSourcedBuilder in _eventSourcedBuilders)
             {
                 eventSourcedBuilder.Apply(eventEnvelope.Message);

@@ -256,7 +256,7 @@
     <Compile Include="Cqrs\NServiceBusCommandQueue.cs" />
     <Compile Include="Hubs\CommandHandlingFeedbackHub.cs" />
     <Compile Include="Hubs\EventAppliedToReadModelNotificationHub.cs" />
-    <Compile Include="Hubs\ICommandHandlingFeedbackHubContext.cs" />
+    <Compile Include="Hubs\ICommandHandlingFeedbackHubClient.cs" />
     <Compile Include="Hubs\IEventAppliedToReadModelNotificationHubClient.cs" />
     <Compile Include="Models\LoginCommand.cs" />
     <Compile Include="Models\NotifyOnEventsAppliedToReadModelResponse.cs" />
@@ -425,11 +425,8 @@
     <TypeScriptCompile Include="Scripts\app\CommandHandling\ICommandHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\Events.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\GuidGenerator.ts" />
-    <TypeScriptCompile Include="Scripts\app\Infrastructure\IPushNotificationsService.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\IEventAppliedToReadModelNotificationHubServer.ts" />
     <TypeScriptCompile Include="Scripts\app\Infrastructure\NotifyOnEventsAppliedToReadModelResponse.ts" />
-    <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsService.ts" />
-    <TypeScriptCompile Include="Scripts\app\Infrastructure\PushNotificationsSubscription.ts" />
     <TypeScriptCompile Include="Scripts\app\Messages\Commands.ts" />
     <TypeScriptCompile Include="Scripts\app\Messages\ICommand.ts" />
     <TypeScriptCompile Include="Scripts\app\Messages\Queries.ts" />
