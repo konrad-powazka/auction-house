@@ -18,6 +18,7 @@ using Autofac;
 using Autofac.Integration.SignalR;
 using Autofac.Integration.WebApi;
 using EventStore.ClientAPI;
+using EventStore.ClientAPI.SystemData;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Infrastructure;
@@ -152,7 +153,7 @@ namespace AuctionHouse.Web
             //TODO: Read from config
             const int defaultPort = 1113;
             var settings = ConnectionSettings.Create();
-            settings.KeepReconnecting();
+            settings.KeepReconnecting().SetDefaultUserCredentials(new UserCredentials("admin", "changeit"));
             var endpoint = new IPEndPoint(IPAddress.Loopback, defaultPort);
             var connection = EventStoreConnection.Create(settings, endpoint);
             connection.ConnectAsync().Wait();

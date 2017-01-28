@@ -355,7 +355,7 @@
 	                    }
 	                };
 	                var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
-	                    if (commandHandlingFailedEvent.CommandId === command.id) {
+	                    if (commandHandlingFailedEvent.commandId === command.id) {
 	                        wasPromiseResolvedOrRejected = true;
 	                        deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
 	                    }

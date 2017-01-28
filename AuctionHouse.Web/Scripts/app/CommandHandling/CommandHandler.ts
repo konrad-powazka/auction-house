@@ -68,7 +68,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
                         };
 
                         const commandHandlingFailureCallback = (commandHandlingFailedEvent: any) => {
-                            if (commandHandlingFailedEvent.CommandId === command.id) {
+                            if (commandHandlingFailedEvent.commandId === command.id) {
                                 wasPromiseResolvedOrRejected = true;
                                 deferred.reject(CommandHandlingErrorType.FailedToProcess);
                             }
