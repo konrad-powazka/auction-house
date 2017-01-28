@@ -339,7 +339,8 @@
 	                CommandHandler.commandHandlingFailureCallbacks.fire(commandHandlingFailedEvent);
 	            };
 	            var eventAppliedToReadModelNotificationHub = connection.eventAppliedToReadModelNotificationHub;
-	            eventAppliedToReadModelNotificationHub.client.handleEventsAppliedToReadModel = function (subscriptionId) {
+	            eventAppliedToReadModelNotificationHub.client
+	                .handleEventsAppliedToReadModel = function (subscriptionId) {
 	                CommandHandler.eventsAppliedToReadModelCallbacks.fire(subscriptionId);
 	            };
 	            CommandHandler
@@ -352,25 +353,15 @@
 	        var deferred = this.qService.defer();
 	        this.connectSignalR()
 	            .then(function () {
-	            _this.sendCommand(command, shouldWaitForEventsApplicationToReadModel, deferred);
+	            _this.sendCommandAndWaitForHandling(command, shouldWaitForEventsApplicationToReadModel, deferred);
 	        })
 	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
 	        return deferred.promise;
 	    };
-	    CommandHandler.prototype.sendCommand = function (command, shouldWaitForEventsApplicationToReadModel, deferred) {
-	        var _this = this;
-	        var url = "api/" + this.getCommandName() + "/Handle";
-	        this.httpService.post(url, command)
-	            .then(function () {
-	            // TODO: Generate command id internally, it does not need to be visible outside
-	            _this.waitForCommandHandling(command.id, shouldWaitForEventsApplicationToReadModel, deferred);
-	        })
-	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
-	    };
-	    CommandHandler.prototype.waitForCommandHandling = function (commandId, shouldWaitForEventsApplicationToReadModel, deferred) {
+	    CommandHandler.prototype.sendCommandAndWaitForHandling = function (command, shouldWaitForEventsApplicationToReadModel, deferred) {
 	        var _this = this;
 	        var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
-	            if (commandHandlingSucceededEvent.commandId === commandId) {
+	            if (commandHandlingSucceededEvent.commandId === command.id) {
 	                if (!shouldWaitForEventsApplicationToReadModel) {
 	                    deferred.resolve();
 	                }
@@ -382,22 +373,30 @@
 	            }
 	        };
 	        var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
-	            if (commandHandlingFailedEvent.commandId === commandId) {
+	            if (commandHandlingFailedEvent.commandId === command.id) {
 	                deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
 	            }
 	        };
 	        CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
 	        CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
+	        this.sendCommand(command)
+	            .then(function () {
+	            var commandHandlingTimeoutMilliseconds = 15 * 1000;
+	            _this.timeoutService(commandHandlingTimeoutMilliseconds)
+	                .then(function () {
+	                deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.Timeout);
+	            });
+	        })
+	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
 	        var removeCallbacks = function () {
 	            CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
 	            CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
 	        };
 	        deferred.promise.finally(removeCallbacks);
-	        var commandHandlingTimeoutMilliseconds = 15 * 1000;
-	        this.timeoutService(commandHandlingTimeoutMilliseconds)
-	            .then(function () {
-	            deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.Timeout);
-	        });
+	    };
+	    CommandHandler.prototype.sendCommand = function (command) {
+	        var url = "api/" + this.getCommandName() + "/Handle";
+	        return this.httpService.post(url, command);
 	    };
 	    CommandHandler.prototype.waitForEventsApplicationToReadModel = function (publishedEventIds, deferred) {
 	        CommandHandler
@@ -414,7 +413,8 @@
 	                }
 	            };
 	            CommandHandler.eventsAppliedToReadModelCallbacks.add(eventsAppliedCallback);
-	            deferred.promise.finally(function () { return CommandHandler.eventsAppliedToReadModelCallbacks.remove(eventsAppliedCallback); });
+	            deferred.promise.finally(function () { return CommandHandler.eventsAppliedToReadModelCallbacks
+	                .remove(eventsAppliedCallback); });
 	            deferred.promise.catch(function () {
 	                // TODO: cancel subscription on timeout
 	            });
