@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Web", "Auction
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.ServiceBus", "AuctionHouse.ServiceBus\AuctionHouse.ServiceBus.csproj", "{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventStore", "EventStore", "{AA5E1D0B-14F9-4F04-8002-945D1EF2378C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.EventStoreLauncher", "AuctionHouse.EventStoreLauncher\AuctionHouse.EventStoreLauncher.csproj", "{C16953B4-C157-442D-9816-6388C654D05F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Messages.Commands", "AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj", "{3FB528A3-F733-415D-8E46-49B846F8D27C}"
