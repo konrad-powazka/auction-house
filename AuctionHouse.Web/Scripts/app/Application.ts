@@ -8,6 +8,8 @@ import {ApplicationCtrl} from './UI/Shared/ApplicationCtrl';
 import {Routing} from './Routing';
 import {AngularQueryHandlersRegistry} from './QueryHandling/GeneratedQueryHandlers';
 import {DisplayAuctionComponent} from './UI/Auctions/DisplayAuctionComponent';
+import BusyIndicator from './UI/Shared/BusyIndicator';
+import {AngularCommandUiHandlersRegistry} from './UI/Shared/CommandHandling/GeneratedUiCommandHandlers';
 
 export class Application {
     private static components: INamedComponentOptions[] = [
@@ -20,12 +22,13 @@ export class Application {
         const module = angular.module('auctionHouse',
         [
             'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
-            'ui.bootstrap.datetimepicker'
+            'ui.bootstrap.datetimepicker', 'angularSpinner'
         ]);
 
         module.controller('applicationCtrl', ApplicationCtrl);
 
         this.registerSerivces(module);
+        this.registerConstants(module);
 
         for (let component of Application.components) {
             module.component(component.registerAs, component);
@@ -40,8 +43,13 @@ export class Application {
     private static registerSerivces(module: ng.IModule): void {
         module.service(AngularCommandHandlersRegistry.commandHandlers);
         module.service(AngularQueryHandlersRegistry.queryHandlers);
+        module.service(AngularCommandUiHandlersRegistry.commandUiHandlers);
         module.service('securityService', SecurityService);
         module.service('securityUiService', SecurityUiService);
+    }
+
+    private static registerConstants(module: ng.IModule): void {
+        module.constant('busyIndicator', new BusyIndicator());
     }
 
     private static configureModule($stateProvider: ng.ui.IStateProvider): void {

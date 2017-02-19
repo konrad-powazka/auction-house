@@ -1,6 +1,6 @@
 ﻿import { CreateAuctionCommand } from '../../Messages/Commands';
 import { CreateAuctionCommandHandler } from '../../CommandHandling/GeneratedCommandHandlers';
-import { ICommandHandler } from '../../CommandHandling/ICommandHandler';
+import { ICommandUiHandler } from '../Shared/CommandHandling/ICommandUiHandler';
 import { CommandHandlingErrorType } from '../../CommandHandling/CommandHandlingErrorType';
 import {IQueryHandler as QueryHandler} from '../../QueryHandling/IQueryHandler';
 import {GetAuctionDetailsQuery as AuctionDetailsQuery} from '../../Messages/Queries';
@@ -12,9 +12,9 @@ export class CreateAuctionCtrl implements ng.IController {
     model: CreateAuctionCommand;
     form: ng.IFormController;
 
-    static $inject = ['createAuctionCommandHandler', 'getAuctionDetailsQueryHandler', '$state'];
+    static $inject = ['createAuctionCommandUiHandler', 'getAuctionDetailsQueryHandler', '$state'];
 
-    constructor(private createAuctionCommandHandler: ICommandHandler<CreateAuctionCommand>,
+    constructor(private createAuctionCommandUiHandler: ICommandUiHandler<CreateAuctionCommand>,
         private getAuctionDetailsQueryHandler: QueryHandler<AuctionDetailsQuery, AuctionDetailsReadModel>,
         private stateService: ng.ui.IStateService) {
         this.model = {
@@ -62,7 +62,7 @@ export class CreateAuctionCtrl implements ng.IController {
             return;
         }
 
-        this.createAuctionCommandHandler
+        this.createAuctionCommandUiHandler
             .handle(this.model, true)
             .then(() => {
                 alert('Success');

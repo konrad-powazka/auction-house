@@ -1,16 +1,14 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="$(TargetDir)AuctionHouse.DynamicTypeScanning.dll" #>
+<#@ assembly name="$(TargetDir)AuctionHouse.Messages.Commands.dll" #>
 <#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="AuctionHouse.DynamicTypeScanning" #>
+<#@ import namespace="AuctionHouse.Messages.Commands" #>
 <#@ output extension=".ts" #>
 
 import { CommandHandler } from './CommandHandler';
 import * as Commands from '../Messages/Commands';
 
-<# foreach(var commandType in AuctionHouse.DynamicTypeScanning.DynamicTypeScanner.GetCommandTypes())
+<# foreach(var commandType in CommandsAssemblyMarker.GetCommandTypes())
 { #>
 	export class <#= commandType.Name #>Handler extends CommandHandler<Commands.<#= commandType.Name #>> {
 		protected getCommandName(): string {
@@ -21,7 +19,7 @@ import * as Commands from '../Messages/Commands';
 
 export class AngularCommandHandlersRegistry {
 	static commandHandlers: {[name: string]: ng.Injectable<Function>} = {
-			<# foreach(var commandType in AuctionHouse.DynamicTypeScanning.DynamicTypeScanner.GetCommandTypes())
+			<# foreach(var commandType in CommandsAssemblyMarker.GetCommandTypes())
 			{ #>
 				'<#= commandType.Name.First().ToString().ToLower() + commandType.Name.Substring(1) #>Handler': <#= commandType.Name #>Handler,
 			<# } #>

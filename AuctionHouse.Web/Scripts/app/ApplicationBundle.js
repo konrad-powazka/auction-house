@@ -54,16 +54,19 @@
 	var Routing_1 = __webpack_require__(12);
 	var GeneratedQueryHandlers_1 = __webpack_require__(13);
 	var DisplayAuctionComponent_1 = __webpack_require__(15);
+	var BusyIndicator_1 = __webpack_require__(17);
+	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
 	var Application = (function () {
 	    function Application() {
 	    }
 	    Application.bootstrap = function () {
 	        var module = angular.module('auctionHouse', [
 	            'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
-	            'ui.bootstrap.datetimepicker'
+	            'ui.bootstrap.datetimepicker', 'angularSpinner'
 	        ]);
 	        module.controller('applicationCtrl', ApplicationCtrl_1.ApplicationCtrl);
 	        this.registerSerivces(module);
+	        this.registerConstants(module);
 	        for (var _i = 0, _a = Application.components; _i < _a.length; _i++) {
 	            var component = _a[_i];
 	            module.component(component.registerAs, component);
@@ -77,8 +80,12 @@
 	    Application.registerSerivces = function (module) {
 	        module.service(GeneratedCommandHandlers_1.AngularCommandHandlersRegistry.commandHandlers);
 	        module.service(GeneratedQueryHandlers_1.AngularQueryHandlersRegistry.queryHandlers);
+	        module.service(GeneratedUiCommandHandlers_1.AngularCommandUiHandlersRegistry.commandUiHandlers);
 	        module.service('securityService', SecurityService_1.SecurityService);
 	        module.service('securityUiService', SecurityUiService_1.SecurityUiService);
+	    };
+	    Application.registerConstants = function (module) {
+	        module.constant('busyIndicator', new BusyIndicator_1.default());
 	    };
 	    Application.configureModule = function ($stateProvider) {
 	        Routing_1.Routing.configure($stateProvider);
@@ -148,8 +155,8 @@
 	var CommandHandlingErrorType_1 = __webpack_require__(3);
 	var GuidGenerator_1 = __webpack_require__(4);
 	var CreateAuctionCtrl = (function () {
-	    function CreateAuctionCtrl(createAuctionCommandHandler, getAuctionDetailsQueryHandler, stateService) {
-	        this.createAuctionCommandHandler = createAuctionCommandHandler;
+	    function CreateAuctionCtrl(createAuctionCommandUiHandler, getAuctionDetailsQueryHandler, stateService) {
+	        this.createAuctionCommandUiHandler = createAuctionCommandUiHandler;
 	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
 	        this.stateService = stateService;
 	        this.model = {
@@ -196,7 +203,7 @@
 	        if (!this.form.$valid) {
 	            return;
 	        }
-	        this.createAuctionCommandHandler
+	        this.createAuctionCommandUiHandler
 	            .handle(this.model, true)
 	            .then(function () {
 	            alert('Success');
@@ -208,7 +215,7 @@
 	    };
 	    return CreateAuctionCtrl;
 	}());
-	CreateAuctionCtrl.$inject = ['createAuctionCommandHandler', 'getAuctionDetailsQueryHandler', '$state'];
+	CreateAuctionCtrl.$inject = ['createAuctionCommandUiHandler', 'getAuctionDetailsQueryHandler', '$state'];
 	exports.CreateAuctionCtrl = CreateAuctionCtrl;
 
 
@@ -614,12 +621,54 @@
 
 	"use strict";
 	var ApplicationCtrl = (function () {
-	    function ApplicationCtrl(securityUiService) {
+	    function ApplicationCtrl(securityUiService, busyIndicator) {
 	        this.securityUiService = securityUiService;
+	        this.busyIndicator = busyIndicator;
+	        this.spinnerOptions = {
+	            lines: 13 // The number of lines to draw
+	            ,
+	            length: 28 // The length of each line
+	            ,
+	            width: 14 // The line thickness
+	            ,
+	            radius: 35 // The radius of the inner circle
+	            ,
+	            scale: 1 // Scales overall size of the spinner
+	            ,
+	            corners: 1 // Corner roundness (0..1)
+	            ,
+	            color: '#FFFFFF' // #rgb or #rrggbb or array of colors
+	            ,
+	            opacity: 0.25 // Opacity of the lines
+	            ,
+	            rotate: 0 // The rotation offset
+	            ,
+	            direction: 1 // 1: clockwise, -1: counterclockwise
+	            ,
+	            speed: 2.2 // Rounds per second
+	            ,
+	            trail: 60 // Afterglow percentage
+	            ,
+	            fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+	            ,
+	            zIndex: 2e9 // The z-index (defaults to 2000000000)
+	            ,
+	            className: 'spinner' // The CSS class to assign to the spinner
+	            ,
+	            top: '50%' // Top position relative to parent
+	            ,
+	            left: '50%' // Left position relative to parent
+	            ,
+	            shadow: false // Whether to render a shadow
+	            ,
+	            hwaccel: false // Whether to use hardware acceleration
+	            ,
+	            position: 'relative' // Element positioning
+	        };
 	    }
 	    return ApplicationCtrl;
 	}());
-	ApplicationCtrl.$inject = ['securityUiService'];
+	ApplicationCtrl.$inject = ['securityUiService', 'busyIndicator'];
 	exports.ApplicationCtrl = ApplicationCtrl;
 
 
@@ -761,6 +810,135 @@
 	}());
 	DisplayAuctionCtrl.$inject = ['getAuctionDetailsQueryHandler'];
 	exports.DisplayAuctionCtrl = DisplayAuctionCtrl;
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var BusyIndicator = (function () {
+	    function BusyIndicator(parentBusyIndicator) {
+	        this.parentBusyIndicator = parentBusyIndicator;
+	        this.busyStatesCount = 0;
+	    }
+	    Object.defineProperty(BusyIndicator.prototype, "isBusy", {
+	        get: function () {
+	            return this.busyStatesCount > 0 ||
+	                (!!this.parentBusyIndicator && this.parentBusyIndicator.isBusy);
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    BusyIndicator.prototype.enterBusyState = function () {
+	        var _this = this;
+	        var wasBusyStateLeft = false;
+	        this.busyStatesCount++;
+	        var leaveBusyStateFn = function () {
+	            if (!wasBusyStateLeft) {
+	                wasBusyStateLeft = true;
+	                _this.busyStatesCount--;
+	            }
+	        };
+	        return leaveBusyStateFn;
+	    };
+	    BusyIndicator.prototype.createNestedBusyIndicator = function () {
+	        return new BusyIndicator(this);
+	    };
+	    BusyIndicator.prototype.attachToPromise = function (promise) {
+	        var leaveBusyStateFn = this.enterBusyState();
+	        promise.finally(function () {
+	            leaveBusyStateFn();
+	        });
+	        return promise;
+	    };
+	    return BusyIndicator;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = BusyIndicator;
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var CommandUiHandler_1 = __webpack_require__(19);
+	var CancelAuctionCommandUiHandler = (function (_super) {
+	    __extends(CancelAuctionCommandUiHandler, _super);
+	    function CancelAuctionCommandUiHandler(cancelAuctionCommandHandler, busyIndicator, securityUiService) {
+	        var _this = _super.call(this, busyIndicator, securityUiService) || this;
+	        _this.cancelAuctionCommandHandler = cancelAuctionCommandHandler;
+	        return _this;
+	    }
+	    CancelAuctionCommandUiHandler.prototype.getCommandHandler = function () {
+	        return this.cancelAuctionCommandHandler;
+	    };
+	    return CancelAuctionCommandUiHandler;
+	}(CommandUiHandler_1.CommandUiHandler));
+	exports.CancelAuctionCommandUiHandler = CancelAuctionCommandUiHandler;
+	var CreateAuctionCommandUiHandler = (function (_super) {
+	    __extends(CreateAuctionCommandUiHandler, _super);
+	    function CreateAuctionCommandUiHandler(createAuctionCommandHandler, busyIndicator, securityUiService) {
+	        var _this = _super.call(this, busyIndicator, securityUiService) || this;
+	        _this.createAuctionCommandHandler = createAuctionCommandHandler;
+	        return _this;
+	    }
+	    CreateAuctionCommandUiHandler.prototype.getCommandHandler = function () {
+	        return this.createAuctionCommandHandler;
+	    };
+	    return CreateAuctionCommandUiHandler;
+	}(CommandUiHandler_1.CommandUiHandler));
+	exports.CreateAuctionCommandUiHandler = CreateAuctionCommandUiHandler;
+	var MakeBidCommandUiHandler = (function (_super) {
+	    __extends(MakeBidCommandUiHandler, _super);
+	    function MakeBidCommandUiHandler(makeBidCommandHandler, busyIndicator, securityUiService) {
+	        var _this = _super.call(this, busyIndicator, securityUiService) || this;
+	        _this.makeBidCommandHandler = makeBidCommandHandler;
+	        return _this;
+	    }
+	    MakeBidCommandUiHandler.prototype.getCommandHandler = function () {
+	        return this.makeBidCommandHandler;
+	    };
+	    return MakeBidCommandUiHandler;
+	}(CommandUiHandler_1.CommandUiHandler));
+	exports.MakeBidCommandUiHandler = MakeBidCommandUiHandler;
+	var AngularCommandUiHandlersRegistry = (function () {
+	    function AngularCommandUiHandlersRegistry() {
+	    }
+	    return AngularCommandUiHandlersRegistry;
+	}());
+	AngularCommandUiHandlersRegistry.commandUiHandlers = {
+	    'cancelAuctionCommandUiHandler': CancelAuctionCommandUiHandler,
+	    'createAuctionCommandUiHandler': CreateAuctionCommandUiHandler,
+	    'makeBidCommandUiHandler': MakeBidCommandUiHandler,
+	};
+	exports.AngularCommandUiHandlersRegistry = AngularCommandUiHandlersRegistry;
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var CommandUiHandler = (function () {
+	    function CommandUiHandler(busyIndicator, securityUiService) {
+	        this.busyIndicator = busyIndicator;
+	        this.securityUiService = securityUiService;
+	    }
+	    CommandUiHandler.prototype.handle = function (command, shouldWaitForEventsApplicationToReadModel) {
+	        // TODO: Authorization and authentication
+	        var promise = this.getCommandHandler().handle(command, shouldWaitForEventsApplicationToReadModel);
+	        return this.busyIndicator.attachToPromise(promise);
+	    };
+	    return CommandUiHandler;
+	}());
+	exports.CommandUiHandler = CommandUiHandler;
 
 
 /***/ }

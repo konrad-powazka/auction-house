@@ -22,7 +22,9 @@ namespace AuctionHouse.Web
                 "~/Scripts/formly.js",
                 "~/Scripts/angular-formly-templates-bootstrap.js",
                 "~/node_modules/moment/moment.js",
-                "~/Scripts/datetimepicker-fixed.js"));
+                "~/Scripts/datetimepicker-fixed.js",
+                "~/Scripts/spin.js",
+                "~/Scripts/angular-spinner.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap.css",

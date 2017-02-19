@@ -1,17 +1,15 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="$(TargetDir)AuctionHouse.DynamicTypeScanning.dll" #>
+<#@ assembly name="$(TargetDir)AuctionHouse.Messages.Queries.dll" #>
 <#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="AuctionHouse.DynamicTypeScanning" #>
+<#@ import namespace="AuctionHouse.Messages.Queries" #>
 <#@ output extension=".ts" #>
 
 import { QueryHandler } from './QueryHandler';
 import * as Queries from '../Messages/Queries';
 import * as ReadModel from '../ReadModel';
 
-<# foreach(var queryTypeInfo in DynamicTypeScanner.GetQueryTypeInfos())
+<# foreach(var queryTypeInfo in QueriesAssemblyMarker.GetQueryTypeInfos())
 { #>
 export class <#= queryTypeInfo.QueryType.Name #>Handler extends QueryHandler<Queries.<#= queryTypeInfo.QueryType.Name #>, ReadModel.<#= queryTypeInfo.QueryResultType.Name #>> {
 	protected getQueryName(): string {
@@ -22,7 +20,7 @@ export class <#= queryTypeInfo.QueryType.Name #>Handler extends QueryHandler<Que
 
 export class AngularQueryHandlersRegistry {
 	static queryHandlers: {[name: string]: ng.Injectable<Function>} = {
-			<# foreach(var queryTypeInfo in DynamicTypeScanner.GetQueryTypeInfos())
+			<# foreach(var queryTypeInfo in QueriesAssemblyMarker.GetQueryTypeInfos())
 			{ #>
 				'<#= queryTypeInfo.QueryType.Name.First().ToString().ToLower() + queryTypeInfo.QueryType.Name.Substring(1) #>Handler': <#= queryTypeInfo.QueryType.Name #>Handler,
 			<# } #>

@@ -1,0 +1,38 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(TargetDir)AuctionHouse.Core.dll" #>
+<#@ assembly name="$(TargetDir)AuctionHouse.Messages.Commands.dll" #>
+<#@ import namespace="AuctionHouse.Messages.Commands" #>
+<#@ import namespace="AuctionHouse.Core.Text" #>
+<#@ output extension=".ts" #>
+
+import { CommandUiHandler } from './CommandUiHandler';
+import { ICommandHandler } from '../../../CommandHandling/ICommandHandler';
+import * as Commands from '../../../Messages/Commands';
+import {SecurityUiService } from '../SecurityUiService';
+import BusyIndicator from '../BusyIndicator';
+
+<# foreach(var commandType in CommandsAssemblyMarker.GetCommandTypes())
+{ #>
+	export class <#= commandType.Name #>UiHandler extends CommandUiHandler<Commands.<#= commandType.Name #>> {
+		static $inject: ['<#= commandType.Name.LowerCaseFirstLetter() #>Handler', 'busyIndicator', 'securityUiService'];
+
+		constructor(
+			private <#= commandType.Name.LowerCaseFirstLetter() #>Handler: ICommandHandler<Commands.<#= commandType.Name #>>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
+			super(busyIndicator, securityUiService);
+		}
+
+		protected getCommandHandler(): ICommandHandler<Commands.<#= commandType.Name #>> {
+			return this.<#= commandType.Name.LowerCaseFirstLetter() #>Handler;
+		}
+	}
+<# } #>
+
+export class AngularCommandUiHandlersRegistry {
+	static commandUiHandlers: {[name: string]: ng.Injectable<Function>} = {
+			<# foreach(var commandType in CommandsAssemblyMarker.GetCommandTypes())
+			{ #>
+				'<#= commandType.Name.LowerCaseFirstLetter() #>UiHandler': <#= commandType.Name #>UiHandler,
+			<# } #>
+		};
+	}

@@ -316,6 +316,10 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GeneratedQueryHandlers.ts</LastGenOutput>
     </Content>
+    <Content Include="Scripts\app\UI\Shared\CommandHandling\GeneratedUiCommandHandlers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GeneratedUiCommandHandlers.ts</LastGenOutput>
+    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\angular-route.min.js.map" />
@@ -444,6 +448,14 @@
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\ViewAuctionCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\BusyIndicator.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\GeneratedUiCommandHandlers.ts">
+      <DependentUpon>GeneratedUiCommandHandlers.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\ICommandUiHandler.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\CommandUiHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\LoginDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\ApplicationCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\LoginDialogCtrl.ts" />

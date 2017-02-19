@@ -50,11 +50,18 @@ namespace AuctionHouse.Domain.Auctions
 
         public string HighestBidderUserName { get; private set; }
 
+        public string CreatedByUserName { get; private set; }
+
         public void MakeBid(string bidderUserName, decimal bidPrice)
         {
             if (bidPrice < MinimalPriceForNextBidder)
             {
-                throw new ArgumentOutOfRangeException(nameof(bidPrice));
+                throw new ArgumentOutOfRangeException(nameof(bidPrice), "Bid price is too low.");
+            }
+
+            if (bidderUserName == CreatedByUserName)
+            {
+                throw new ArgumentException(nameof(bidderUserName), "A user cannot make bids in his own auction.");
             }
 
             var newBidIsHighest = !HighestBidPrice.HasValue || bidPrice > HighestBidPrice;
@@ -96,6 +103,7 @@ namespace AuctionHouse.Domain.Auctions
             Title = auctionCreatedEvent.Title;
             Description = auctionCreatedEvent.Description;
             StartingPrice = auctionCreatedEvent.StartingPrice;
+            CreatedByUserName = auctionCreatedEvent.CreatedByUserName;
         }
 
         private void Apply(BidMadeEvent bidMadeEvent)
