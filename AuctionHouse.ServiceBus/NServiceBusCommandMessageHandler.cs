@@ -28,14 +28,17 @@ namespace AuctionHouse.ServiceBus
                 throw new ArgumentNullException(nameof(command));
             }
 
-            await Handle((dynamic) command);
+            var senderUserName = context.MessageHeaders[MessageHeaderNames.SenderUserName];
+            var commandId = Guid.Parse(context.MessageId);
+            await Handle((dynamic) command, commandId, senderUserName);
         }
 
-        private async Task Handle<TCommand>(TCommand command)
+        private async Task Handle<TCommand>(TCommand command, Guid commandId, string senderUserName)
             where TCommand : ICommand
         {
             var commandHandler = _componentContext.Resolve<ICommandHandler<TCommand>>();
-            await commandHandler.Handle(command);
+            var commandEnvelope = new CommandEnvelope<TCommand>(command, commandId, senderUserName);
+            await commandHandler.Handle(commandEnvelope);
         }
     }
 }

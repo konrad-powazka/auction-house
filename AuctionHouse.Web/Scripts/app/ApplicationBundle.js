@@ -153,7 +153,6 @@
 	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
 	        this.stateService = stateService;
 	        this.model = {
-	            id: GuidGenerator_1.default.generateGuid(),
 	            auctionId: GuidGenerator_1.default.generateGuid(),
 	            title: '',
 	            description: '',
@@ -324,6 +323,7 @@
 
 	"use strict";
 	var CommandHandlingErrorType_1 = __webpack_require__(3);
+	var GuidGenerator_1 = __webpack_require__(4);
 	var CommandHandler = (function () {
 	    function CommandHandler(httpService, qService, timeoutService) {
 	        this.httpService = httpService;
@@ -350,18 +350,19 @@
 	    }
 	    CommandHandler.prototype.handle = function (command, shouldWaitForEventsApplicationToReadModel) {
 	        var _this = this;
+	        var commandId = GuidGenerator_1.default.generateGuid();
 	        var deferred = this.qService.defer();
 	        this.connectSignalR()
 	            .then(function () {
-	            _this.sendCommandAndWaitForHandling(command, shouldWaitForEventsApplicationToReadModel, deferred);
+	            _this.sendCommandAndWaitForHandling(command, commandId, shouldWaitForEventsApplicationToReadModel, deferred);
 	        })
 	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
 	        return deferred.promise;
 	    };
-	    CommandHandler.prototype.sendCommandAndWaitForHandling = function (command, shouldWaitForEventsApplicationToReadModel, deferred) {
+	    CommandHandler.prototype.sendCommandAndWaitForHandling = function (command, commandId, shouldWaitForEventsApplicationToReadModel, deferred) {
 	        var _this = this;
 	        var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
-	            if (commandHandlingSucceededEvent.commandId === command.id) {
+	            if (commandHandlingSucceededEvent.commandId === commandId) {
 	                if (!shouldWaitForEventsApplicationToReadModel) {
 	                    deferred.resolve();
 	                }
@@ -373,13 +374,13 @@
 	            }
 	        };
 	        var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
-	            if (commandHandlingFailedEvent.commandId === command.id) {
+	            if (commandHandlingFailedEvent.commandId === commandId) {
 	                deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
 	            }
 	        };
 	        CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
 	        CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
-	        this.sendCommand(command)
+	        this.sendCommand(command, commandId)
 	            .then(function () {
 	            var commandHandlingTimeoutMilliseconds = 15 * 1000;
 	            _this.timeoutService(commandHandlingTimeoutMilliseconds)
@@ -394,8 +395,8 @@
 	        };
 	        deferred.promise.finally(removeCallbacks);
 	    };
-	    CommandHandler.prototype.sendCommand = function (command) {
-	        var url = "api/" + this.getCommandName() + "/Handle";
+	    CommandHandler.prototype.sendCommand = function (command, commandId) {
+	        var url = "api/" + this.getCommandName() + "/Handle?commandId=" + commandId;
 	        return this.httpService.post(url, command);
 	    };
 	    CommandHandler.prototype.waitForEventsApplicationToReadModel = function (publishedEventIds, deferred) {

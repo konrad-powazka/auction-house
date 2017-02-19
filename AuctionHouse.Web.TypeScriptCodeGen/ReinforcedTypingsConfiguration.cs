@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using AuctionHouse.DynamicTypeScanning;
+using AuctionHouse.Messages.Commands;
+using AuctionHouse.Messages.Events;
+using AuctionHouse.Messages.Queries;
+using AuctionHouse.ReadModel;
 using Reinforced.Typings;
 using Reinforced.Typings.Ast;
 using Reinforced.Typings.Fluent;
@@ -22,10 +25,10 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
 
         public static void Configure(ConfigurationBuilder builder)
         {
-            ExportTypes(builder, DynamicTypeScanner.GetCommandTypes(), "Messages/Commands.ts");
-            ExportTypes(builder, DynamicTypeScanner.GetQueryTypes(), "Messages/Queries.ts");
-            ExportTypes(builder, DynamicTypeScanner.GetReadModelTypes(), "ReadModel.ts");
-            ExportTypes(builder, DynamicTypeScanner.GetEventTypes(), "Events.ts");
+            ExportTypes(builder, CommandsAssemblyMarker.GetCommandTypes(), "Messages/Commands.ts");
+            ExportTypes(builder, QueriesAssemblyMarker.GetQueryTypes(), "Messages/Queries.ts");
+            ExportTypes(builder, ReadModelAssemblyMarker.GetReadModelTypes(), "ReadModel.ts");
+            ExportTypes(builder, EventsAssemblyMarker.GetEventTypes(), "Events.ts");
         }
 
         private static void ExportTypes(ConfigurationBuilder builder, IReadOnlyCollection<Type> typesToExport,
@@ -33,7 +36,7 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
         {
             // We need to do this becase of a bug in ReinforcedTypings which causes a
             // "A class must be declared after its base class." TS compiler error
-            typesToExport = GetOrderedInheritanceHierarchy(typesToExport);
+            typesToExport = GetOrderedInheritanceHierarchy(typesToExport).ToList();
 
             //TODO: nullable
             builder.ExportAsClasses(typesToExport,
@@ -56,7 +59,7 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
                 });
         }
 
-        private static IReadOnlyCollection<Type> GetOrderedInheritanceHierarchy(IReadOnlyCollection<Type> types)
+        private static IEnumerable<Type> GetOrderedInheritanceHierarchy(IEnumerable<Type> types)
         {
             var unorderedTypesHierarchy =
                 types.SelectMany(GetTypeInheritanceChain).Where(t => t != typeof(object)).Distinct().ToList();

@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventSourcing\IEventSourcedEntity.cs" />
+    <Compile Include="Messaging\CommandEnvelope.cs" />
+    <Compile Include="Messaging\MessageHeaderNames.cs" />
     <Compile Include="Messaging\ICommand.cs" />
     <Compile Include="Messaging\ICommandHandler.cs" />
     <Compile Include="Messaging\IEvent.cs" />

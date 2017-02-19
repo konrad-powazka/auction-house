@@ -11,7 +11,6 @@ class CancelAuctionCommand
 export
 class CreateAuctionCommand
 {
-	public id: string;
 	public auctionId: string;
 	public title: string;
 	public description: string;
@@ -22,7 +21,8 @@ class CreateAuctionCommand
 export
 class MakeBidCommand
 {
-	public id: string;
 	public auctionId: string;
 	public price: number;
+	public id: string;
+	public expectedAuctionVersion: number;
 }

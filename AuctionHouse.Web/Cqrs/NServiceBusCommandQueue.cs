@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AuctionHouse.Core.Messaging;
 using NServiceBus;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
 
@@ -19,11 +20,13 @@ namespace AuctionHouse.Web.Cqrs
             _endpoint = endpoint;
         }
 
-        public async Task QueueCommand<TCommand>(TCommand command) where TCommand : ICommand
+        public async Task QueueCommand<TCommand>(TCommand command, Guid commandId, string senderUserName)
+            where TCommand : ICommand
         {
             var sendOptions = new SendOptions();
-            sendOptions.SetMessageId(command.Id.ToString());
+            sendOptions.SetMessageId(commandId.ToString());
             sendOptions.SetDestination(Configuration.NServiceBusCommandHandlingDestination);
+            sendOptions.SetHeader(MessageHeaderNames.SenderUserName, senderUserName);
             await _endpoint.Send(command, sendOptions);
         }
     }

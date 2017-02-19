@@ -11,6 +11,10 @@ namespace AuctionHouse.Messages.Events.Auctions
 
         public string Description { get; set; }
 
-        public decimal Price { get; set; }
+        public decimal StartingPrice { get; set; }
+
+        public decimal MinimalPriceForNextBidder { get; set; }
+
+        public string CreatedByUserName { get; set; }
     }
 }

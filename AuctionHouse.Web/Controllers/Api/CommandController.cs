@@ -24,9 +24,9 @@ namespace AuctionHouse.Web.Controllers.Api
 
         [HttpPost]
         [Authorize]
-        public async Task<HttpResponseMessage> Handle(TCommand command)
+        public async Task<HttpResponseMessage> Handle([FromBody] TCommand command, [FromUri] Guid commandId)
         {
-            await _commandQueue.QueueCommand(command);
+            await _commandQueue.QueueCommand(command, commandId, User.Identity.Name);
 
             return new HttpResponseMessage(HttpStatusCode.Accepted);
         }

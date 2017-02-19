@@ -18,7 +18,6 @@ export class CreateAuctionCtrl implements ng.IController {
         private getAuctionDetailsQueryHandler: QueryHandler<AuctionDetailsQuery, AuctionDetailsReadModel>,
         private stateService: ng.ui.IStateService) {
         this.model = {
-            id: GuidGenerator.generateGuid(),
             auctionId: GuidGenerator.generateGuid(),
             title: '',
             description: '',

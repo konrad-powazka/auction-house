@@ -15,10 +15,11 @@ namespace AuctionHouse.Application.Auctions
             _auctionsRepository = auctionsRepository;
         }
 
-        public async Task Handle(CreateAuctionCommand command)
+        public async Task Handle(CommandEnvelope<CreateAuctionCommand> commandEnvelope)
         {
+            var command = commandEnvelope.Message;
             var createdAuction = Auction.Create(command.AuctionId, command.Title, command.Description, command.EndDate,
-                command.StartingPrice, command.BuyNowPrice);
+                command.StartingPrice, command.BuyNowPrice, commandEnvelope.SenderUserName);
 
             await _auctionsRepository.Create(createdAuction);
         }

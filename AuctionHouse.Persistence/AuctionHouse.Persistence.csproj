@@ -86,9 +86,9 @@
       <Project>{bf0b6ad6-b59f-49c1-a7a5-8528edf9d0c7}</Project>
       <Name>AuctionHouse.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AuctionHouse.DynamicTypeScanning\AuctionHouse.DynamicTypeScanning.csproj">
-      <Project>{3A0CEB26-786D-49F0-B960-A321434182B5}</Project>
-      <Name>AuctionHouse.DynamicTypeScanning</Name>
+    <ProjectReference Include="..\AuctionHouse.Messages.Events\AuctionHouse.Messages.Events.csproj">
+      <Project>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</Project>
+      <Name>AuctionHouse.Messages.Events</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

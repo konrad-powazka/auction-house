@@ -7,7 +7,7 @@ namespace AuctionHouse.Core.Messaging
         public Guid MessageId { get; }
         public TMessage Message { get; }
 
-        public MessageEnvelope(Guid messageId, TMessage message)
+        public MessageEnvelope(TMessage message, Guid messageId)
         {
             if (message == null)
             {

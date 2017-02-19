@@ -10,5 +10,6 @@ namespace AuctionHouse.ReadModel.Auctions.List
         public DateTime EndDate;
         public decimal StartingPrice;
         public decimal? BuyNowPrice;
+        public decimal? MinimalPriceForNextBidder;
     }
 }

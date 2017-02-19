@@ -1,12 +1,12 @@
 ﻿import { ICommandHandler } from './ICommandHandler';
 import { CommandHandlingErrorType } from './CommandHandlingErrorType'
-import { ICommand } from '../Messages/ICommand';
 import { IEventAppliedToReadModelNotificationHubServer } from
     '../Infrastructure/IEventAppliedToReadModelNotificationHubServer';
 import { NotifyOnEventsAppliedToReadModelResponse } from '../Infrastructure/NotifyOnEventsAppliedToReadModelResponse';
 import { CommandHandlingSucceededEvent, CommandHandlingFailedEvent } from '../Events';
+import GuidGenerator from '../Infrastructure/GuidGenerator';
 
-export abstract class CommandHandler<TCommand extends ICommand> implements ICommandHandler<TCommand> {
+export abstract class CommandHandler<TCommand> implements ICommandHandler<TCommand> {
     private static wasSignalrRInitialized = false;
     private static commandHandlingSuccessCallbacks = $.Callbacks();
     private static commandHandlingFailureCallbacks = $.Callbacks();
@@ -46,11 +46,12 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
     }
 
     handle(command: TCommand, shouldWaitForEventsApplicationToReadModel: boolean): ng.IPromise<void> {
+        const commandId = GuidGenerator.generateGuid();
         const deferred = this.qService.defer<void>();
 
         this.connectSignalR()
             .then(() => {
-                this.sendCommandAndWaitForHandling(command, shouldWaitForEventsApplicationToReadModel, deferred);
+                this.sendCommandAndWaitForHandling(command, commandId, shouldWaitForEventsApplicationToReadModel, deferred);
             })
             .catch(() => deferred.reject(CommandHandlingErrorType.FailedToConnectToFeedbackHub));
 
@@ -58,11 +59,12 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
     }
 
     private sendCommandAndWaitForHandling(command: TCommand,
+        commandId: string,
         shouldWaitForEventsApplicationToReadModel: boolean,
         deferred: ng.IDeferred<void>): void {
 
         const commandHandlingSuccessCallback = (commandHandlingSucceededEvent: CommandHandlingSucceededEvent) => {
-            if (commandHandlingSucceededEvent.commandId === command.id) {
+            if (commandHandlingSucceededEvent.commandId === commandId) {
 
                 if (!shouldWaitForEventsApplicationToReadModel) {
                     deferred.resolve();
@@ -76,7 +78,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
         };
 
         const commandHandlingFailureCallback = (commandHandlingFailedEvent: CommandHandlingFailedEvent) => {
-            if (commandHandlingFailedEvent.commandId === command.id) {
+            if (commandHandlingFailedEvent.commandId === commandId) {
                 deferred.reject(CommandHandlingErrorType.FailedToProcess);
             }
         };
@@ -84,7 +86,7 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
         CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
         CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
 
-        this.sendCommand(command)
+        this.sendCommand(command, commandId)
             .then(() => {
                 const commandHandlingTimeoutMilliseconds = 15 * 1000;
 
@@ -103,8 +105,8 @@ export abstract class CommandHandler<TCommand extends ICommand> implements IComm
         deferred.promise.finally(removeCallbacks);
     }
 
-    private sendCommand(command: TCommand): ng.IHttpPromise<void> {
-        const url = `api/${this.getCommandName()}/Handle`;
+    private sendCommand(command: TCommand, commandId: string): ng.IHttpPromise<void> {
+        const url = `api/${this.getCommandName()}/Handle?commandId=${commandId}`;
 
         return this.httpService.post<void>(url, command);
     }

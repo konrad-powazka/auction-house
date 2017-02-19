@@ -56,13 +56,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AuctionHouse.DynamicTypeScanning\AuctionHouse.DynamicTypeScanning.csproj">
-      <Project>{3A0CEB26-786D-49F0-B960-A321434182B5}</Project>
-      <Name>AuctionHouse.DynamicTypeScanning</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj">
       <Project>{3FB528A3-F733-415D-8E46-49B846F8D27C}</Project>
       <Name>AuctionHouse.Messages.Commands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Messages.Events\AuctionHouse.Messages.Events.csproj">
+      <Project>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</Project>
+      <Name>AuctionHouse.Messages.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Messages.Queries\AuctionHouse.Messages.Queries.csproj">
       <Project>{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}</Project>

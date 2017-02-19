@@ -43,15 +43,10 @@
     <Compile Include="AggregateRoot.cs" />
     <Compile Include="Auctions\Auction.cs" />
     <Compile Include="Auctions\AuctionState.cs" />
-    <Compile Include="Money\Currency.cs" />
-    <Compile Include="Money\Money.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Common\" />
-    <Folder Include="Users\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>

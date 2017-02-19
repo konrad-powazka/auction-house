@@ -5,9 +5,8 @@ using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.DynamicTypeScanning;
+using AuctionHouse.Messages.Events;
 using EventStore.ClientAPI;
-using EventStore.ClientAPI.SystemData;
 using Newtonsoft.Json;
 
 namespace AuctionHouse.Persistence
@@ -60,10 +59,10 @@ namespace AuctionHouse.Persistence
                     }
 
                     var eventType =
-                        DynamicTypeScanner.GetEventTypes().Single(t => t.Name == e.Event.EventType);
+                        EventsAssemblyMarker.GetEventTypes().Single(t => t.Name == e.Event.EventType);
 
                     var @event = DeserializeEvent(e.Event.Data, eventType);
-                    var eventEnvelope = new MessageEnvelope<IEvent>(e.Event.EventId, @event);
+                    var eventEnvelope = new MessageEnvelope<IEvent>(@event, e.Event.EventId);
                     handleEventEnvelopeCallback(eventEnvelope);
                 }, subscriptionDropped: SubscriptionDropped);
 

@@ -6,7 +6,7 @@ namespace AuctionHouse.Domain.Auctions
     public class Auction : AggregateRoot
     {
         public static Auction Create(Guid id, string title, string description, DateTime endDate, decimal startingPrice,
-            decimal? buyNowPrice)
+            decimal? buyNowPrice, string createdByUserName)
         {
             if (string.IsNullOrEmpty(title))
             {
@@ -26,7 +26,9 @@ namespace AuctionHouse.Domain.Auctions
                 Id = id,
                 Title = title,
                 Description = description,
-                Price = startingPrice
+                StartingPrice = startingPrice,
+                MinimalPriceForNextBidder = startingPrice,
+                CreatedByUserName = createdByUserName
             };
 
             auction.ApplyChange(auctionCreatedEvent);
@@ -38,11 +40,54 @@ namespace AuctionHouse.Domain.Auctions
 
         public string Title { get; private set; }
 
+        public decimal StartingPrice { get; private set; }
+
         public AuctionState State { get; private set; }
+
+        public decimal MinimalPriceForNextBidder { get; private set; }
+
+        public decimal? HighestBidPrice { get; private set; }
+
+        public string HighestBidderUserName { get; private set; }
+
+        public void MakeBid(string bidderUserName, decimal bidPrice)
+        {
+            if (bidPrice < MinimalPriceForNextBidder)
+            {
+                throw new ArgumentOutOfRangeException(nameof(bidPrice));
+            }
+
+            var newBidIsHighest = !HighestBidPrice.HasValue || bidPrice > HighestBidPrice;
+            var newHighestBidPrice = newBidIsHighest ? bidPrice : HighestBidPrice.Value;
+            var newHighestBidderUserName = newBidIsHighest ? bidderUserName : HighestBidderUserName;
+
+            var newMinimalPriceForNextBidderReferencePrice = newBidIsHighest
+                ? (HighestBidPrice ?? StartingPrice)
+                : bidPrice;
+
+            var bidMadeEvent = new BidMadeEvent
+            {
+                BidderUserName = bidderUserName,
+                MinimalPriceForNextBidder = GetNewMinimalPriceForNextBidder(newMinimalPriceForNextBidderReferencePrice),
+                HighestBidderUserName = newHighestBidderUserName,
+                HighestBidPrice = newHighestBidPrice,
+                AuctionId = Id,
+                BidPrice = bidPrice
+            };
+
+            ApplyChange(bidMadeEvent);
+        }
+
+        private static decimal GetNewMinimalPriceForNextBidder(decimal referencePrice)
+        {
+            // TODO: Implement progressive price increase
+            return referencePrice + 0.01m;
+        }
 
         protected override void RegisterEventAppliers()
         {
             RegisterEventApplier<AuctionCreatedEvent>(Apply);
+            RegisterEventApplier<BidMadeEvent>(Apply);
         }
 
         private void Apply(AuctionCreatedEvent auctionCreatedEvent)
@@ -50,6 +95,14 @@ namespace AuctionHouse.Domain.Auctions
             Id = auctionCreatedEvent.Id;
             Title = auctionCreatedEvent.Title;
             Description = auctionCreatedEvent.Description;
+            StartingPrice = auctionCreatedEvent.StartingPrice;
+        }
+
+        private void Apply(BidMadeEvent bidMadeEvent)
+        {
+            MinimalPriceForNextBidder = bidMadeEvent.MinimalPriceForNextBidder;
+            HighestBidPrice = bidMadeEvent.HighestBidPrice;
+            HighestBidderUserName = bidMadeEvent.HighestBidderUserName;
         }
     }
 }

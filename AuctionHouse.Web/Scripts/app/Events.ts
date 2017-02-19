@@ -14,7 +14,19 @@ class AuctionCreatedEvent
 	public id: string;
 	public title: string;
 	public description: string;
-	public price: number;
+	public startingPrice: number;
+	public minimalPriceForNextBidder: number;
+	public createdByUserName: string;
+}
+export
+class BidMadeEvent
+{
+	public auctionId: string;
+	public bidderUserName: string;
+	public bidPrice: number;
+	public highestBidderUserName: string;
+	public highestBidPrice: number;
+	public minimalPriceForNextBidder: number;
 }
 export
 class CommandHandlingSucceededEvent extends CommandHandlingFeedbackEvent
