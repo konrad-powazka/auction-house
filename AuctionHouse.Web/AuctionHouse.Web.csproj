@@ -75,6 +75,10 @@
       <HintPath>..\packages\Autofac.WebApi2.Owin.4.0.0\lib\net45\Autofac.Integration.WebApi.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Elasticsearch.Net, Version=5.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Elasticsearch.Net.5.2.0\lib\net45\Elasticsearch.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EventStore.ClientAPI, Version=3.9.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\EventStore.Client.3.9.2\lib\net40\EventStore.ClientAPI.dll</HintPath>
       <Private>True</Private>
@@ -147,6 +151,10 @@
     <Reference Include="Microsoft.Web.Infrastructure">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Nest, Version=5.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
+      <HintPath>..\packages\NEST.5.2.0\lib\net45\Nest.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -247,9 +255,10 @@
     <Compile Include="Cqrs\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="CodeGen\CqrsControllerTypesGenerator.cs" />
     <Compile Include="Cqrs\ICommandQueue.cs" />
+    <Compile Include="EventSourcing\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="EventSourcing\EventAppliedEventArgs.cs" />
-    <Compile Include="EventSourcing\ContinuousEventSourcedEntitiesBuilder.cs" />
-    <Compile Include="EventSourcing\IContinuousEventSourcedEntitiesBuilder.cs" />
+    <Compile Include="EventSourcing\EventsAppliedToReadModelTracker.cs" />
+    <Compile Include="EventSourcing\IEventsAppliedToReadModelTracker.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

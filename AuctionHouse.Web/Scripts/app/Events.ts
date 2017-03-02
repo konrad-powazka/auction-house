@@ -4,6 +4,11 @@
 
 
 export
+class EventsAppliedToReadModelEvent
+{
+	public appliedEventIds: string[];
+}
+export
 class CommandHandlingFeedbackEvent
 {
 	public commandId: string;

@@ -6,7 +6,7 @@ using System.Reflection;
 using AuctionHouse.Messages.Commands;
 using AuctionHouse.Messages.Events;
 using AuctionHouse.Messages.Queries;
-using AuctionHouse.ReadModel;
+using AuctionHouse.ReadModel.Dtos;
 using Reinforced.Typings;
 using Reinforced.Typings.Ast;
 using Reinforced.Typings.Fluent;
@@ -27,7 +27,7 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
         {
             ExportTypes(builder, CommandsAssemblyMarker.GetCommandTypes(), "Messages/Commands.ts");
             ExportTypes(builder, QueriesAssemblyMarker.GetQueryTypes(), "Messages/Queries.ts");
-            ExportTypes(builder, ReadModelAssemblyMarker.GetReadModelTypes(), "ReadModel.ts");
+            ExportTypes(builder, ReadModelDtosAssemblyMarker.GetReadModelDtoTypes(), "ReadModel.ts");
             ExportTypes(builder, EventsAssemblyMarker.GetEventTypes(), "Events.ts");
         }
 

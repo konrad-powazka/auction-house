@@ -29,6 +29,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.ReadModel", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.Web.TypeScriptCodeGen", "AuctionHouse.Web.TypeScriptCodeGen\AuctionHouse.Web.TypeScriptCodeGen.csproj", "{E832CB05-F712-4813-A452-8095B4206FD6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.ElasticsearchLauncher", "AuctionHouse.ElasticsearchLauncher\AuctionHouse.ElasticsearchLauncher.csproj", "{DB8C8C74-A1E7-4CD5-A92F-A9891C67319D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.ReadModel.Dtos", "AuctionHouse.ReadModel.Dtos\AuctionHouse.ReadModel.Dtos.csproj", "{B8A92522-DB4B-49CB-9DB3-D0AC5B51BB96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionHouse.ReadModel.EventsApplyingService", "AuctionHouse.ReadModel.EventsApplyingService\AuctionHouse.ReadModel.EventsApplyingService.csproj", "{739C777B-B7AE-426A-ADFA-BACBF5D180CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +93,18 @@ Global
 		{E832CB05-F712-4813-A452-8095B4206FD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E832CB05-F712-4813-A452-8095B4206FD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E832CB05-F712-4813-A452-8095B4206FD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB8C8C74-A1E7-4CD5-A92F-A9891C67319D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB8C8C74-A1E7-4CD5-A92F-A9891C67319D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB8C8C74-A1E7-4CD5-A92F-A9891C67319D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB8C8C74-A1E7-4CD5-A92F-A9891C67319D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8A92522-DB4B-49CB-9DB3-D0AC5B51BB96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A92522-DB4B-49CB-9DB3-D0AC5B51BB96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A92522-DB4B-49CB-9DB3-D0AC5B51BB96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A92522-DB4B-49CB-9DB3-D0AC5B51BB96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{739C777B-B7AE-426A-ADFA-BACBF5D180CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{739C777B-B7AE-426A-ADFA-BACBF5D180CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{739C777B-B7AE-426A-ADFA-BACBF5D180CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{739C777B-B7AE-426A-ADFA-BACBF5D180CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

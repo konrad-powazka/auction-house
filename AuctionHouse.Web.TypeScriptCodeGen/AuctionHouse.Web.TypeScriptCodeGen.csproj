@@ -68,6 +68,10 @@
       <Project>{8092DEE0-AE56-42D3-97C6-3A3E9ECD399F}</Project>
       <Name>AuctionHouse.Messages.Queries</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.ReadModel.Dtos\AuctionHouse.ReadModel.Dtos.csproj">
+      <Project>{B8A92522-DB4B-49CB-9DB3-D0AC5B51BB96}</Project>
+      <Name>AuctionHouse.ReadModel.Dtos</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.ReadModel\AuctionHouse.ReadModel.csproj">
       <Project>{BF4E3065-2992-4BAE-8529-77835AA9CE48}</Project>
       <Name>AuctionHouse.ReadModel</Name>

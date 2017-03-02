@@ -17,18 +17,18 @@ namespace AuctionHouse.Web.Hubs
             ConnectionIdToSubscriptionIdToSubscriptionMapMap =
                 new ConcurrentDictionary<string, ConcurrentDictionary<Guid, Subscription>>();
 
-        private readonly IContinuousEventSourcedEntitiesBuilder _continuousEventSourcedEntitiesBuilder;
-        private readonly IHubContext<IEventAppliedToReadModelNotificationHubClient> _hubContext;
+	    private readonly IEventsAppliedToReadModelTracker _eventsAppliedToReadModelTracker;
+	    private readonly IHubContext<IEventAppliedToReadModelNotificationHubClient> _hubContext;
 
         public EventAppliedToReadModelNotificationHub(
-            IContinuousEventSourcedEntitiesBuilder continuousEventSourcedEntitiesBuilder,
-            IHubContext<IEventAppliedToReadModelNotificationHubClient> hubContext)
+			IEventsAppliedToReadModelTracker eventsAppliedToReadModelTracker,
+			IHubContext<IEventAppliedToReadModelNotificationHubClient> hubContext)
         {
-            _continuousEventSourcedEntitiesBuilder = continuousEventSourcedEntitiesBuilder;
-            _hubContext = hubContext;
+	        _eventsAppliedToReadModelTracker = eventsAppliedToReadModelTracker;
+	        _hubContext = hubContext;
         }
 
-        public NotifyOnEventsAppliedToReadModelResponse NotifyOnEventsApplied(
+	    public NotifyOnEventsAppliedToReadModelResponse NotifyOnEventsApplied(
             IReadOnlyCollection<Guid> eventIds)
         {
             if (eventIds == null)
@@ -37,7 +37,7 @@ namespace AuctionHouse.Web.Hubs
             }
 
             var unappliedEventIds =
-                eventIds.Where(i => !_continuousEventSourcedEntitiesBuilder.CheckIfEventWasApplied(i)).ToArray();
+                eventIds.Where(i => !_eventsAppliedToReadModelTracker.CheckIfEventWasApplied(i)).ToArray();
 
             if (!unappliedEventIds.Any())
             {
@@ -48,7 +48,7 @@ namespace AuctionHouse.Web.Hubs
             var subscriptionId = Guid.NewGuid();
 
             var subscription = new Subscription(subscriptionId, connectionId, unappliedEventIds,
-                _continuousEventSourcedEntitiesBuilder, _hubContext);
+				_eventsAppliedToReadModelTracker, _hubContext);
 
             var clientSubscriptionIdToSubscriptionMap =
                 ConnectionIdToSubscriptionIdToSubscriptionMapMap[connectionId];
@@ -122,8 +122,8 @@ namespace AuctionHouse.Web.Hubs
         private class Subscription : IDisposable
         {
             private readonly string _connectionId;
-            private readonly IContinuousEventSourcedEntitiesBuilder _continuousEventSourcedEntitiesBuilder;
-            private readonly IHubContext<IEventAppliedToReadModelNotificationHubClient> _hubContext;
+	        private readonly IEventsAppliedToReadModelTracker _eventsAppliedToReadModelTracker;
+	        private readonly IHubContext<IEventAppliedToReadModelNotificationHubClient> _hubContext;
             private readonly ConcurrentDictionary<Guid, object> _eventIdsToNotifyOnReadModelApplication;
             private readonly Guid _id;
             private readonly object _startLock = new object();
@@ -133,11 +133,11 @@ namespace AuctionHouse.Web.Hubs
             private Action _actionOnStopped;
 
             public Subscription(Guid id, string connectionId, IEnumerable<Guid> eventIdsToNotifyOnReadModelApplication,
-                IContinuousEventSourcedEntitiesBuilder continuousEventSourcedEntitiesBuilder, IHubContext<IEventAppliedToReadModelNotificationHubClient> hubContext)
+				IEventsAppliedToReadModelTracker eventsAppliedToReadModelTracker, IHubContext<IEventAppliedToReadModelNotificationHubClient> hubContext)
             {
                 _id = id;
                 _connectionId = connectionId;
-                _continuousEventSourcedEntitiesBuilder = continuousEventSourcedEntitiesBuilder;
+	            _eventsAppliedToReadModelTracker = eventsAppliedToReadModelTracker;
                 _hubContext = hubContext;
 
                 _eventIdsToNotifyOnReadModelApplication =
@@ -160,7 +160,7 @@ namespace AuctionHouse.Web.Hubs
                     }
 
                     _actionOnStopped = actionOnStopped;
-                    _continuousEventSourcedEntitiesBuilder.EventApplied += EventAppliedToReadModel;
+					_eventsAppliedToReadModelTracker.EventApplied += EventAppliedToReadModel;
                     _hasStarted = true;
                 }
             }
@@ -171,7 +171,7 @@ namespace AuctionHouse.Web.Hubs
 
                 if (
                     _eventIdsToNotifyOnReadModelApplication.TryRemove(
-                        eventAppliedEventArgs.AppliedEventEnvelope.MessageId, out value) &&
+                        eventAppliedEventArgs.AppliedEventId, out value) &&
                     _eventIdsToNotifyOnReadModelApplication.Count == 0)
                 {
                     Stop(false);
@@ -208,7 +208,7 @@ namespace AuctionHouse.Web.Hubs
                         return;
                     }
 
-                    _continuousEventSourcedEntitiesBuilder.EventApplied -= EventAppliedToReadModel;
+					_eventsAppliedToReadModelTracker.EventApplied -= EventAppliedToReadModel;
 
                     if (!isPremature)
                     {

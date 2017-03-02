@@ -4,7 +4,6 @@ using System.Net;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Messages.Events;
 using AuctionHouse.Persistence;
@@ -24,10 +23,12 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NServiceBus;
 using Owin;
+using ConnectionSettings = EventStore.ClientAPI.ConnectionSettings;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
 using IEvent = AuctionHouse.Core.Messaging.IEvent;
 using IMessage = AuctionHouse.Core.Messaging.IMessage;
@@ -86,9 +87,6 @@ namespace AuctionHouse.Web
             builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
                 .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces().SingleInstance();
 
-            builder.RegisterAssemblyTypes(typeof(QueryHandlingAssemblyMarker).Assembly)
-                .As<IEventSourcedEntity>();
-
             var nServiceBusEndpoint = StartWebApiNServiceBusEndpoint();
 
             builder.RegisterInstance(nServiceBusEndpoint)
@@ -101,8 +99,8 @@ namespace AuctionHouse.Web
 
             builder.RegisterType<EventStoreEventsDatabase>().As<IEventsDatabase>().InstancePerLifetimeScope();
 
-            builder.RegisterType<ContinuousEventSourcedEntitiesBuilder>()
-                .As<IContinuousEventSourcedEntitiesBuilder>()
+            builder.RegisterType<EventsAppliedToReadModelTracker>()
+                .As<IEventsAppliedToReadModelTracker>()
                 .SingleInstance();
 
             builder.RegisterHubs(Assembly.GetExecutingAssembly());
@@ -128,10 +126,10 @@ namespace AuctionHouse.Web
                 });
 
             builder.RegisterInstance(jsonSerializer).As<JsonSerializer>();
+	        RegisterElasticSearchClient(builder);
 
-            var container = builder.Build();
+			var container = builder.Build();
             httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-            container.Resolve<IContinuousEventSourcedEntitiesBuilder>().Start();
 
             var signalRDependencyResolver = new AutofacDependencyResolver(container);
             hubConfig.Resolver = signalRDependencyResolver;
@@ -174,12 +172,15 @@ namespace AuctionHouse.Web
             endpointConfiguration.UseSerialization<NServiceBus.JsonSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
 
-            endpointConfiguration.UseTransport<MsmqTransport>()
-                .Routing()
-                .RegisterPublisher(typeof(EventsAssemblyMarker).Assembly,
-                    Web.Configuration.NServiceBusCommandHandlingDestination);
+            var routing = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
 
-            endpointConfiguration.Conventions()
+	        routing.RegisterPublisher(typeof(EventsAssemblyMarker).Assembly,
+		        Web.Configuration.NServiceBusCommandHandlingDestination);
+
+			routing.RegisterPublisher(typeof(EventsAssemblyMarker).Assembly,
+				"AuctionHouse.ReadModel.EventsApplyingService");
+
+			endpointConfiguration.Conventions()
                 .DefiningCommandsAs(t => typeof(ICommand).IsAssignableFrom(t))
                 .DefiningEventsAs(t => typeof(IEvent).IsAssignableFrom(t))
                 .DefiningMessagesAs(t => typeof(IMessage).IsAssignableFrom(t));
@@ -189,6 +190,14 @@ namespace AuctionHouse.Web
 
             return Endpoint.Start(endpointConfiguration).Result;
         }
+
+	    private static void RegisterElasticSearchClient(ContainerBuilder containerBuilder)
+	    {
+			const string indexName = "auctionhouse";
+			var connectionSettings = new Nest.ConnectionSettings().DefaultIndex(indexName).ThrowExceptions(); ;
+			var elasticClient = new ElasticClient(connectionSettings);
+			containerBuilder.RegisterInstance(elasticClient).As<IElasticClient>();
+		}
 
         private class DynamicAssemblyControllerTypeResolver : DefaultHttpControllerTypeResolver
         {
