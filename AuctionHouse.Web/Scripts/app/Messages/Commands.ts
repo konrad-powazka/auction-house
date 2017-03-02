@@ -4,6 +4,10 @@
 
 
 export
+class PopulateDatabaseWithTestDataCommand
+{
+}
+export
 class CancelAuctionCommand
 {
 	public id: string;

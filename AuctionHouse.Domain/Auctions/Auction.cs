@@ -1,4 +1,5 @@
 ﻿using System;
+using AuctionHouse.Core.Time;
 using AuctionHouse.Messages.Events.Auctions;
 
 namespace AuctionHouse.Domain.Auctions
@@ -6,20 +7,20 @@ namespace AuctionHouse.Domain.Auctions
     public class Auction : AggregateRoot
     {
         public static Auction Create(Guid id, string title, string description, DateTime endDate, decimal startingPrice,
-            decimal? buyNowPrice, string createdByUserName)
+            decimal? buyNowPrice, string createdByUserName, ITimeProvider timeProvider)
         {
-            if (string.IsNullOrEmpty(title))
-            {
-                throw new ArgumentException(null, nameof(title));
-            }
+	        if (string.IsNullOrWhiteSpace(title))
+	        {
+		        throw new ArgumentException("Value cannot be null or whitespace.", nameof(title));
+	        }
 
             //TODO: Mockable date
-            if (endDate <= DateTime.Now)
+            if (endDate <= timeProvider.Now)
             {
                 throw new ArgumentOutOfRangeException(nameof(endDate));
             }
 
-            var auction = new Auction();
+	        var auction = new Auction();
 
             var auctionCreatedEvent = new AuctionCreatedEvent
             {

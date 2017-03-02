@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using AuctionHouse.Core.Messaging;
+using AuctionHouse.Messages.Commands.Test;
 using AuctionHouse.Messages.Events;
 using AuctionHouse.Persistence;
 using AuctionHouse.QueryHandling;
@@ -69,6 +70,12 @@ namespace AuctionHouse.Web
             app.UseWebApi(httpConfig);
             app.MapSignalR(hubConfig);
             StartSignalRNServiceBusEndpoint(container);
+
+	        if (Web.Configuration.PopulatingDatabaseWithTestDataOnStartupIsEnabled)
+	        {
+		        container.Resolve<ICommandQueue>()
+			        .QueueCommand(new PopulateDatabaseWithTestDataCommand(), Guid.NewGuid(), "system");
+	        }
         }
 
         private static IContainer SetupDependencyInjection(HttpConfiguration httpConfig, HubConfiguration hubConfig)

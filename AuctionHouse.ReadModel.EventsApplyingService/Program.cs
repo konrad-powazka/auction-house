@@ -17,6 +17,8 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 	{
 		private static void Main()
 		{
+			Console.Title = "AuctionHouse.ReadModel.EventsApplyingService";
+			
 			using (var autofacContainer = CreateAutofacContainer())
 			{
 				var continuousEventPropagator = autofacContainer.Resolve<ReadModelEventsApplier>();
@@ -33,7 +35,7 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 		{
 			var containerBuilder = new ContainerBuilder();
 			containerBuilder.RegisterAssemblyTypes(typeof(ReadModelAssemblyMarker).Assembly).As<IReadModelBuilder>();
-			containerBuilder.RegisterType<ElasticsearchReadModelRepository>().As<IReadModelRepository>();
+			containerBuilder.RegisterType<ElasticsearchReadModelDbContext>().As<IReadModelDbContext>();
 			containerBuilder.RegisterType<EventStoreEventsDatabase>().As<IEventsDatabase>();
 			RegisterElasticsearchClient(containerBuilder);
 			RegisterEventStoreConnection(containerBuilder);

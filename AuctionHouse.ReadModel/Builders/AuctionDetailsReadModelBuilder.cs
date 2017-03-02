@@ -9,7 +9,7 @@ namespace AuctionHouse.ReadModel.Builders
 {
 	public class AuctionDetailsReadModelBuilder : IReadModelBuilder
 	{
-		public async Task Apply(IEvent @event, IReadModelRepository readModelRepository)
+		public async Task Apply(IEvent @event, IReadModelDbContext readModelDbContext)
 		{
 			if (@event is AuctionCreatedEvent)
 			{
@@ -18,7 +18,7 @@ namespace AuctionHouse.ReadModel.Builders
 				auctionDetails.Id = auctionCreatedEvent.Id;
 				auctionDetails.Title = auctionCreatedEvent.Title;
 				auctionDetails.Description = auctionCreatedEvent.Description;
-				await readModelRepository.Create(auctionDetails, auctionCreatedEvent.Id);
+				readModelDbContext.CreateOrOverwrite(auctionDetails, auctionCreatedEvent.Id);
 			}
 		}
 	}

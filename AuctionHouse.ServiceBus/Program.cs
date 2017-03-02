@@ -2,6 +2,7 @@
 using System.Net;
 using AuctionHouse.Application;
 using AuctionHouse.Core.Messaging;
+using AuctionHouse.Core.Time;
 using AuctionHouse.Persistence;
 using Autofac;
 using EventStore.ClientAPI;
@@ -57,6 +58,7 @@ namespace AuctionHouse.ServiceBus
                     .As<ITrackingEventsDatabase>()
                     .InstancePerLifetimeScope();
 
+	        containerBuilder.RegisterType<TimeProvider>().As<ITimeProvider>();
             var container = containerBuilder.Build();
 
             endpointConfiguration.UseContainer<AutofacBuilder>(

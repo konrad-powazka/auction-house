@@ -5,6 +5,6 @@ namespace AuctionHouse.Core.ReadModel
 {
 	public interface IReadModelBuilder
 	{
-		Task Apply(IEvent @event, IReadModelRepository readModelRepository);
+		Task Apply(IEvent @event, IReadModelDbContext readModelDbContext);
 	}
 }
