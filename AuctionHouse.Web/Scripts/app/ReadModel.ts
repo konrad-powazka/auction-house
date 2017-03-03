@@ -11,9 +11,13 @@ class AuctionListItemReadModel
 	public description: string;
 }
 export
-class AuctionListReadModel
+class AuctionsListReadModel
 {
-	public auctions: AuctionListItemReadModel[];
+	public pageNumber: number;
+	public totalPagesCount: number;
+	public totalItemsCount: number;
+	public pageItems: AuctionListItemReadModel[];
+	public pageSize: number;
 }
 export
 class AuctionDetailsReadModel extends AuctionListItemReadModel

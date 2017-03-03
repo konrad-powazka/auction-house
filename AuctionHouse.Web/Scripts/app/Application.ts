@@ -10,9 +10,11 @@ import {AngularQueryHandlersRegistry} from './QueryHandling/GeneratedQueryHandle
 import {DisplayAuctionComponent} from './UI/Auctions/DisplayAuctionComponent';
 import BusyIndicator from './UI/Shared/BusyIndicator';
 import {AngularCommandUiHandlersRegistry} from './UI/Shared/CommandHandling/GeneratedUiCommandHandlers';
+import {AuctionsListComponent} from './UI/Auctions/AuctionsListComponent';
 
 export class Application {
-    private static components: INamedComponentOptions[] = [
+	private static components: INamedComponentOptions[] = [
+		new AuctionsListComponent(),
         new CreateAuctionComponent(),
         new DisplayAuctionComponent(),
         new LoginDialogComponent()
@@ -22,7 +24,7 @@ export class Application {
         const module = angular.module('auctionHouse',
         [
             'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
-            'ui.bootstrap.datetimepicker', 'angularSpinner'
+			'ui.bootstrap.datetimepicker', 'angularSpinner', 'ngTasty'
         ]);
 
         module.controller('applicationCtrl', ApplicationCtrl);
@@ -34,7 +36,7 @@ export class Application {
             module.component(component.registerAs, component);
         }
 
-        Application.configureModule.$inject = ['$stateProvider'];
+		Application.configureModule.$inject = ['$stateProvider', '$urlRouterProvider'];
         module.config(Application.configureModule);
         Application.runModule.$inject = ['formlyConfig', 'formlyValidationMessages'];
         module.run(Application.runModule);
@@ -52,8 +54,8 @@ export class Application {
         module.constant('busyIndicator', new BusyIndicator());
     }
 
-    private static configureModule($stateProvider: ng.ui.IStateProvider): void {
-        Routing.configure($stateProvider);
+	private static configureModule($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider): void {
+		Routing.configure($stateProvider, $urlRouterProvider);
     }
 
     private static runModule(formlyConfig: AngularFormly.IFormlyConfig,

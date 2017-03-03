@@ -56,13 +56,14 @@
 	var DisplayAuctionComponent_1 = __webpack_require__(15);
 	var BusyIndicator_1 = __webpack_require__(17);
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
+	var AuctionsListComponent_1 = __webpack_require__(20);
 	var Application = (function () {
 	    function Application() {
 	    }
 	    Application.bootstrap = function () {
 	        var module = angular.module('auctionHouse', [
 	            'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
-	            'ui.bootstrap.datetimepicker', 'angularSpinner'
+	            'ui.bootstrap.datetimepicker', 'angularSpinner', 'ngTasty'
 	        ]);
 	        module.controller('applicationCtrl', ApplicationCtrl_1.ApplicationCtrl);
 	        this.registerSerivces(module);
@@ -71,7 +72,7 @@
 	            var component = _a[_i];
 	            module.component(component.registerAs, component);
 	        }
-	        Application.configureModule.$inject = ['$stateProvider'];
+	        Application.configureModule.$inject = ['$stateProvider', '$urlRouterProvider'];
 	        module.config(Application.configureModule);
 	        Application.runModule.$inject = ['formlyConfig', 'formlyValidationMessages'];
 	        module.run(Application.runModule);
@@ -87,8 +88,8 @@
 	    Application.registerConstants = function (module) {
 	        module.constant('busyIndicator', new BusyIndicator_1.default());
 	    };
-	    Application.configureModule = function ($stateProvider) {
-	        Routing_1.Routing.configure($stateProvider);
+	    Application.configureModule = function ($stateProvider, $urlRouterProvider) {
+	        Routing_1.Routing.configure($stateProvider, $urlRouterProvider);
 	    };
 	    Application.runModule = function (formlyConfig, formlyValidationMessages) {
 	        Application.configureFormly(formlyConfig, formlyValidationMessages);
@@ -122,6 +123,7 @@
 	    return Application;
 	}());
 	Application.components = [
+	    new AuctionsListComponent_1.AuctionsListComponent(),
 	    new CreateAuctionComponent_1.CreateAuctionComponent(),
 	    new DisplayAuctionComponent_1.DisplayAuctionComponent(),
 	    new LoginDialogComponent_1.LoginDialogComponent()
@@ -680,8 +682,13 @@
 	var Routing = (function () {
 	    function Routing() {
 	    }
-	    Routing.configure = function ($stateProvider) {
+	    Routing.configure = function ($stateProvider, $urlRouterProvider) {
 	        var states = [
+	            {
+	                name: 'home',
+	                url: '/',
+	                component: 'auctionsList'
+	            },
 	            {
 	                name: 'createAuction',
 	                url: '/auction/create',
@@ -702,6 +709,7 @@
 	            var state = states_1[_i];
 	            $stateProvider.state(state);
 	        }
+	        $urlRouterProvider.when('', '/');
 	    };
 	    return Routing;
 	}());
@@ -730,17 +738,17 @@
 	    return GetAuctionDetailsQueryHandler;
 	}(QueryHandler_1.QueryHandler));
 	exports.GetAuctionDetailsQueryHandler = GetAuctionDetailsQueryHandler;
-	var GetAuctionListQueryHandler = (function (_super) {
-	    __extends(GetAuctionListQueryHandler, _super);
-	    function GetAuctionListQueryHandler() {
+	var SearchAuctionsQueryHandler = (function (_super) {
+	    __extends(SearchAuctionsQueryHandler, _super);
+	    function SearchAuctionsQueryHandler() {
 	        return _super.apply(this, arguments) || this;
 	    }
-	    GetAuctionListQueryHandler.prototype.getQueryName = function () {
-	        return 'GetAuctionListQuery';
+	    SearchAuctionsQueryHandler.prototype.getQueryName = function () {
+	        return 'SearchAuctionsQuery';
 	    };
-	    return GetAuctionListQueryHandler;
+	    return SearchAuctionsQueryHandler;
 	}(QueryHandler_1.QueryHandler));
-	exports.GetAuctionListQueryHandler = GetAuctionListQueryHandler;
+	exports.SearchAuctionsQueryHandler = SearchAuctionsQueryHandler;
 	var AngularQueryHandlersRegistry = (function () {
 	    function AngularQueryHandlersRegistry() {
 	    }
@@ -748,7 +756,7 @@
 	}());
 	AngularQueryHandlersRegistry.queryHandlers = {
 	    'getAuctionDetailsQueryHandler': GetAuctionDetailsQueryHandler,
-	    'getAuctionListQueryHandler': GetAuctionListQueryHandler,
+	    'searchAuctionsQueryHandler': SearchAuctionsQueryHandler,
 	};
 	exports.AngularQueryHandlersRegistry = AngularQueryHandlersRegistry;
 
@@ -939,6 +947,77 @@
 	    return CommandUiHandler;
 	}());
 	exports.CommandUiHandler = CommandUiHandler;
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var AuctionsListCtrl_1 = __webpack_require__(21);
+	var AuctionsListComponent = (function () {
+	    function AuctionsListComponent() {
+	        this.controller = AuctionsListCtrl_1.AuctionsListCtrl;
+	        this.templateUrl = 'Template/Auctions/List';
+	        this.registerAs = 'auctionsList';
+	        this.bindings = {};
+	    }
+	    return AuctionsListComponent;
+	}());
+	exports.AuctionsListComponent = AuctionsListComponent;
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var AuctionsListCtrl = (function () {
+	    function AuctionsListCtrl(searchAuctionsQueryHandler) {
+	        var _this = this;
+	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
+	        this.tastyInitCfg = {
+	            'count': 10,
+	            'page': 1
+	        };
+	        this.staticResource = {
+	            header: [
+	                {
+	                    key: 'Title',
+	                    name: 'Title',
+	                    style: { width: '30%' }
+	                },
+	                {
+	                    key: 'Description',
+	                    name: 'Description',
+	                    style: { width: '70%' }
+	                }
+	            ]
+	        };
+	        this.getResource = function (paramsString, paramsObject) {
+	            var query = {
+	                pageSize: paramsObject.count,
+	                pageNumber: paramsObject.page
+	            };
+	            return _this.searchAuctionsQueryHandler.handle(query)
+	                .then(function (auctionsList) {
+	                return {
+	                    rows: auctionsList.pageItems,
+	                    pagination: {
+	                        count: auctionsList.pageSize,
+	                        page: auctionsList.pageNumber,
+	                        pages: auctionsList.totalPagesCount,
+	                        size: auctionsList.totalItemsCount
+	                    },
+	                    header: _this.staticResource.header
+	                };
+	            });
+	        };
+	    }
+	    return AuctionsListCtrl;
+	}());
+	AuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
+	exports.AuctionsListCtrl = AuctionsListCtrl;
 
 
 /***/ }

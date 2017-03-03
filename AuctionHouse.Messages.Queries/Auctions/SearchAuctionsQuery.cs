@@ -3,7 +3,9 @@ using AuctionHouse.ReadModel.Dtos.Auctions.List;
 
 namespace AuctionHouse.Messages.Queries.Auctions
 {
-	public class GetAuctionListQuery : IQuery<AuctionListReadModel>
+	public class SearchAuctionsQuery : IQuery<AuctionsListReadModel>
 	{
+		public int PageSize { get; set; }
+		public int PageNumber { get; set; }
 	}
 }

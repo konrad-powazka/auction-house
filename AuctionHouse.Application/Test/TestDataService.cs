@@ -25,7 +25,7 @@ namespace AuctionHouse.Application.Test
 
 		public async Task Handle(CommandEnvelope<PopulateDatabaseWithTestDataCommand> commandEnvelope)
 		{
-			const int numberOfAuctionsToGenerate = 500;
+			const int numberOfAuctionsToGenerate = 502;
 
 			var auctionTemplates = GetHardcodedAuctionTemplates().Take(numberOfAuctionsToGenerate).ToList();
 

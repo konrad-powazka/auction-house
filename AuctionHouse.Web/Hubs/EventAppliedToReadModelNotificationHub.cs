@@ -96,7 +96,7 @@ namespace AuctionHouse.Web.Hubs
                 !ConnectionIdToSubscriptionIdToSubscriptionMapMap.TryRemove(Context.ConnectionId,
                     out clientSubscriptionIdToSubscriptionMap))
             {
-                throw new InvalidOperationException();
+	            return;
             }
 
             // If it's possible for NotifyOnEventsAppliedToReadModel to be invoked simultaneously

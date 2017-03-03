@@ -2,9 +2,10 @@
   "version": "1.0.0",
   "name": "auction-house",
   "private": true,
-  "dependencies": {
-    "moment": "2.17.1"
-  },
+	"dependencies": {
+		"moment": "2.17.1",
+		"ng-tasty":  "0.6.1" 
+	},
   "scripts": {
     "webpack": "webpack",
     "webpackWatch": "webpack -w"

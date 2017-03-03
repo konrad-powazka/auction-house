@@ -10,6 +10,8 @@ class GetAuctionDetailsQuery
 	public id: string;
 }
 export
-class GetAuctionListQuery
+class SearchAuctionsQuery
 {
+	public pageSize: number;
+	public pageNumber: number;
 }

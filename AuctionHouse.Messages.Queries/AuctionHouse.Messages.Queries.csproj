@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auctions\GetAuctionDetailsQuery.cs" />
-    <Compile Include="Auctions\GetAuctionListQuery.cs" />
+    <Compile Include="Auctions\SearchAuctionsQuery.cs" />
     <Compile Include="QueriesAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryTypeInfo.cs" />
