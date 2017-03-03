@@ -18,7 +18,9 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 {
 	public class ReadModelEventsApplier : IDisposable
 	{
+		private const int BatchConstructionTimeoutMilliseconds = 1000; // TODO: Move to cfg
 		private readonly IEventsDatabase _eventsDatabase;
+
 		private readonly BlockingCollection<MessageEnvelope<IEvent>> _eventsQueue =
 			new BlockingCollection<MessageEnvelope<IEvent>>();
 
@@ -26,9 +28,7 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 		private readonly CancellationTokenSource _processingStoppedCancellationTokenSource = new CancellationTokenSource();
 		private readonly IEnumerable<IReadModelBuilder> _readModelBuilders;
 		private readonly IReadModelDbContext _readModelDbContext;
-		private readonly Stopwatch _stopwatch = new Stopwatch();
 		private IDisposable _eventsSubscription;
-		private int _numberOfEventsProcessed;
 
 		public ReadModelEventsApplier(IEventsDatabase eventsDatabase, IElasticClient elasticClient,
 			IEnumerable<IReadModelBuilder> readModelBuilders, IEndpointInstance nServiceBusEndpointInstance)
@@ -37,7 +37,11 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 			_readModelBuilders = readModelBuilders;
 			_nServiceBusEndpointInstance = nServiceBusEndpointInstance;
 			_readModelDbContext = new ElasticsearchReadModelDbContext(elasticClient);
-			_stopwatch.Start();
+		}
+
+		public void Dispose()
+		{
+			Stop().Wait();
 		}
 
 		public async Task Start()
@@ -50,62 +54,60 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 
 		private void ProcessQueue()
 		{
+			var appliedEventIds = new HashSet<Guid>();
+			var appliedEventIdsInCurrentBatch = new HashSet<Guid>();
+
 			while (true)
 			{
 				var eventEnvelope = _eventsQueue.Take(_processingStoppedCancellationTokenSource.Token);
-				const int maxBatchSize = 10; // TODO: Make larger after tests
-				var eventEnvelopesBatch = new List<MessageEnvelope<IEvent>>(maxBatchSize);
-				var batchConstructionTimeout = new TimeSpan(0, 0, 0, 1000);
+
+				if (appliedEventIds.Contains(eventEnvelope.MessageId))
+				{
+					continue;
+				}
+
 				var batchConstructionStopwatch = new Stopwatch();
 				batchConstructionStopwatch.Start();
 
 				while (true)
 				{
-					eventEnvelopesBatch.Add(eventEnvelope);
-					var timeLeftForBatchConstruction = batchConstructionTimeout - batchConstructionStopwatch.Elapsed;
-
-					if (eventEnvelopesBatch.Count >= maxBatchSize || timeLeftForBatchConstruction < TimeSpan.Zero)
+					if (appliedEventIds.Contains(eventEnvelope.MessageId))
 					{
-						ProcessEventEnvelopesBatch(eventEnvelopesBatch);
-						break;
+						continue;
 					}
 
-					const int maximumDelayInMillisecondsBetweenEventsInBatch = 100;
+					HandleEventEnvelope(eventEnvelope);
+					appliedEventIds.Add(eventEnvelope.MessageId);
+					appliedEventIdsInCurrentBatch.Add(eventEnvelope.MessageId);
 
-					var nextEventDequeueTimeoutInMilliseconds = Math.Min(maximumDelayInMillisecondsBetweenEventsInBatch,
-						timeLeftForBatchConstruction.Milliseconds);
+					var millisecondsLeftForBatchConstruction = BatchConstructionTimeoutMilliseconds -
+					                                           batchConstructionStopwatch.ElapsedMilliseconds;
 
-					var eventEnvelopeDequeueingTimedOut =
-						!_eventsQueue.TryTake(out eventEnvelope, nextEventDequeueTimeoutInMilliseconds,
-							_processingStoppedCancellationTokenSource.Token);
+					var batchConstructionTimedOut = millisecondsLeftForBatchConstruction <= 0;
 
-					if (eventEnvelopeDequeueingTimedOut)
+					var batchShouldBeFinished = batchConstructionTimedOut ||
+					                            !_eventsQueue.TryTake(out eventEnvelope, 0,
+						                            _processingStoppedCancellationTokenSource.Token);
+
+					if (!batchShouldBeFinished)
 					{
-						ProcessEventEnvelopesBatch(eventEnvelopesBatch);
-						break;
+						continue;
 					}
+
+					_readModelDbContext.SaveChanges().Wait();
+					Console.WriteLine(appliedEventIdsInCurrentBatch.Count); // TODO: Create a logger
+
+					var eventsAppliedToReadModelEvent = new EventsAppliedToReadModelEvent
+					{
+						AppliedEventIds = appliedEventIdsInCurrentBatch.ToList()
+					};
+
+					// TODO: Only live events should be included
+					_nServiceBusEndpointInstance.Publish(eventsAppliedToReadModelEvent).Wait();
+					appliedEventIdsInCurrentBatch.Clear();
+					break;
 				}
 			}
-		}
-
-		private void ProcessEventEnvelopesBatch(IReadOnlyCollection<MessageEnvelope<IEvent>> eventEnvelopesBatch)
-		{
-			Console.WriteLine(eventEnvelopesBatch.Count());
-
-			// TODO na cacheowane repo
-			foreach (var eventEnvelope in eventEnvelopesBatch)
-			{
-				HandleEventEnvelope(eventEnvelope);
-			}
-
-			_readModelDbContext.SaveChanges().Wait();
-			var eventsAppliedToReadModelEvent = new EventsAppliedToReadModelEvent
-			{
-				AppliedEventIds = eventEnvelopesBatch.Select(e => e.MessageId).ToList()
-			};
-
-			// TODO: Only live events should be included
-			_nServiceBusEndpointInstance.Publish(eventsAppliedToReadModelEvent).Wait();
 		}
 
 		private void HandleEventEnvelope(MessageEnvelope<IEvent> eventEnvelope)
@@ -120,22 +122,12 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 			{
 				readModelBuilder.Apply(eventEnvelope.Message, _readModelDbContext).Wait();
 			}
-
-			_numberOfEventsProcessed++;
-			Console.WriteLine(
-				$"{_numberOfEventsProcessed.ToString("D8")} | {_stopwatch.Elapsed.ToString("c")} | TID: {Thread.CurrentThread.ManagedThreadId} | {eventEnvelope.MessageId}");
-			_stopwatch.Restart();
 		}
 
 		public async Task Stop()
 		{
 			_eventsSubscription?.Dispose();
 			_processingStoppedCancellationTokenSource.Cancel();
-		}
-
-		public void Dispose()
-		{
-			Stop().Wait();
 		}
 	}
 }
