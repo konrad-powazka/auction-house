@@ -201,7 +201,10 @@ namespace AuctionHouse.Web
 	    private static void RegisterElasticSearchClient(ContainerBuilder containerBuilder)
 	    {
 			const string indexName = "auctionhouse";
-			var connectionSettings = new Nest.ConnectionSettings().DefaultIndex(indexName).ThrowExceptions(); ;
+
+			var connectionSettings =
+				new Nest.ConnectionSettings().DefaultIndex(indexName).ThrowExceptions().MaximumRetries(int.MaxValue);
+
 			var elasticClient = new ElasticClient(connectionSettings);
 			containerBuilder.RegisterInstance(elasticClient).As<IElasticClient>();
 		}

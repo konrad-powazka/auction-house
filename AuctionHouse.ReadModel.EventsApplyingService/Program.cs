@@ -48,7 +48,10 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 		private static void RegisterElasticsearchClient(ContainerBuilder containerBuilder)
 		{
 			const string indexName = "auctionhouse";
-			var connectionSettings = new ConnectionSettings().DefaultIndex(indexName).ThrowExceptions();
+
+			var connectionSettings =
+				new ConnectionSettings().DefaultIndex(indexName).ThrowExceptions().MaximumRetries(int.MaxValue);
+
 			var elasticClient = new ElasticClient(connectionSettings);
 
 			// Rebuilding an index each time the service restarts is not optimal, but creating an infrastructure to persist
