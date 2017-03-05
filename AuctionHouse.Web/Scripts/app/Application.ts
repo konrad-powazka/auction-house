@@ -11,90 +11,105 @@ import {DisplayAuctionComponent} from './UI/Auctions/DisplayAuctionComponent';
 import BusyIndicator from './UI/Shared/BusyIndicator';
 import {AngularCommandUiHandlersRegistry} from './UI/Shared/CommandHandling/GeneratedUiCommandHandlers';
 import {AuctionsListComponent} from './UI/Auctions/AuctionsListComponent';
+import BusyIndicatingHttpInterceptor from './UI/Shared/BusyIndicatingHttpInterceptor';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
 		new AuctionsListComponent(),
-        new CreateAuctionComponent(),
-        new DisplayAuctionComponent(),
-        new LoginDialogComponent()
-    ];
+		new CreateAuctionComponent(),
+		new DisplayAuctionComponent(),
+		new LoginDialogComponent()
+	];
 
-    static bootstrap(): void {
-        const module = angular.module('auctionHouse',
-        [
-            'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
+	static bootstrap(): void {
+		const module = angular.module('auctionHouse',
+		[
+			'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
 			'ui.bootstrap.datetimepicker', 'angularSpinner', 'ngTasty'
-        ]);
+		]);
 
-        module.controller('applicationCtrl', ApplicationCtrl);
+		this.registerConstants(module);
 
-        this.registerSerivces(module);
-        this.registerConstants(module);
+		Application.configureModule.$inject = [
+			'$stateProvider', '$urlRouterProvider', '$httpProvider'
+		];
 
-        for (let component of Application.components) {
-            module.component(component.registerAs, component);
-        }
+		module.config(Application.configureModule);
+		this.registerSerivces(module);
+		module.controller('applicationCtrl', ApplicationCtrl);
 
-		Application.configureModule.$inject = ['$stateProvider', '$urlRouterProvider'];
-        module.config(Application.configureModule);
-        Application.runModule.$inject = ['formlyConfig', 'formlyValidationMessages'];
-        module.run(Application.runModule);
-    };
+		for (let component of Application.components) {
+			module.component(component.registerAs, component);
+		}
 
-    private static registerSerivces(module: ng.IModule): void {
-        module.service(AngularCommandHandlersRegistry.commandHandlers);
-        module.service(AngularQueryHandlersRegistry.queryHandlers);
-        module.service(AngularCommandUiHandlersRegistry.commandUiHandlers);
-        module.service('securityService', SecurityService);
-        module.service('securityUiService', SecurityUiService);
-    }
+		Application.runModule.$inject = [
+			'formlyConfig', 'formlyValidationMessages'
+		];
 
-    private static registerConstants(module: ng.IModule): void {
-        module.constant('busyIndicator', new BusyIndicator());
-    }
+		module.run(Application.runModule);
+	};
 
-	private static configureModule($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider): void {
+	private static registerSerivces(module: ng.IModule): void {
+		module.service(AngularCommandHandlersRegistry.commandHandlers);
+		module.service(AngularQueryHandlersRegistry.queryHandlers);
+		module.service(AngularCommandUiHandlersRegistry.commandUiHandlers);
+		module.service('securityService', SecurityService);
+		module.service('securityUiService', SecurityUiService);
+		module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor);
+	}
+
+	private static registerConstants(module: ng.IModule): void {
+		module.constant('busyIndicator', new BusyIndicator());
+	}
+
+	private static configureModule($stateProvider: ng.ui.IStateProvider,
+		$urlRouterProvider: ng.ui.IUrlRouterProvider,
+		$httpProvider: ng.IHttpProvider): void {
 		Routing.configure($stateProvider, $urlRouterProvider);
-    }
+		$httpProvider.interceptors.push([
+			'busyIndicatingHttpInterceptor',
+			(busyIndicatingHttpInterceptor: BusyIndicatingHttpInterceptor) => busyIndicatingHttpInterceptor
+		]);
+	}
 
-    private static runModule(formlyConfig: AngularFormly.IFormlyConfig,
-        formlyValidationMessages: AngularFormly.IValidationMessages): void {
-        Application.configureFormly(formlyConfig, formlyValidationMessages);
-    }
+	private static runModule(formlyConfig: AngularFormly.IFormlyConfig,
+		formlyValidationMessages: AngularFormly.IValidationMessages): void {
+		Application.configureFormly(formlyConfig, formlyValidationMessages);
+	}
 
-    // Reference at http://angular-formly.com/#/example/other/error-summary
-    private static configureFormly(formlyConfig: AngularFormly.IFormlyConfig,
-        formlyValidationMessages: AngularFormly.IValidationMessages): void {
+	// Reference at http://angular-formly.com/#/example/other/error-summary
+	private static configureFormly(formlyConfig: AngularFormly.IFormlyConfig,
+		formlyValidationMessages: AngularFormly.IValidationMessages): void {
 
-        formlyConfig.setType({
-            name: 'dateTimePicker',
-            template: '<div><datetimepicker ng-model="model[options.key]" show-spinners="true" date-format="M/d/yyyy" date-options="dateOptions"></datetimepicker></div>',
-            wrapper: ['bootstrapLabel', 'bootstrapHasError'],
-            defaultOptions: {
-                templateOptions: {
-                    label: 'Time'
-                }
-            }
-        });
+		formlyConfig.setType({
+			name: 'dateTimePicker',
+			template:
+				'<div><datetimepicker ng-model="model[options.key]" show-spinners="true" date-format="M/d/yyyy" date-options="dateOptions"></datetimepicker></div>',
+			wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+			defaultOptions: {
+				templateOptions: {
+					label: 'Time'
+				}
+			}
+		});
 
-        formlyConfig.setWrapper({
-            name: 'validation',
-            types: ['input', 'textarea', 'dateTimePicker'],
-            templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
-        });
+		formlyConfig.setWrapper({
+			name: 'validation',
+			types: ['input', 'textarea', 'dateTimePicker'],
+			templateUrl: 'Template/Shared/AngularFormlyErrorMessagesInputWrapper'
+		});
 
-        formlyValidationMessages
-            .addTemplateOptionValueMessage('maxlength', 'maxlength', '', 'is the maximum length', 'Too long');
+		formlyValidationMessages
+			.addTemplateOptionValueMessage('maxlength', 'maxlength', '', 'is the maximum length', 'Too long');
 
-        formlyValidationMessages
-            .addTemplateOptionValueMessage('minlength', 'minlength', '', 'is the minimum length', 'Too short');
+		formlyValidationMessages
+			.addTemplateOptionValueMessage('minlength', 'minlength', '', 'is the minimum length', 'Too short');
 
-        formlyValidationMessages
-            .addTemplateOptionValueMessage('required', 'label', '', 'is required', 'This field is required');
+		formlyValidationMessages
+			.addTemplateOptionValueMessage('required', 'label', '', 'is required', 'This field is required');
 
-        formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
-    };
+		formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
+	};
 }
 
 Application.bootstrap();

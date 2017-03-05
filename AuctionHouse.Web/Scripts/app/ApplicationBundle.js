@@ -57,6 +57,7 @@
 	var BusyIndicator_1 = __webpack_require__(17);
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
 	var AuctionsListComponent_1 = __webpack_require__(20);
+	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(22);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -65,16 +66,20 @@
 	            'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
 	            'ui.bootstrap.datetimepicker', 'angularSpinner', 'ngTasty'
 	        ]);
-	        module.controller('applicationCtrl', ApplicationCtrl_1.ApplicationCtrl);
-	        this.registerSerivces(module);
 	        this.registerConstants(module);
+	        Application.configureModule.$inject = [
+	            '$stateProvider', '$urlRouterProvider', '$httpProvider'
+	        ];
+	        module.config(Application.configureModule);
+	        this.registerSerivces(module);
+	        module.controller('applicationCtrl', ApplicationCtrl_1.ApplicationCtrl);
 	        for (var _i = 0, _a = Application.components; _i < _a.length; _i++) {
 	            var component = _a[_i];
 	            module.component(component.registerAs, component);
 	        }
-	        Application.configureModule.$inject = ['$stateProvider', '$urlRouterProvider'];
-	        module.config(Application.configureModule);
-	        Application.runModule.$inject = ['formlyConfig', 'formlyValidationMessages'];
+	        Application.runModule.$inject = [
+	            'formlyConfig', 'formlyValidationMessages'
+	        ];
 	        module.run(Application.runModule);
 	    };
 	    ;
@@ -84,12 +89,17 @@
 	        module.service(GeneratedUiCommandHandlers_1.AngularCommandUiHandlersRegistry.commandUiHandlers);
 	        module.service('securityService', SecurityService_1.SecurityService);
 	        module.service('securityUiService', SecurityUiService_1.SecurityUiService);
+	        module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor_1.default);
 	    };
 	    Application.registerConstants = function (module) {
 	        module.constant('busyIndicator', new BusyIndicator_1.default());
 	    };
-	    Application.configureModule = function ($stateProvider, $urlRouterProvider) {
+	    Application.configureModule = function ($stateProvider, $urlRouterProvider, $httpProvider) {
 	        Routing_1.Routing.configure($stateProvider, $urlRouterProvider);
+	        $httpProvider.interceptors.push([
+	            'busyIndicatingHttpInterceptor',
+	            function (busyIndicatingHttpInterceptor) { return busyIndicatingHttpInterceptor; }
+	        ]);
 	    };
 	    Application.runModule = function (formlyConfig, formlyValidationMessages) {
 	        Application.configureFormly(formlyConfig, formlyValidationMessages);
@@ -1019,6 +1029,46 @@
 	}());
 	AuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
 	exports.AuctionsListCtrl = AuctionsListCtrl;
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var BusyIndicatingHttpInterceptor = (function () {
+	    function BusyIndicatingHttpInterceptor(busyIndicator, $q) {
+	        var _this = this;
+	        this.busyIndicator = busyIndicator;
+	        this.$q = $q;
+	        this.numberOfRequestsInProgress = 0;
+	        this.request = function (config) {
+	            if (_this.numberOfRequestsInProgress === 0) {
+	                _this.leaveHttpBusyStateFn = _this.busyIndicator.enterBusyState();
+	            }
+	            _this.numberOfRequestsInProgress++;
+	            return config;
+	        };
+	        this.response = function (response) {
+	            _this.decrementNumberOfRequestsInProgress();
+	            return response;
+	        };
+	        this.responseError = function (rejection) {
+	            _this.decrementNumberOfRequestsInProgress();
+	            return _this.$q.reject(rejection);
+	        };
+	    }
+	    BusyIndicatingHttpInterceptor.prototype.decrementNumberOfRequestsInProgress = function () {
+	        this.numberOfRequestsInProgress--;
+	        if (this.numberOfRequestsInProgress === 0) {
+	            this.leaveHttpBusyStateFn();
+	        }
+	    };
+	    return BusyIndicatingHttpInterceptor;
+	}());
+	BusyIndicatingHttpInterceptor.$inject = ['busyIndicator', '$q'];
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = BusyIndicatingHttpInterceptor;
 
 
 /***/ }

@@ -469,6 +469,7 @@
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\DisplayAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\BusyIndicatingHttpInterceptor.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\BusyIndicator.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\GeneratedUiCommandHandlers.ts">
       <DependentUpon>GeneratedUiCommandHandlers.tt</DependentUpon>
