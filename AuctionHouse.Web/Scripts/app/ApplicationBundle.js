@@ -471,8 +471,15 @@
 	"use strict";
 	var SecurityService = (function () {
 	    function SecurityService(httpService) {
+	        var _this = this;
 	        this.httpService = httpService;
 	        this.currentUserName = null;
+	        this.httpService.get('api/Authentication/GetCurrentUser', {})
+	            .then(function (response) {
+	            if (!_this.currentUserName && response.data && response.data.name) {
+	                _this.currentUserName = response.data.name;
+	            }
+	        });
 	    }
 	    SecurityService.prototype.logIn = function (userName, password) {
 	        var _this = this;

@@ -1,42 +1,49 @@
 ﻿export class SecurityService {
-    private currentUserName: string | null = null;
+	private currentUserName: string | null = null;
 
-    static $inject = ['$http'];
+	static $inject = ['$http'];
 
-    constructor(private httpService: ng.IHttpService) {
-    }
+	constructor(private httpService: ng.IHttpService) {
+		this.httpService.get<any>('api/Authentication/GetCurrentUser', {})
+			.then((response) => {
+				if (!this.currentUserName && response.data && response.data.name) {
+					this.currentUserName = response.data.name;
+				}
+			});
+	}
 
-    logIn(userName: string, password: string): ng.IPromise<void> {
-        const loginCommand = {
-            userName: userName,
-            password: password
-        };
+	logIn(userName: string, password: string): ng.IPromise<void> {
+		const loginCommand = {
+			userName: userName,
+			password: password
+		};
 
-        return this.httpService.post('api/Authentication/LogIn', loginCommand)
-            .then(() => {
-                this.currentUserName = userName;
-            });
-    }
+		return this.httpService.post('api/Authentication/LogIn', loginCommand)
+			.then(() => {
+				this.currentUserName = userName;
+			});
+	}
 
-    logOut(): ng.IPromise<void> {
-        if (!this.checkIfUserIsAuthenticated()) {
-            throw new Error('Current user is not authenticated.');
-        }
-        return this.httpService.post('api/Authentication/LogOut', {})
-            .then(() => {
-                this.currentUserName = null;
-            });
-    }
+	logOut(): ng.IPromise<void> {
+		if (!this.checkIfUserIsAuthenticated()) {
+			throw new Error('Current user is not authenticated.');
+		}
 
-    checkIfUserIsAuthenticated(): boolean {
-        return this.currentUserName !== null;
-    }
+		return this.httpService.post('api/Authentication/LogOut', {})
+			.then(() => {
+				this.currentUserName = null;
+			});
+	}
 
-    getCurrentUserName(): string {
-        if (!this.checkIfUserIsAuthenticated()) {
-            throw new Error('Current user is not authenticated.');
-        }
+	checkIfUserIsAuthenticated(): boolean {
+		return this.currentUserName !== null;
+	}
 
-        return this.currentUserName as string;
-    }
+	getCurrentUserName(): string {
+		if (!this.checkIfUserIsAuthenticated()) {
+			throw new Error('Current user is not authenticated.');
+		}
+
+		return this.currentUserName as string;
+	}
 }

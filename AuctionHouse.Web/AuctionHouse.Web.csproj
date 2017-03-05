@@ -267,6 +267,7 @@
     <Compile Include="Hubs\EventAppliedToReadModelNotificationHub.cs" />
     <Compile Include="Hubs\ICommandHandlingFeedbackHubClient.cs" />
     <Compile Include="Hubs\IEventAppliedToReadModelNotificationHubClient.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Models\LoginCommand.cs" />
     <Compile Include="Models\NotifyOnEventsAppliedToReadModelResponse.cs" />
     <Compile Include="Models\NotifyOnQueryResultChangedCommand.cs" />

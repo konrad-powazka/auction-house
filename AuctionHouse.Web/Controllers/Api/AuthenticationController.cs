@@ -6,9 +6,9 @@ using Microsoft.AspNet.Identity;
 
 namespace AuctionHouse.Web.Controllers.Api
 {
-    public class AuthenticationController : ApiController
+	[AllowAnonymous]
+	public class AuthenticationController : ApiController
     {
-        [AllowAnonymous]
         [HttpPost]
         public void LogIn(LoginCommand command)
         {
@@ -22,11 +22,16 @@ namespace AuctionHouse.Web.Controllers.Api
             Request.GetOwinContext().Authentication.SignIn(claimsIdentity);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public void LogOut()
         {
             Request.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
         }
-    }
+
+		[HttpGet]
+		public User GetCurrentUser()
+		{
+			return User.Identity.IsAuthenticated ? new User(User.Identity.Name) : null; 
+		}
+	}
 }
