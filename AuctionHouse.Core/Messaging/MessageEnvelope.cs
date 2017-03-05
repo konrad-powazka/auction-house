@@ -2,7 +2,7 @@
 
 namespace AuctionHouse.Core.Messaging
 {
-    public class MessageEnvelope<TMessage> where TMessage : IMessage
+    public class MessageEnvelope<TMessage> : IMessageEnvelope<TMessage> where TMessage : IMessage
     {
         public Guid MessageId { get; }
         public TMessage Message { get; }

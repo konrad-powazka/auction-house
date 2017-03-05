@@ -57,7 +57,6 @@ namespace AuctionHouse.Domain
 
         protected void ApplyChange(IEvent eventToApply)
         {
-            TryRegisterEventAppliers();
             Apply(eventToApply);
             _changes.Add(eventToApply);
         }
@@ -69,7 +68,8 @@ namespace AuctionHouse.Domain
                 throw new ArgumentNullException(nameof(eventToApply));
             }
 
-            Action<IEvent> applyEventAction;
+			TryRegisterEventAppliers();
+			Action<IEvent> applyEventAction;
             var eventType = eventToApply.GetType();
 
             if (!_eventAppliers.TryGetValue(eventType, out applyEventAction))

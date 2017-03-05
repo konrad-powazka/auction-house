@@ -5,16 +5,16 @@ import * as Commands from '../../../Messages/Commands';
 import {SecurityUiService } from '../SecurityUiService';
 import BusyIndicator from '../BusyIndicator';
 
-	export class CancelAuctionCommandUiHandler extends CommandUiHandler<Commands.CancelAuctionCommand> {
-		static $inject: ['cancelAuctionCommandHandler', 'busyIndicator', 'securityUiService'];
+	export class PopulateDatabaseWithTestDataCommandUiHandler extends CommandUiHandler<Commands.PopulateDatabaseWithTestDataCommand> {
+		static $inject: ['populateDatabaseWithTestDataCommandHandler', 'busyIndicator', 'securityUiService'];
 
 		constructor(
-			private cancelAuctionCommandHandler: ICommandHandler<Commands.CancelAuctionCommand>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
+			private populateDatabaseWithTestDataCommandHandler: ICommandHandler<Commands.PopulateDatabaseWithTestDataCommand>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
 			super(busyIndicator, securityUiService);
 		}
 
-		protected getCommandHandler(): ICommandHandler<Commands.CancelAuctionCommand> {
-			return this.cancelAuctionCommandHandler;
+		protected getCommandHandler(): ICommandHandler<Commands.PopulateDatabaseWithTestDataCommand> {
+			return this.populateDatabaseWithTestDataCommandHandler;
 		}
 	}
 	export class CreateAuctionCommandUiHandler extends CommandUiHandler<Commands.CreateAuctionCommand> {
@@ -27,6 +27,18 @@ import BusyIndicator from '../BusyIndicator';
 
 		protected getCommandHandler(): ICommandHandler<Commands.CreateAuctionCommand> {
 			return this.createAuctionCommandHandler;
+		}
+	}
+	export class FinishAuctionCommandUiHandler extends CommandUiHandler<Commands.FinishAuctionCommand> {
+		static $inject: ['finishAuctionCommandHandler', 'busyIndicator', 'securityUiService'];
+
+		constructor(
+			private finishAuctionCommandHandler: ICommandHandler<Commands.FinishAuctionCommand>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
+			super(busyIndicator, securityUiService);
+		}
+
+		protected getCommandHandler(): ICommandHandler<Commands.FinishAuctionCommand> {
+			return this.finishAuctionCommandHandler;
 		}
 	}
 	export class MakeBidCommandUiHandler extends CommandUiHandler<Commands.MakeBidCommand> {
@@ -44,8 +56,9 @@ import BusyIndicator from '../BusyIndicator';
 
 export class AngularCommandUiHandlersRegistry {
 	static commandUiHandlers: {[name: string]: ng.Injectable<Function>} = {
-							'cancelAuctionCommandUiHandler': CancelAuctionCommandUiHandler,
+							'populateDatabaseWithTestDataCommandUiHandler': PopulateDatabaseWithTestDataCommandUiHandler,
 							'createAuctionCommandUiHandler': CreateAuctionCommandUiHandler,
+							'finishAuctionCommandUiHandler': FinishAuctionCommandUiHandler,
 							'makeBidCommandUiHandler': MakeBidCommandUiHandler,
 					};
 	}

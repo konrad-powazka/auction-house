@@ -290,17 +290,17 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var CommandHandler_1 = __webpack_require__(6);
-	var CancelAuctionCommandHandler = (function (_super) {
-	    __extends(CancelAuctionCommandHandler, _super);
-	    function CancelAuctionCommandHandler() {
+	var PopulateDatabaseWithTestDataCommandHandler = (function (_super) {
+	    __extends(PopulateDatabaseWithTestDataCommandHandler, _super);
+	    function PopulateDatabaseWithTestDataCommandHandler() {
 	        return _super.apply(this, arguments) || this;
 	    }
-	    CancelAuctionCommandHandler.prototype.getCommandName = function () {
-	        return 'CancelAuctionCommand';
+	    PopulateDatabaseWithTestDataCommandHandler.prototype.getCommandName = function () {
+	        return 'PopulateDatabaseWithTestDataCommand';
 	    };
-	    return CancelAuctionCommandHandler;
+	    return PopulateDatabaseWithTestDataCommandHandler;
 	}(CommandHandler_1.CommandHandler));
-	exports.CancelAuctionCommandHandler = CancelAuctionCommandHandler;
+	exports.PopulateDatabaseWithTestDataCommandHandler = PopulateDatabaseWithTestDataCommandHandler;
 	var CreateAuctionCommandHandler = (function (_super) {
 	    __extends(CreateAuctionCommandHandler, _super);
 	    function CreateAuctionCommandHandler() {
@@ -312,6 +312,17 @@
 	    return CreateAuctionCommandHandler;
 	}(CommandHandler_1.CommandHandler));
 	exports.CreateAuctionCommandHandler = CreateAuctionCommandHandler;
+	var FinishAuctionCommandHandler = (function (_super) {
+	    __extends(FinishAuctionCommandHandler, _super);
+	    function FinishAuctionCommandHandler() {
+	        return _super.apply(this, arguments) || this;
+	    }
+	    FinishAuctionCommandHandler.prototype.getCommandName = function () {
+	        return 'FinishAuctionCommand';
+	    };
+	    return FinishAuctionCommandHandler;
+	}(CommandHandler_1.CommandHandler));
+	exports.FinishAuctionCommandHandler = FinishAuctionCommandHandler;
 	var MakeBidCommandHandler = (function (_super) {
 	    __extends(MakeBidCommandHandler, _super);
 	    function MakeBidCommandHandler() {
@@ -329,8 +340,9 @@
 	    return AngularCommandHandlersRegistry;
 	}());
 	AngularCommandHandlersRegistry.commandHandlers = {
-	    'cancelAuctionCommandHandler': CancelAuctionCommandHandler,
+	    'populateDatabaseWithTestDataCommandHandler': PopulateDatabaseWithTestDataCommandHandler,
 	    'createAuctionCommandHandler': CreateAuctionCommandHandler,
+	    'finishAuctionCommandHandler': FinishAuctionCommandHandler,
 	    'makeBidCommandHandler': MakeBidCommandHandler,
 	};
 	exports.AngularCommandHandlersRegistry = AngularCommandHandlersRegistry;
@@ -640,10 +652,11 @@
 
 	"use strict";
 	var ApplicationCtrl = (function () {
-	    function ApplicationCtrl(securityUiService, busyIndicator, $state) {
+	    function ApplicationCtrl(securityUiService, busyIndicator, $state, $timeout, $scope) {
+	        var _this = this;
 	        this.securityUiService = securityUiService;
-	        this.busyIndicator = busyIndicator;
 	        this.$state = $state;
+	        this.busySpinnerIsVisible = false;
 	        this.spinnerOptions = {
 	            lines: 13,
 	            length: 28,
@@ -666,6 +679,20 @@
 	            hwaccel: false,
 	            position: 'relative' // Element positioning
 	        };
+	        $scope.$watch(function () { return busyIndicator.isBusy; }, function () {
+	            if (busyIndicator.isBusy) {
+	                var showBusyIndicatorDelayInMilliseconds = 400;
+	                $timeout(showBusyIndicatorDelayInMilliseconds)
+	                    .then(function () {
+	                    if (busyIndicator.isBusy) {
+	                        _this.busySpinnerIsVisible = true;
+	                    }
+	                });
+	            }
+	            else {
+	                _this.busySpinnerIsVisible = false;
+	            }
+	        });
 	    }
 	    ApplicationCtrl.prototype.checkIfAuctionsSearchQueryStringIsValid = function () {
 	        return _(this.auctionsSearchQueryString).isString() && !!this.auctionsSearchQueryString.trim();
@@ -675,7 +702,7 @@
 	    };
 	    return ApplicationCtrl;
 	}());
-	ApplicationCtrl.$inject = ['securityUiService', 'busyIndicator', '$state'];
+	ApplicationCtrl.$inject = ['securityUiService', 'busyIndicator', '$state', '$timeout', '$scope'];
 	exports.ApplicationCtrl = ApplicationCtrl;
 
 
@@ -892,19 +919,19 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var CommandUiHandler_1 = __webpack_require__(19);
-	var CancelAuctionCommandUiHandler = (function (_super) {
-	    __extends(CancelAuctionCommandUiHandler, _super);
-	    function CancelAuctionCommandUiHandler(cancelAuctionCommandHandler, busyIndicator, securityUiService) {
+	var PopulateDatabaseWithTestDataCommandUiHandler = (function (_super) {
+	    __extends(PopulateDatabaseWithTestDataCommandUiHandler, _super);
+	    function PopulateDatabaseWithTestDataCommandUiHandler(populateDatabaseWithTestDataCommandHandler, busyIndicator, securityUiService) {
 	        var _this = _super.call(this, busyIndicator, securityUiService) || this;
-	        _this.cancelAuctionCommandHandler = cancelAuctionCommandHandler;
+	        _this.populateDatabaseWithTestDataCommandHandler = populateDatabaseWithTestDataCommandHandler;
 	        return _this;
 	    }
-	    CancelAuctionCommandUiHandler.prototype.getCommandHandler = function () {
-	        return this.cancelAuctionCommandHandler;
+	    PopulateDatabaseWithTestDataCommandUiHandler.prototype.getCommandHandler = function () {
+	        return this.populateDatabaseWithTestDataCommandHandler;
 	    };
-	    return CancelAuctionCommandUiHandler;
+	    return PopulateDatabaseWithTestDataCommandUiHandler;
 	}(CommandUiHandler_1.CommandUiHandler));
-	exports.CancelAuctionCommandUiHandler = CancelAuctionCommandUiHandler;
+	exports.PopulateDatabaseWithTestDataCommandUiHandler = PopulateDatabaseWithTestDataCommandUiHandler;
 	var CreateAuctionCommandUiHandler = (function (_super) {
 	    __extends(CreateAuctionCommandUiHandler, _super);
 	    function CreateAuctionCommandUiHandler(createAuctionCommandHandler, busyIndicator, securityUiService) {
@@ -918,6 +945,19 @@
 	    return CreateAuctionCommandUiHandler;
 	}(CommandUiHandler_1.CommandUiHandler));
 	exports.CreateAuctionCommandUiHandler = CreateAuctionCommandUiHandler;
+	var FinishAuctionCommandUiHandler = (function (_super) {
+	    __extends(FinishAuctionCommandUiHandler, _super);
+	    function FinishAuctionCommandUiHandler(finishAuctionCommandHandler, busyIndicator, securityUiService) {
+	        var _this = _super.call(this, busyIndicator, securityUiService) || this;
+	        _this.finishAuctionCommandHandler = finishAuctionCommandHandler;
+	        return _this;
+	    }
+	    FinishAuctionCommandUiHandler.prototype.getCommandHandler = function () {
+	        return this.finishAuctionCommandHandler;
+	    };
+	    return FinishAuctionCommandUiHandler;
+	}(CommandUiHandler_1.CommandUiHandler));
+	exports.FinishAuctionCommandUiHandler = FinishAuctionCommandUiHandler;
 	var MakeBidCommandUiHandler = (function (_super) {
 	    __extends(MakeBidCommandUiHandler, _super);
 	    function MakeBidCommandUiHandler(makeBidCommandHandler, busyIndicator, securityUiService) {
@@ -937,8 +977,9 @@
 	    return AngularCommandUiHandlersRegistry;
 	}());
 	AngularCommandUiHandlersRegistry.commandUiHandlers = {
-	    'cancelAuctionCommandUiHandler': CancelAuctionCommandUiHandler,
+	    'populateDatabaseWithTestDataCommandUiHandler': PopulateDatabaseWithTestDataCommandUiHandler,
 	    'createAuctionCommandUiHandler': CreateAuctionCommandUiHandler,
+	    'finishAuctionCommandUiHandler': FinishAuctionCommandUiHandler,
 	    'makeBidCommandUiHandler': MakeBidCommandUiHandler,
 	};
 	exports.AngularCommandUiHandlersRegistry = AngularCommandUiHandlersRegistry;

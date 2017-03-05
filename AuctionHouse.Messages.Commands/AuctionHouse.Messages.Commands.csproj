@@ -40,8 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Auctions\CancelAuctionCommand.cs" />
     <Compile Include="Auctions\CreateAuctionCommand.cs" />
+    <Compile Include="Auctions\FinishAuctionCommand.cs" />
     <Compile Include="Auctions\MakeBidCommand.cs" />
     <Compile Include="CommandsAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

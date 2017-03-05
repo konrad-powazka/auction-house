@@ -41,6 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\DictionaryExtensions.cs" />
+    <Compile Include="GuidGenerator.cs" />
+    <Compile Include="Messaging\ICommandQueue.cs" />
+    <Compile Include="Messaging\IEventHandler.cs" />
+    <Compile Include="Messaging\IMessageEnvelope.cs" />
     <Compile Include="ReadModel\IReadModelBuilder.cs" />
     <Compile Include="ReadModel\IReadModelDbContext.cs" />
     <Compile Include="Messaging\CommandEnvelope.cs" />

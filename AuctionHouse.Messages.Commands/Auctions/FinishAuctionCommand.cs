@@ -3,8 +3,8 @@ using AuctionHouse.Core.Messaging;
 
 namespace AuctionHouse.Messages.Commands.Auctions
 {
-    public class CancelAuctionCommand : ICommand
-    {
-        public Guid Id { get; set; }
-    }
+	public class FinishAuctionCommand : ICommand
+	{
+		public Guid Id;
+	}
 }

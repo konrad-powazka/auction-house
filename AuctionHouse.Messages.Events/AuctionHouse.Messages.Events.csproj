@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auctions\AuctionCreatedEvent.cs" />
+    <Compile Include="Auctions\AuctionFinishedEvent.cs" />
     <Compile Include="Auctions\BidMadeEvent.cs" />
     <Compile Include="EventsAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

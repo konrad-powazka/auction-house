@@ -43,9 +43,9 @@ namespace AuctionHouse.ServiceBus
 
             RegisterEventStoreConnection(containerBuilder);
 
-            containerBuilder.RegisterGeneric(typeof(EventStoreRepository<>))
-                .As(typeof(IRepository<>))
-                .InstancePerLifetimeScope();
+	        containerBuilder.RegisterAssemblyTypes(typeof(PersistenceAssemblyMarker).Assembly)
+		        .AsClosedTypesOf(typeof(IRepository<>))
+		        .InstancePerLifetimeScope();
 
             containerBuilder.RegisterType<EventStoreEventsDatabase>()
                 .Named<IEventsDatabase>("EventsDatabase")

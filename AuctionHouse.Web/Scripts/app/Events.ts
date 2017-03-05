@@ -22,6 +22,12 @@ class AuctionCreatedEvent
 	public startingPrice: number;
 	public minimalPriceForNextBidder: number;
 	public createdByUserName: string;
+	public endDateTime: string;
+}
+export
+class AuctionFinishedEvent
+{
+	public auctionId: string;
 }
 export
 class BidMadeEvent

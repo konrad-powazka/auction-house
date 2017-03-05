@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using AuctionHouse.Core.Messaging;
+using AuctionHouse.Core.Time;
 using AuctionHouse.Messages.Commands.Test;
 using AuctionHouse.Messages.Events;
 using AuctionHouse.Persistence;
@@ -101,6 +102,7 @@ namespace AuctionHouse.Web
                 .SingleInstance()
                 .OnRelease(instance => instance.Stop().Wait());
 
+	        builder.RegisterType<TimeProvider>().As<ITimeProvider>().SingleInstance();
             builder.RegisterType<NServiceBusCommandQueue>().As<ICommandQueue>().SingleInstance();
             RegisterEventStoreConnection(builder);
 

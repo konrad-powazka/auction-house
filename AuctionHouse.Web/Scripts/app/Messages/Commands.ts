@@ -8,11 +8,6 @@ class PopulateDatabaseWithTestDataCommand
 {
 }
 export
-class CancelAuctionCommand
-{
-	public id: string;
-}
-export
 class CreateAuctionCommand
 {
 	public auctionId: string;
@@ -21,6 +16,10 @@ class CreateAuctionCommand
 	public startingPrice: number;
 	public buyNowPrice: number;
 	public endDate: string;
+}
+export
+class FinishAuctionCommand
+{
 }
 export
 class MakeBidCommand

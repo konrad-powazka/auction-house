@@ -254,7 +254,6 @@
     <Compile Include="Controllers\View\HomeController.cs" />
     <Compile Include="Cqrs\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="CodeGen\CqrsControllerTypesGenerator.cs" />
-    <Compile Include="Cqrs\ICommandQueue.cs" />
     <Compile Include="EventSourcing\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="EventSourcing\EventAppliedEventArgs.cs" />
     <Compile Include="EventSourcing\EventsAppliedToReadModelTracker.cs" />

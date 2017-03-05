@@ -2,14 +2,19 @@
 import { CommandHandler } from './CommandHandler';
 import * as Commands from '../Messages/Commands';
 
-	export class CancelAuctionCommandHandler extends CommandHandler<Commands.CancelAuctionCommand> {
+	export class PopulateDatabaseWithTestDataCommandHandler extends CommandHandler<Commands.PopulateDatabaseWithTestDataCommand> {
 		protected getCommandName(): string {
-			return 'CancelAuctionCommand';
+			return 'PopulateDatabaseWithTestDataCommand';
 		}
 	}
 	export class CreateAuctionCommandHandler extends CommandHandler<Commands.CreateAuctionCommand> {
 		protected getCommandName(): string {
 			return 'CreateAuctionCommand';
+		}
+	}
+	export class FinishAuctionCommandHandler extends CommandHandler<Commands.FinishAuctionCommand> {
+		protected getCommandName(): string {
+			return 'FinishAuctionCommand';
 		}
 	}
 	export class MakeBidCommandHandler extends CommandHandler<Commands.MakeBidCommand> {
@@ -20,8 +25,9 @@ import * as Commands from '../Messages/Commands';
 
 export class AngularCommandHandlersRegistry {
 	static commandHandlers: {[name: string]: ng.Injectable<Function>} = {
-							'cancelAuctionCommandHandler': CancelAuctionCommandHandler,
+							'populateDatabaseWithTestDataCommandHandler': PopulateDatabaseWithTestDataCommandHandler,
 							'createAuctionCommandHandler': CreateAuctionCommandHandler,
+							'finishAuctionCommandHandler': FinishAuctionCommandHandler,
 							'makeBidCommandHandler': MakeBidCommandHandler,
 					};
 	}

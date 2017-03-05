@@ -16,5 +16,7 @@ namespace AuctionHouse.Messages.Events.Auctions
         public decimal MinimalPriceForNextBidder { get; set; }
 
         public string CreatedByUserName { get; set; }
+
+		public DateTime EndDateTime { get; set; }
     }
 }

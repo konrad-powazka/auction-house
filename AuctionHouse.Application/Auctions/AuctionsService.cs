@@ -7,7 +7,9 @@ using AuctionHouse.Persistence;
 
 namespace AuctionHouse.Application.Auctions
 {
-	public class AuctionsService : ICommandHandler<CreateAuctionCommand>
+	public class AuctionsService :
+		ICommandHandler<CreateAuctionCommand>,
+		ICommandHandler<FinishAuctionCommand>
 	{
 		private readonly IRepository<Auction> _auctionsRepository;
 		private readonly ITimeProvider _timeProvider;
@@ -25,6 +27,12 @@ namespace AuctionHouse.Application.Auctions
 				command.StartingPrice, command.BuyNowPrice, commandEnvelope.SenderUserName, _timeProvider);
 
 			await _auctionsRepository.Create(createdAuction);
+		}
+
+		public async Task Handle(CommandEnvelope<FinishAuctionCommand> commandEnvelope)
+		{
+			var auction = await _auctionsRepository.Get(commandEnvelope.Message.Id);
+			auction.Finish();
 		}
 	}
 }
