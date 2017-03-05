@@ -3,6 +3,8 @@ import {IQueryHandler} from '../../QueryHandling/IQueryHandler';
 import { SearchAuctionsQuery } from '../../Messages/Queries';
 
 export class AuctionsListCtrl implements ng.IController {
+	queryString: string;
+
 	tastyInitCfg = {
 		'count': 10,
 		'page': 1
@@ -30,6 +32,7 @@ export class AuctionsListCtrl implements ng.IController {
 
 	getResource = (paramsString: string, paramsObject: any): ng.IPromise<any> => {
 		const query = {
+			queryString: this.queryString,
 			pageSize: paramsObject.count,
 			pageNumber: paramsObject.page
 		};

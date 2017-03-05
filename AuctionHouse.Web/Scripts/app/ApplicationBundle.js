@@ -623,54 +623,42 @@
 
 	"use strict";
 	var ApplicationCtrl = (function () {
-	    function ApplicationCtrl(securityUiService, busyIndicator) {
+	    function ApplicationCtrl(securityUiService, busyIndicator, $state) {
 	        this.securityUiService = securityUiService;
 	        this.busyIndicator = busyIndicator;
+	        this.$state = $state;
 	        this.spinnerOptions = {
-	            lines: 13 // The number of lines to draw
-	            ,
-	            length: 28 // The length of each line
-	            ,
-	            width: 14 // The line thickness
-	            ,
-	            radius: 35 // The radius of the inner circle
-	            ,
-	            scale: 1 // Scales overall size of the spinner
-	            ,
-	            corners: 1 // Corner roundness (0..1)
-	            ,
-	            color: '#FFFFFF' // #rgb or #rrggbb or array of colors
-	            ,
-	            opacity: 0.25 // Opacity of the lines
-	            ,
-	            rotate: 0 // The rotation offset
-	            ,
-	            direction: 1 // 1: clockwise, -1: counterclockwise
-	            ,
-	            speed: 2.2 // Rounds per second
-	            ,
-	            trail: 60 // Afterglow percentage
-	            ,
-	            fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
-	            ,
-	            zIndex: 2e9 // The z-index (defaults to 2000000000)
-	            ,
-	            className: 'spinner' // The CSS class to assign to the spinner
-	            ,
-	            top: '50%' // Top position relative to parent
-	            ,
-	            left: '50%' // Left position relative to parent
-	            ,
-	            shadow: false // Whether to render a shadow
-	            ,
-	            hwaccel: false // Whether to use hardware acceleration
-	            ,
+	            lines: 13,
+	            length: 28,
+	            width: 14,
+	            radius: 35,
+	            scale: 1,
+	            corners: 1,
+	            color: '#FFFFFF',
+	            opacity: 0.25,
+	            rotate: 0,
+	            direction: 1,
+	            speed: 2.2,
+	            trail: 60,
+	            fps: 20,
+	            zIndex: 2e9,
+	            className: 'spinner',
+	            top: '50%',
+	            left: '50%',
+	            shadow: false,
+	            hwaccel: false,
 	            position: 'relative' // Element positioning
 	        };
 	    }
+	    ApplicationCtrl.prototype.checkIfAuctionsSearchQueryStringIsValid = function () {
+	        return _(this.auctionsSearchQueryString).isString() && !!this.auctionsSearchQueryString.trim();
+	    };
+	    ApplicationCtrl.prototype.searchAuctions = function () {
+	        this.$state.go('auctionsSearch', { queryString: this.auctionsSearchQueryString });
+	    };
 	    return ApplicationCtrl;
 	}());
-	ApplicationCtrl.$inject = ['securityUiService', 'busyIndicator'];
+	ApplicationCtrl.$inject = ['securityUiService', 'busyIndicator', '$state'];
 	exports.ApplicationCtrl = ApplicationCtrl;
 
 
@@ -690,6 +678,18 @@
 	                component: 'auctionsList'
 	            },
 	            {
+	                name: 'auctionsSearch',
+	                url: '/auction/search/{queryString}',
+	                component: 'auctionsList',
+	                resolve: {
+	                    queryString: [
+	                        '$stateParams', function ($stateParams) {
+	                            return $stateParams['queryString'];
+	                        }
+	                    ]
+	                }
+	            },
+	            {
 	                name: 'createAuction',
 	                url: '/auction/create',
 	                component: 'createAuction'
@@ -699,9 +699,7 @@
 	                url: '/auction/{auctionId}',
 	                component: 'displayAuction',
 	                resolve: {
-	                    auctionId: function ($stateParams) {
-	                        return $stateParams.auctionId;
-	                    }
+	                    auctionId: ['$stateParams', function ($stateParams) { return $stateParams['auctionId']; }]
 	                }
 	            }
 	        ];
@@ -960,7 +958,9 @@
 	        this.controller = AuctionsListCtrl_1.AuctionsListCtrl;
 	        this.templateUrl = 'Template/Auctions/List';
 	        this.registerAs = 'auctionsList';
-	        this.bindings = {};
+	        this.bindings = {
+	            queryString: '<'
+	        };
 	    }
 	    return AuctionsListComponent;
 	}());
@@ -996,6 +996,7 @@
 	        };
 	        this.getResource = function (paramsString, paramsObject) {
 	            var query = {
+	                queryString: _this.queryString,
 	                pageSize: paramsObject.count,
 	                pageNumber: paramsObject.page
 	            };

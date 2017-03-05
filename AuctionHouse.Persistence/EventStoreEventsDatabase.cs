@@ -72,7 +72,6 @@ namespace AuctionHouse.Persistence
         private void SubscriptionDropped(EventStoreCatchUpSubscription eventStoreCatchUpSubscription, SubscriptionDropReason subscriptionDropReason, Exception arg3)
         {
             //TODO: Resume subscription
-            throw new NotImplementedException();
         }
 
         private bool CheckIfIsInternalEventStoreEvent(ResolvedEvent eventStoreEvent)

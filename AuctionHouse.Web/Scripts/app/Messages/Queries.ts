@@ -12,6 +12,7 @@ class GetAuctionDetailsQuery
 export
 class SearchAuctionsQuery
 {
+	public queryString: string;
 	public pageSize: number;
 	public pageNumber: number;
 }

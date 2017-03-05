@@ -50,9 +50,31 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 			const string indexName = "auctionhouse";
 
 			var connectionSettings =
-				new ConnectionSettings().DefaultIndex(indexName).ThrowExceptions().MaximumRetries(int.MaxValue);
+				new ConnectionSettings().DefaultIndex(indexName)
+					.ThrowExceptions()
+					.RequestTimeout(TimeSpan.FromSeconds(30))
+					.MaxRetryTimeout(TimeSpan.FromSeconds(30))
+					.MaximumRetries(2);
 
 			var elasticClient = new ElasticClient(connectionSettings);
+
+			// Timeouts an retry settings do not seem to be working for cases when the
+			// elasticsearch server is offline, so we need this ugly workaround
+			bool elasticsearchStarted;
+
+			do
+			{
+				elasticsearchStarted = true;
+
+				try
+				{
+					elasticClient.ClusterHealth();
+				}
+				catch
+				{
+					elasticsearchStarted = false;
+				}
+			} while (!elasticsearchStarted);
 
 			// Rebuilding an index each time the service restarts is not optimal, but creating an infrastructure to persist
 			// last processed event and build new/corrupted read models from scratch would be costly

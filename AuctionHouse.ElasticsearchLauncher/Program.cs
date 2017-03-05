@@ -12,31 +12,20 @@ namespace AuctionHouse.ElasticsearchLauncher
 			Console.Title = "AuctionHouse.ElasticsearchLauncher";
 
 			var elasticsearchExecutablePath = Path.Combine(Environment.CurrentDirectory,
-				"ElasticsearchFiles/bin/elasticsearch.bat");
+				"ElasticsearchFiles/bin/elasticsearch.bat --silent");
 
 			var elasticsearchCmdProcess = new Process
 			{
 				StartInfo = new ProcessStartInfo("cmd.exe", $@"/C {elasticsearchExecutablePath}")
 			{
-					UseShellExecute = false,
-					RedirectStandardOutput = true,
-					CreateNoWindow = true
+					UseShellExecute = true,
+					CreateNoWindow = false
 				}
 			};
 
 			try
 			{
 				elasticsearchCmdProcess.Start();
-
-				Task.Run(() =>
-				{
-					while (!elasticsearchCmdProcess.StandardOutput.EndOfStream)
-					{
-						var line = elasticsearchCmdProcess.StandardOutput.ReadLine();
-						Console.WriteLine(line);
-					}
-				});
-
 				Console.WriteLine("Press any key to exit");
 				Console.ReadKey();
 			}

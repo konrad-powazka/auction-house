@@ -30,7 +30,18 @@ namespace AuctionHouse.QueryHandling
 			var firstAuctionIndex = (pageNumber - 1)*query.PageSize;
 
 			var elasticResult =
-				await _elasticClient.SearchAsync<AuctionDetailsReadModel>(s => s.From(firstAuctionIndex).Take(query.PageSize));
+				await
+					_elasticClient.SearchAsync<AuctionDetailsReadModel>(
+						s =>
+							s.Query(
+								q =>
+									q.MultiMatch(
+										mq =>
+											mq.Fields(f => f.Fields(a => a.Title, a => a.Description))
+												.Query(query.QueryString)
+												.Fuzziness(Fuzziness.Auto)))
+								.From(firstAuctionIndex)
+								.Take(query.PageSize));
 
 			return new AuctionsListReadModel
 			{

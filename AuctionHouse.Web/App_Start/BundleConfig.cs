@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Web.Optimization;
+﻿using System.Web.Optimization;
 
 namespace AuctionHouse.Web
 {
@@ -9,7 +7,8 @@ namespace AuctionHouse.Web
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/libs").Include(
-                "~/Scripts/jquery-{version}.js",
+				"~/Scripts/underscore.js",
+				"~/Scripts/jquery-{version}.js",
                 "~/Scripts/jquery.signalR-2.2.1.js",
                 "~/Scripts/bootstrap.js",
                 "~/Scripts/respond.js",

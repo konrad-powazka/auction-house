@@ -203,7 +203,11 @@ namespace AuctionHouse.Web
 			const string indexName = "auctionhouse";
 
 			var connectionSettings =
-				new Nest.ConnectionSettings().DefaultIndex(indexName).ThrowExceptions().MaximumRetries(int.MaxValue);
+				new Nest.ConnectionSettings().DefaultIndex(indexName)
+					.ThrowExceptions()
+					.RequestTimeout(TimeSpan.FromSeconds(30))
+					.MaxRetryTimeout(TimeSpan.FromSeconds(30))
+					.MaximumRetries(2);
 
 			var elasticClient = new ElasticClient(connectionSettings);
 			containerBuilder.RegisterInstance(elasticClient).As<IElasticClient>();
