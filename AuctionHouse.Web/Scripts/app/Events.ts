@@ -23,6 +23,7 @@ class AuctionCreatedEvent
 	public minimalPriceForNextBidder: number;
 	public createdByUserName: string;
 	public endDateTime: string;
+	public buyNowPrice: number;
 }
 export
 class AuctionFinishedEvent

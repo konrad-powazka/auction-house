@@ -382,9 +382,10 @@
     <Content Include="Scripts\underscore.min.map" />
     <Content Include="Views\Auctions\Create.cshtml" />
     <Content Include="Views\Shared\AngularFormlyErrorMessagesInputWrapper.cshtml" />
-    <Content Include="Views\Security\LoginDialog.cshtml" />
+    <Content Include="Views\Security\SignInDialog.cshtml" />
     <Content Include="Views\Auctions\Display.cshtml" />
     <Content Include="Views\Auctions\List.cshtml" />
+    <Content Include="Views\Shared\SimpleNotificationDialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -474,6 +475,7 @@
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\BusyIndicatingHttpInterceptor.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\BusyIndicator.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\NotificationType.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\GeneratedUiCommandHandlers.ts">
       <DependentUpon>GeneratedUiCommandHandlers.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -481,9 +483,12 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\ICommandUiHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\CommandUiHandler.ts" />
-    <TypeScriptCompile Include="Scripts\app\UI\Shared\LoginDialogComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\SimpleNotificationDialogComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\ApplicationCtrl.ts" />
-    <TypeScriptCompile Include="Scripts\app\UI\Shared\LoginDialogCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\SimpleNotificationDialogCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\GenericModalService.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SecurityUiService.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-formly\angular-formly.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />

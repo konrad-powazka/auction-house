@@ -41,10 +41,14 @@ namespace AuctionHouse.Domain.Auctions
 				throw new ArgumentException("Value cannot be null or whitespace.", nameof(title));
 			}
 
-			//TODO: Mockable date
 			if (endDate <= timeProvider.Now)
 			{
 				throw new ArgumentOutOfRangeException(nameof(endDate));
+			}
+
+			if (buyNowPrice.HasValue && buyNowPrice < startingPrice)
+			{
+				throw new ArgumentOutOfRangeException(nameof(buyNowPrice));
 			}
 
 			var auction = new Auction(timeProvider);
@@ -57,7 +61,8 @@ namespace AuctionHouse.Domain.Auctions
 				StartingPrice = startingPrice,
 				MinimalPriceForNextBidder = startingPrice,
 				CreatedByUserName = createdByUserName,
-				EndDateTime = endDate
+				EndDateTime = endDate,
+				BuyNowPrice = buyNowPrice
 			};
 
 			auction.ApplyChange(auctionCreatedEvent);

@@ -24,7 +24,8 @@ export class CreateAuctionCtrl implements ng.IController {
             startingPrice: 5,
             buyNowPrice: 10,
             endDate: undefined as any
-        };
+		};
+
         this.fields = [
             {
                 key: 'title',
@@ -65,10 +66,10 @@ export class CreateAuctionCtrl implements ng.IController {
         this.createAuctionCommandUiHandler
             .handle(this.model, true)
             .then(() => {
-                alert('Success');
                 this.stateService.go('displayAuction', { auctionId: this.model.auctionId });
             })
-            .catch((commandHandlingErrorType: CommandHandlingErrorType) =>
+			.catch((commandHandlingErrorType: CommandHandlingErrorType) =>
+				// TODO: To modal with proper error handling
                 alert(`Command processing error: ${CommandHandlingErrorType[commandHandlingErrorType]}`));
     } 
 }

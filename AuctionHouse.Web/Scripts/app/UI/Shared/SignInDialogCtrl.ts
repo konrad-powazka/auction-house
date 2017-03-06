@@ -1,14 +1,14 @@
 ﻿import {SecurityService} from '../../Security/SecurityService';
 import ModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 
-export class LoginDialogCtrl implements ng.IController {
+export class SignInDialogCtrl implements ng.IController {
     modalInstance: ModalServiceInstance;
 
     fields: AngularFormly.IFieldArray;
 
     model: {
-        userName: string,
-        password: string
+        userName: string;
+        password: string;
     };
 
     form: ng.IFormController;
@@ -43,7 +43,7 @@ export class LoginDialogCtrl implements ng.IController {
         }
 
         this.securityService
-            .logIn(this.model.userName, this.model.password)
+            .signIn(this.model.userName, this.model.password)
             .then(() => {
                 this.modalInstance.close();
             },

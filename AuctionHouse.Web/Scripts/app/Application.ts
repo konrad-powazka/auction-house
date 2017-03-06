@@ -3,7 +3,7 @@ import { CreateAuctionComponent } from './UI/Auctions/CreateAuctionComponent';
 import { AngularCommandHandlersRegistry } from './CommandHandling/GeneratedCommandHandlers';
 import {SecurityService} from './Security/SecurityService';
 import {SecurityUiService} from './UI/Shared/SecurityUiService';
-import {LoginDialogComponent} from './UI/Shared/LoginDialogComponent';
+import { SignInDialogComponent } from './UI/Shared/SignInDialogComponent';
 import {ApplicationCtrl} from './UI/Shared/ApplicationCtrl';
 import {Routing} from './Routing';
 import {AngularQueryHandlersRegistry} from './QueryHandling/GeneratedQueryHandlers';
@@ -12,13 +12,16 @@ import BusyIndicator from './UI/Shared/BusyIndicator';
 import {AngularCommandUiHandlersRegistry} from './UI/Shared/CommandHandling/GeneratedUiCommandHandlers';
 import {AuctionsListComponent} from './UI/Auctions/AuctionsListComponent';
 import BusyIndicatingHttpInterceptor from './UI/Shared/BusyIndicatingHttpInterceptor';
+import {SimpleNotificationDialogComponent} from './UI/Shared/SimpleNotificationDialogComponent';
+import GenericModalService from './UI/Shared/GenericModalService';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
 		new AuctionsListComponent(),
 		new CreateAuctionComponent(),
 		new DisplayAuctionComponent(),
-		new LoginDialogComponent()
+		new SignInDialogComponent(),
+		new SimpleNotificationDialogComponent()
 	];
 
 	static bootstrap(): void {
@@ -56,6 +59,7 @@ export class Application {
 		module.service('securityService', SecurityService);
 		module.service('securityUiService', SecurityUiService);
 		module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor);
+		module.service('genericModalService', GenericModalService);
 	}
 
 	private static registerConstants(module: ng.IModule): void {

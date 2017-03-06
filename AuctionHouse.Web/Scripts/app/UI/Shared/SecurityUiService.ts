@@ -22,18 +22,18 @@ export class SecurityUiService {
             return this.qService.resolve();
         }
 
-        return this.showLogInDialog();
+        return this.showSignInDialog();
     }
 
-    showLogInDialog(): ng.IPromise<void> {
+    showSignInDialog(): ng.IPromise<void> {
         const modalInstance = this.modalService.open({
-            component: 'loginDialog'
+            component: 'signInDialog'
         });
 
         return modalInstance.result;
     }
 
-    logOut(): ng.IPromise<void> {
-        return this.securityService.logOut();
+    signOut(): ng.IPromise<void> {
+        return this.securityService.signOut();
     }
 }

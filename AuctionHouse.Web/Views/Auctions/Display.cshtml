@@ -1,1 +1,55 @@
-﻿<div>{{ $ctrl.auction }}</div>
+﻿<div class="page-header">
+	<h2>{{ $ctrl.auction.title }}</h2>
+</div>
+<div class="row">
+	<div class="panel panel-default col-md-4">
+		<div class="panel-body">
+			<dl class="dl-horizontal">
+				<dt>
+					Seller
+				</dt>
+				<dd>
+					<span class="fa fa-user"></span> {{ $ctrl.auction.createdByUserName }}
+				</dd>
+				<dt ng-if="$ctrl.auction.buyNowPrice">
+					Buy now price
+				</dt>
+				<dd ng-if="$ctrl.auction.buyNowPrice">
+					{{ $ctrl.auction.buyNowPrice | currency }}
+				</dd>
+				<dt>
+					Current price
+				</dt>
+				<dd>
+					{{ $ctrl.auction.minimalPriceForNextBidder | currency }}
+				</dd>
+				<dt>
+					Starting price
+				</dt>
+				<dd>
+					{{ $ctrl.auction.startingPrice | currency }}
+				</dd>
+				<dt>
+					Number of bids
+				</dt>
+				<dd>
+					{{ $ctrl.auction.numberOfBids }}
+				</dd>
+				<dt ng-if="$ctrl.auction.HighestBidderUserName">
+					Highest bidder
+				</dt>
+				<dd ng-if="$ctrl.auction.HighestBidderUserName">
+					<span class="fa fa-user"></span> {{ $ctrl.auction.HighestBidderUserName }}
+				</dd>
+			</dl>
+			<form ng-submit="$ctrl.makeBid()" name="$ctrl.makeBidForm" novalidate>
+				<formly-form model="$ctrl.makeBidModel" fields="$ctrl.makeBidFields" form="$ctrl.makeBidForm">
+					<button type="submit" class="btn btn-primary submit-button">Make bid</button>
+				</formly-form>
+			</form>
+		</div>
+	</div>
+	<div class="col-md-8">
+			{{ $ctrl.auction.description }}
+	</div>
+</div>

@@ -12,24 +12,24 @@
 			});
 	}
 
-	logIn(userName: string, password: string): ng.IPromise<void> {
+	signIn(userName: string, password: string): ng.IPromise<void> {
 		const loginCommand = {
 			userName: userName,
 			password: password
 		};
 
-		return this.httpService.post('api/Authentication/LogIn', loginCommand)
+		return this.httpService.post('api/Authentication/SignIn', loginCommand)
 			.then(() => {
 				this.currentUserName = userName;
 			});
 	}
 
-	logOut(): ng.IPromise<void> {
+	signOut(): ng.IPromise<void> {
 		if (!this.checkIfUserIsAuthenticated()) {
 			throw new Error('Current user is not authenticated.');
 		}
 
-		return this.httpService.post('api/Authentication/LogOut', {})
+		return this.httpService.post('api/Authentication/SignOut', {})
 			.then(() => {
 				this.currentUserName = null;
 			});

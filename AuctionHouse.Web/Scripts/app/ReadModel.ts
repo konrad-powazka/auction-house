@@ -7,13 +7,14 @@ export
 class AuctionListItemReadModel
 {
 	public id: string;
+	public createdByUserName: string;
 	public title: string;
 	public description: string;
 	public endDate: string;
-	public startingPrice: number;
 	public buyNowPrice: number;
 	public minimalPriceForNextBidder: number;
 	public wasFinished: boolean;
+	public numberOfBids: number;
 }
 export
 class AuctionsListReadModel
@@ -27,4 +28,6 @@ class AuctionsListReadModel
 export
 class AuctionDetailsReadModel extends AuctionListItemReadModel
 {
+	public startingPrice: number;
+	public highestBidderUserName: string;
 }

@@ -1,0 +1,15 @@
+﻿<div class="modal-header bg-danger text-danger">
+	<span class="modal-title">
+		<span ng-if="$ctrl.isErrorNotification"><span class="fa fa-times-circle"></span> Error</span>
+	</span>
+</div>
+<form ng-submit="$ctrl.modalInstance.close()" novalidate>
+	<div class="modal-body" id="modal-body">
+		<div class="alert">
+			{{ $ctrl.resolve.notificationMessage }}
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="submit" class="btn btn-primary submit-button">OK</button>
+	</div>
+</form>

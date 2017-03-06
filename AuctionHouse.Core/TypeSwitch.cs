@@ -3,6 +3,7 @@
 namespace AuctionHouse.Core
 {
 	// Based on https://blogs.msdn.microsoft.com/jaredpar/2008/05/16/switching-on-types/
+	// TODO: To fluent API
 	public static class TypeSwitch
 	{
 		public static void Do(object source, params CaseInfo[] cases)

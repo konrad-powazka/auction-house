@@ -31,15 +31,19 @@
 				<a ui-sref="createAuction">Create auction</a>
 			</li>
 			<li ng-hide="$ctrl.securityUiService.isUserAuthenticated">
-				<a href ng-click="$ctrl.securityUiService.showLogInDialog()">Log in</a>
+				<a href ng-click="$ctrl.securityUiService.showSignInDialog()">
+					<span class="fa fa-sign-in"></span> Sign in
+				</a>
 			</li>
 			<li ng-show="$ctrl.securityUiService.isUserAuthenticated" class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+				<a href class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 					<span class="fa fa-user-circle fa-lg"></span> {{ $ctrl.securityUiService.currentUserName }}
 				</a>
 				<ul class="dropdown-menu">
 					<li >
-						<a href ng-click="$ctrl.securityUiService.logOut()">Log out</a>
+						<a href ng-click="$ctrl.securityUiService.signOut()">
+							<span class="fa fa-sign-out"></span> Sign out
+						</a>
 					</li>
 				</ul>
 			</li>

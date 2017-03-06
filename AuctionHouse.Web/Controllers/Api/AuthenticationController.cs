@@ -10,7 +10,7 @@ namespace AuctionHouse.Web.Controllers.Api
 	public class AuthenticationController : ApiController
     {
         [HttpPost]
-        public void LogIn(LoginCommand command)
+        public void SignIn(LoginCommand command)
         {
             // For test purposes we authenticate any user name/password combination
             var userNameClaim = new Claim(ClaimTypes.Name, command.UserName);
@@ -23,7 +23,7 @@ namespace AuctionHouse.Web.Controllers.Api
         }
 
         [HttpPost]
-        public void LogOut()
+        public void SignOut()
         {
             Request.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
         }

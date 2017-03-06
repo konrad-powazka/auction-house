@@ -49,7 +49,7 @@
 	var GeneratedCommandHandlers_1 = __webpack_require__(5);
 	var SecurityService_1 = __webpack_require__(7);
 	var SecurityUiService_1 = __webpack_require__(8);
-	var LoginDialogComponent_1 = __webpack_require__(9);
+	var SignInDialogComponent_1 = __webpack_require__(27);
 	var ApplicationCtrl_1 = __webpack_require__(11);
 	var Routing_1 = __webpack_require__(12);
 	var GeneratedQueryHandlers_1 = __webpack_require__(13);
@@ -58,6 +58,8 @@
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
 	var AuctionsListComponent_1 = __webpack_require__(20);
 	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(22);
+	var SimpleNotificationDialogComponent_1 = __webpack_require__(23);
+	var GenericModalService_1 = __webpack_require__(26);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -90,6 +92,7 @@
 	        module.service('securityService', SecurityService_1.SecurityService);
 	        module.service('securityUiService', SecurityUiService_1.SecurityUiService);
 	        module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor_1.default);
+	        module.service('genericModalService', GenericModalService_1.default);
 	    };
 	    Application.registerConstants = function (module) {
 	        module.constant('busyIndicator', new BusyIndicator_1.default());
@@ -136,7 +139,8 @@
 	    new AuctionsListComponent_1.AuctionsListComponent(),
 	    new CreateAuctionComponent_1.CreateAuctionComponent(),
 	    new DisplayAuctionComponent_1.DisplayAuctionComponent(),
-	    new LoginDialogComponent_1.LoginDialogComponent()
+	    new SignInDialogComponent_1.SignInDialogComponent(),
+	    new SimpleNotificationDialogComponent_1.SimpleNotificationDialogComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -218,10 +222,10 @@
 	        this.createAuctionCommandUiHandler
 	            .handle(this.model, true)
 	            .then(function () {
-	            alert('Success');
 	            _this.stateService.go('displayAuction', { auctionId: _this.model.auctionId });
 	        })
 	            .catch(function (commandHandlingErrorType) {
+	            // TODO: To modal with proper error handling
 	            return alert("Command processing error: " + CommandHandlingErrorType_1.CommandHandlingErrorType[commandHandlingErrorType]);
 	        });
 	    };
@@ -493,23 +497,23 @@
 	            }
 	        });
 	    }
-	    SecurityService.prototype.logIn = function (userName, password) {
+	    SecurityService.prototype.signIn = function (userName, password) {
 	        var _this = this;
 	        var loginCommand = {
 	            userName: userName,
 	            password: password
 	        };
-	        return this.httpService.post('api/Authentication/LogIn', loginCommand)
+	        return this.httpService.post('api/Authentication/SignIn', loginCommand)
 	            .then(function () {
 	            _this.currentUserName = userName;
 	        });
 	    };
-	    SecurityService.prototype.logOut = function () {
+	    SecurityService.prototype.signOut = function () {
 	        var _this = this;
 	        if (!this.checkIfUserIsAuthenticated()) {
 	            throw new Error('Current user is not authenticated.');
 	        }
-	        return this.httpService.post('api/Authentication/LogOut', {})
+	        return this.httpService.post('api/Authentication/SignOut', {})
 	            .then(function () {
 	            _this.currentUserName = null;
 	        });
@@ -558,16 +562,16 @@
 	        if (this.securityService.checkIfUserIsAuthenticated()) {
 	            return this.qService.resolve();
 	        }
-	        return this.showLogInDialog();
+	        return this.showSignInDialog();
 	    };
-	    SecurityUiService.prototype.showLogInDialog = function () {
+	    SecurityUiService.prototype.showSignInDialog = function () {
 	        var modalInstance = this.modalService.open({
-	            component: 'loginDialog'
+	            component: 'signInDialog'
 	        });
 	        return modalInstance.result;
 	    };
-	    SecurityUiService.prototype.logOut = function () {
-	        return this.securityService.logOut();
+	    SecurityUiService.prototype.signOut = function () {
+	        return this.securityService.signOut();
 	    };
 	    return SecurityUiService;
 	}());
@@ -576,77 +580,8 @@
 
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var LoginDialogCtrl_1 = __webpack_require__(10);
-	var LoginDialogComponent = (function () {
-	    function LoginDialogComponent() {
-	        this.controller = LoginDialogCtrl_1.LoginDialogCtrl;
-	        this.templateUrl = 'Template/Security/LoginDialog';
-	        this.registerAs = 'loginDialog';
-	        this.bindings = {
-	            modalInstance: '<'
-	        };
-	    }
-	    return LoginDialogComponent;
-	}());
-	exports.LoginDialogComponent = LoginDialogComponent;
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var LoginDialogCtrl = (function () {
-	    function LoginDialogCtrl(securityService) {
-	        this.securityService = securityService;
-	        this.fields = [
-	            {
-	                key: 'userName',
-	                type: 'input',
-	                templateOptions: {
-	                    label: 'User name',
-	                    required: true
-	                }
-	            },
-	            {
-	                key: 'password',
-	                type: 'input',
-	                templateOptions: {
-	                    type: 'password',
-	                    label: 'Password',
-	                    required: true
-	                }
-	            }
-	        ];
-	    }
-	    LoginDialogCtrl.prototype.login = function () {
-	        var _this = this;
-	        if (!this.form.$valid) {
-	            return;
-	        }
-	        this.securityService
-	            .logIn(this.model.userName, this.model.password)
-	            .then(function () {
-	            _this.modalInstance.close();
-	        }, function () {
-	            // TODO: create generic notification dialogs
-	            alert('error');
-	        });
-	    };
-	    LoginDialogCtrl.prototype.cancel = function () {
-	        this.modalInstance.dismiss();
-	    };
-	    return LoginDialogCtrl;
-	}());
-	LoginDialogCtrl.$inject = ['securityService'];
-	exports.LoginDialogCtrl = LoginDialogCtrl;
-
-
-/***/ },
+/* 9 */,
+/* 10 */,
 /* 11 */
 /***/ function(module, exports) {
 
@@ -849,16 +784,42 @@
 
 	"use strict";
 	var DisplayAuctionCtrl = (function () {
-	    function DisplayAuctionCtrl(getAuctionDetailsQueryHandler) {
+	    function DisplayAuctionCtrl(getAuctionDetailsQueryHandler, securityUiService, createAuctionCommandUiHandler, genericModalService) {
 	        var _this = this;
+	        this.securityUiService = securityUiService;
+	        this.createAuctionCommandUiHandler = createAuctionCommandUiHandler;
+	        this.genericModalService = genericModalService;
 	        getAuctionDetailsQueryHandler.handle({
 	            id: this.auctionId
 	        })
-	            .then(function (auction) { return _this.auction = auction; });
+	            .then(function (auction) {
+	            _this.auction = auction;
+	            _this.makeBidFields = [
+	                {
+	                    key: 'price',
+	                    type: 'input',
+	                    defaultValue: _this.auction.minimalPriceForNextBidder,
+	                    templateOptions: {
+	                        label: '',
+	                        required: true
+	                    }
+	                }
+	            ];
+	        });
 	    }
+	    DisplayAuctionCtrl.prototype.makeBid = function () {
+	        var _this = this;
+	        this.securityUiService.ensureUserIsAuthenticated()
+	            .then(function () {
+	            if (_this.securityUiService.currentUserName === _this.auction.createdByUserName) {
+	                _this.genericModalService.showErrorNotification('You cannot bid at your own auction.');
+	                return;
+	            }
+	        });
+	    };
 	    return DisplayAuctionCtrl;
 	}());
-	DisplayAuctionCtrl.$inject = ['getAuctionDetailsQueryHandler'];
+	DisplayAuctionCtrl.$inject = ['getAuctionDetailsQueryHandler', 'securityUiService', 'createAuctionCommandUiHandler', 'genericModalService'];
 	exports.DisplayAuctionCtrl = DisplayAuctionCtrl;
 
 
@@ -1117,6 +1078,157 @@
 	BusyIndicatingHttpInterceptor.$inject = ['busyIndicator', '$q'];
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = BusyIndicatingHttpInterceptor;
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var SimpleNotificationDialogCtrl_1 = __webpack_require__(24);
+	var SimpleNotificationDialogComponent = (function () {
+	    function SimpleNotificationDialogComponent() {
+	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
+	        this.templateUrl = 'Template/Shared/SimpleNotificationDialog';
+	        this.registerAs = 'simpleNotificationDialog';
+	        this.bindings = {
+	            modalInstance: '<',
+	            resolve: '<'
+	        };
+	    }
+	    return SimpleNotificationDialogComponent;
+	}());
+	exports.SimpleNotificationDialogComponent = SimpleNotificationDialogComponent;
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var NotificationType_1 = __webpack_require__(25);
+	var SimpleNotificationDialogCtrl = (function () {
+	    function SimpleNotificationDialogCtrl() {
+	    }
+	    Object.defineProperty(SimpleNotificationDialogCtrl.prototype, "isErrorNotification", {
+	        get: function () {
+	            return this.resolve.notificationType === NotificationType_1.NotificationType.Error;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    return SimpleNotificationDialogCtrl;
+	}());
+	exports.SimpleNotificationDialogCtrl = SimpleNotificationDialogCtrl;
+
+
+/***/ },
+/* 25 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var NotificationType;
+	(function (NotificationType) {
+	    NotificationType[NotificationType["Error"] = 0] = "Error";
+	})(NotificationType = exports.NotificationType || (exports.NotificationType = {}));
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var NotificationType_1 = __webpack_require__(25);
+	var GenericModalService = (function () {
+	    function GenericModalService(modalService) {
+	        this.modalService = modalService;
+	    }
+	    GenericModalService.prototype.showErrorNotification = function (notificationMessage) {
+	        var modalInstance = this.modalService.open({
+	            component: 'simpleNotificationDialog',
+	            resolve: {
+	                notificationMessage: function () { return notificationMessage; },
+	                notificationType: function () { return NotificationType_1.NotificationType.Error; }
+	            }
+	        });
+	        return modalInstance.result;
+	    };
+	    return GenericModalService;
+	}());
+	GenericModalService.$inject = ['$uibModal'];
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = GenericModalService;
+
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var SignInDialogCtrl_1 = __webpack_require__(28);
+	var SignInDialogComponent = (function () {
+	    function SignInDialogComponent() {
+	        this.controller = SignInDialogCtrl_1.SignInDialogCtrl;
+	        this.templateUrl = 'Template/Security/SignInDialog';
+	        this.registerAs = 'signInDialog';
+	        this.bindings = {
+	            modalInstance: '<'
+	        };
+	    }
+	    return SignInDialogComponent;
+	}());
+	exports.SignInDialogComponent = SignInDialogComponent;
+
+
+/***/ },
+/* 28 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var SignInDialogCtrl = (function () {
+	    function SignInDialogCtrl(securityService) {
+	        this.securityService = securityService;
+	        this.fields = [
+	            {
+	                key: 'userName',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'User name',
+	                    required: true
+	                }
+	            },
+	            {
+	                key: 'password',
+	                type: 'input',
+	                templateOptions: {
+	                    type: 'password',
+	                    label: 'Password',
+	                    required: true
+	                }
+	            }
+	        ];
+	    }
+	    SignInDialogCtrl.prototype.login = function () {
+	        var _this = this;
+	        if (!this.form.$valid) {
+	            return;
+	        }
+	        this.securityService
+	            .signIn(this.model.userName, this.model.password)
+	            .then(function () {
+	            _this.modalInstance.close();
+	        }, function () {
+	            // TODO: create generic notification dialogs
+	            alert('error');
+	        });
+	    };
+	    SignInDialogCtrl.prototype.cancel = function () {
+	        this.modalInstance.dismiss();
+	    };
+	    return SignInDialogCtrl;
+	}());
+	SignInDialogCtrl.$inject = ['securityService'];
+	exports.SignInDialogCtrl = SignInDialogCtrl;
 
 
 /***/ }
