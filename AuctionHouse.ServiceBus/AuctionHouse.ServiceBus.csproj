@@ -59,12 +59,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandHandlingFeedbackBehavior.cs" />
-    <Compile Include="ITrackingEventsDatabase.cs" />
-    <Compile Include="NServiceBusCommandMessageHandler.cs" />
+    <Compile Include="Behaviors\PublishPersistedEventsBehavior.cs" />
+    <Compile Include="Behaviors\CommandHandlingFeedbackBehavior.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Handlers\NServiceBusEventMessageHandler.cs" />
+    <Compile Include="Handlers\NServiceBusCommandMessageHandler.cs" />
+    <Compile Include="NsbCommandQueueConfiguration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrackingEventsDatabase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -74,6 +76,10 @@
     <ProjectReference Include="..\AuctionHouse.Application\AuctionHouse.Application.csproj">
       <Project>{db45cca7-5a1a-40a1-8cd4-42bc7c5974bc}</Project>
       <Name>AuctionHouse.Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Core.Dependent\AuctionHouse.Core.Dependent.csproj">
+      <Project>{51A79491-5EF4-454B-8A12-807BF87B54C1}</Project>
+      <Name>AuctionHouse.Core.Dependent</Name>
     </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
@@ -96,6 +102,7 @@
       <Name>AuctionHouse.Persistence</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

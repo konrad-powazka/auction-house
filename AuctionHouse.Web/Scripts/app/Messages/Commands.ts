@@ -20,6 +20,7 @@ class CreateAuctionCommand
 export
 class FinishAuctionCommand
 {
+	public id: string;
 }
 export
 class MakeBidCommand

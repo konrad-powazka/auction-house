@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.ReadModel;
 using AuctionHouse.Persistence;
 using AuctionHouse.ReadModel.Repositories;

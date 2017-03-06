@@ -72,7 +72,7 @@
   <ItemGroup>
     <Compile Include="EventStoreEventsDatabase.cs" />
     <Compile Include="AuctionsRepository.cs" />
-    <Compile Include="IEventsDatabase.cs" />
+    <Compile Include="ExpectedAggregateRootVersion.cs" />
     <Compile Include="PersistenceAssemblyMarker.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -9,6 +9,11 @@ class AuctionListItemReadModel
 	public id: string;
 	public title: string;
 	public description: string;
+	public endDate: string;
+	public startingPrice: number;
+	public buyNowPrice: number;
+	public minimalPriceForNextBidder: number;
+	public wasFinished: boolean;
 }
 export
 class AuctionsListReadModel

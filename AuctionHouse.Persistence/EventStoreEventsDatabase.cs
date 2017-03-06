@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Messages.Events;
 using EventStore.ClientAPI;
@@ -11,88 +12,142 @@ using Newtonsoft.Json;
 
 namespace AuctionHouse.Persistence
 {
-    public class EventStoreEventsDatabase : IEventsDatabase
-    {
-        private readonly IEventStoreConnection _eventStoreConnection;
+	public class EventStoreEventsDatabase : IEventsDatabase
+	{
+		private readonly IEventStoreConnection _eventStoreConnection;
 
-        public EventStoreEventsDatabase(IEventStoreConnection eventStoreConnection)
-        {
-            _eventStoreConnection = eventStoreConnection;
-        }
+		public EventStoreEventsDatabase(IEventStoreConnection eventStoreConnection)
+		{
+			_eventStoreConnection = eventStoreConnection;
+		}
 
-        public async Task AppendToStream(string streamName, int? expectedStreamVersion,
-            IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend)
-        {
-            if (eventEnvelopesToAppend == null)
-            {
-                throw new ArgumentNullException(nameof(eventEnvelopesToAppend));
-            }
+		public async Task AppendToStream(string streamName, IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend,
+			ExpectedStreamVersion expectedStreamVersion, int? specificExpectedStreamVersion)
+		{
+			if (eventEnvelopesToAppend == null)
+			{
+				throw new ArgumentNullException(nameof(eventEnvelopesToAppend));
+			}
 
-            var eventDataList =
-                eventEnvelopesToAppend.Select(e =>
-                {
-                    var serializedEvent = SerializeEvent(e.Message);
-                    return new EventData(e.MessageId, e.Message.GetType().Name, true, serializedEvent, null);
-                });
+			var eventDataList =
+				eventEnvelopesToAppend.Select(e =>
+				{
+					var serializedEvent = SerializeEvent(e.Message);
+					return new EventData(e.MessageId, e.Message.GetType().Name, true, serializedEvent, null);
+				});
 
-            await
-                _eventStoreConnection.AppendToStreamAsync(streamName,
-                    expectedStreamVersion ?? ExpectedVersion.NoStream,
-                    eventDataList);
-        }
+			var eventStoreExpectedStreamVersion = GetEventStoreExpectedStreamVersion(expectedStreamVersion,
+				specificExpectedStreamVersion);
 
-        public async Task<IDisposable> ReadAllExistingEventsAndSubscribe(
-            Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback)
-        {
-            if (handleEventEnvelopeCallback == null)
-            {
-                throw new ArgumentNullException(nameof(handleEventEnvelopeCallback));
-            }
+			await
+				_eventStoreConnection.AppendToStreamAsync(streamName,
+					eventStoreExpectedStreamVersion,
+					eventDataList);
+		}
 
-            // TODO: Handle subscription dropped
-            var subscription = _eventStoreConnection.SubscribeToAllFrom(null, CatchUpSubscriptionSettings.Default,
-                (s, e) =>
-                {
-                    if (CheckIfIsInternalEventStoreEvent(e))
-                    {
-                        return;
-                    }
+		public async Task<IEnumerable<IMessageEnvelope<IEvent>>> ReadStream(string streamName)
+		{
+			var eventEnvelopes = new List<MessageEnvelope<IEvent>>();
 
-                    var eventType =
-                        EventsAssemblyMarker.GetEventTypes().Single(t => t.Name == e.Event.EventType);
+			StreamEventsSlice eventsSlice;
+			var nextSliceStart = StreamPosition.Start;
 
-                    var @event = DeserializeEvent(e.Event.Data, eventType);
-                    var eventEnvelope = new MessageEnvelope<IEvent>(@event, e.Event.EventId);
-                    handleEventEnvelopeCallback(eventEnvelope);
-                }, subscriptionDropped: SubscriptionDropped);
+			do
+			{
+				eventsSlice =
+					await _eventStoreConnection.ReadStreamEventsForwardAsync(streamName, nextSliceStart, 400, false);
 
-            return Disposable.Create(() => subscription.Stop());
-        }
+				nextSliceStart = eventsSlice.NextEventNumber;
 
-        private void SubscriptionDropped(EventStoreCatchUpSubscription eventStoreCatchUpSubscription, SubscriptionDropReason subscriptionDropReason, Exception arg3)
-        {
-            //TODO: Resume subscription
-        }
+				var sliceEventEnvelopes = eventsSlice.Events.Select(e => MapToEventEnvelope(e.Event)).ToList();
+				eventEnvelopes.AddRange(sliceEventEnvelopes);
+			} while (!eventsSlice.IsEndOfStream);
 
-        private bool CheckIfIsInternalEventStoreEvent(ResolvedEvent eventStoreEvent)
-        {
-            return eventStoreEvent.Event.EventType.StartsWith("$");
-        }
+			return eventEnvelopes;
+		}
 
-        private static byte[] SerializeEvent(IEvent eventToSerialize)
-        {
-            var textSerializedEvent = JsonConvert.SerializeObject(eventToSerialize);
-            var binarySerializedEvent = Encoding.UTF8.GetBytes(textSerializedEvent);
+		public async Task<IDisposable> ReadAllExistingEventsAndSubscribe(
+			Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback)
+		{
+			if (handleEventEnvelopeCallback == null)
+			{
+				throw new ArgumentNullException(nameof(handleEventEnvelopeCallback));
+			}
 
-            return binarySerializedEvent;
-        }
+			// TODO: Handle subscription dropped
+			var subscription = _eventStoreConnection.SubscribeToAllFrom(null, CatchUpSubscriptionSettings.Default,
+				(s, e) =>
+				{
+					if (CheckIfIsInternalEventStoreEvent(e))
+					{
+						return;
+					}
 
-        private static IEvent DeserializeEvent(byte[] eventBytes, Type eventType)
-        {
-            var textSerializedEvent = Encoding.UTF8.GetString(eventBytes);
-            var @event = (IEvent)JsonConvert.DeserializeObject(textSerializedEvent, eventType);
+					var eventEnvelope = MapToEventEnvelope(e.Event);
+					handleEventEnvelopeCallback(eventEnvelope);
+				}, subscriptionDropped: SubscriptionDropped);
 
-            return @event;
-        }
-    }
+			return Disposable.Create(() => subscription.Stop());
+		}
+
+		private static int GetEventStoreExpectedStreamVersion(ExpectedStreamVersion expectedStreamVersion,
+			int? specificExpectedStreamVersion)
+		{
+			switch (expectedStreamVersion)
+			{
+				case ExpectedStreamVersion.AnyExisting:
+					return ExpectedVersion.StreamExists;
+				case ExpectedStreamVersion.NotExisting:
+					return ExpectedVersion.NoStream;
+				case ExpectedStreamVersion.SpecificExisting:
+				{
+					if (!specificExpectedStreamVersion.HasValue)
+					{
+						throw new ArgumentNullException(nameof(expectedStreamVersion));
+					}
+
+					return specificExpectedStreamVersion.Value;
+				}
+				default:
+					throw new ArgumentOutOfRangeException(nameof(expectedStreamVersion));
+			}
+		}
+
+		private MessageEnvelope<IEvent> MapToEventEnvelope(RecordedEvent recordedEvent)
+		{
+			var eventType =
+				EventsAssemblyMarker.GetEventTypes().Single(t => t.Name == recordedEvent.EventType);
+
+			var @event = DeserializeEvent(recordedEvent.Data, eventType);
+			var eventEnvelope = new MessageEnvelope<IEvent>(@event, recordedEvent.EventId);
+			return eventEnvelope;
+		}
+
+		private void SubscriptionDropped(EventStoreCatchUpSubscription eventStoreCatchUpSubscription,
+			SubscriptionDropReason subscriptionDropReason, Exception arg3)
+		{
+			//TODO: Resume subscription
+		}
+
+		private static bool CheckIfIsInternalEventStoreEvent(ResolvedEvent eventStoreEvent)
+		{
+			return eventStoreEvent.Event.EventType.StartsWith("$");
+		}
+
+		private static byte[] SerializeEvent(IEvent eventToSerialize)
+		{
+			var textSerializedEvent = JsonConvert.SerializeObject(eventToSerialize);
+			var binarySerializedEvent = Encoding.UTF8.GetBytes(textSerializedEvent);
+
+			return binarySerializedEvent;
+		}
+
+		private static IEvent DeserializeEvent(byte[] eventBytes, Type eventType)
+		{
+			var textSerializedEvent = Encoding.UTF8.GetString(eventBytes);
+			var @event = (IEvent) JsonConvert.DeserializeObject(textSerializedEvent, eventType);
+
+			return @event;
+		}
+	}
 }

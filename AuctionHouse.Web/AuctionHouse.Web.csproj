@@ -261,7 +261,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Cqrs\NServiceBusCommandQueue.cs" />
     <Compile Include="Hubs\CommandHandlingFeedbackHub.cs" />
     <Compile Include="Hubs\EventAppliedToReadModelNotificationHub.cs" />
     <Compile Include="Hubs\ICommandHandlingFeedbackHubClient.cs" />
@@ -401,6 +400,10 @@
     <ProjectReference Include="..\AuctionHouse.Application\AuctionHouse.Application.csproj">
       <Project>{DB45CCA7-5A1A-40A1-8CD4-42BC7C5974BC}</Project>
       <Name>AuctionHouse.Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Core.Dependent\AuctionHouse.Core.Dependent.csproj">
+      <Project>{51A79491-5EF4-454B-8A12-807BF87B54C1}</Project>
+      <Name>AuctionHouse.Core.Dependent</Name>
     </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>

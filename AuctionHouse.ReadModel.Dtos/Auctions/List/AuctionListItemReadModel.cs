@@ -7,9 +7,10 @@ namespace AuctionHouse.ReadModel.Dtos.Auctions.List
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime EndDate;
-        public decimal StartingPrice;
-        public decimal? BuyNowPrice;
-        public decimal? MinimalPriceForNextBidder;
+        public DateTime EndDate { get; set; }
+		public decimal StartingPrice { get; set; }
+		public decimal? BuyNowPrice { get; set; }
+		public decimal? MinimalPriceForNextBidder { get; set; }
+		public bool WasFinished { get; set; }
     }
 }

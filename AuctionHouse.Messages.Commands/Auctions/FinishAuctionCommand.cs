@@ -5,6 +5,6 @@ namespace AuctionHouse.Messages.Commands.Auctions
 {
 	public class FinishAuctionCommand : ICommand
 	{
-		public Guid Id;
+		public Guid Id { get; set; }
 	}
 }

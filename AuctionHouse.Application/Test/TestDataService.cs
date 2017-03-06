@@ -62,7 +62,7 @@ namespace AuctionHouse.Application.Test
 					auctionTemplate.CreatedByUserName, _timeProvider);
 
 				// TODO: parallel
-				await _repository.Create(auction);
+				await _repository.Create(auction, Guid.NewGuid().ToString());
 			}
 		}
 

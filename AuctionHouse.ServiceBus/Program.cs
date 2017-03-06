@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using AuctionHouse.Application;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Time;
+using AuctionHouse.Messages.Events;
 using AuctionHouse.Persistence;
+using AuctionHouse.ServiceBus.Behaviors;
+using AuctionHouse.ServiceBus.Handlers;
 using Autofac;
 using EventStore.ClientAPI;
 using NServiceBus;
@@ -18,7 +23,7 @@ namespace AuctionHouse.ServiceBus
         public static void Main()
         {
             Console.Title = "AuctionHouse.ServiceBus";
-            var endpointConfiguration = new EndpointConfiguration("AuctionHouse.ServiceBus");          
+            var endpointConfiguration = new EndpointConfiguration(Constants.EndpointName);          
             endpointConfiguration.SendFailedMessagesTo("error");
             endpointConfiguration.UseSerialization<JsonSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
@@ -36,7 +41,15 @@ namespace AuctionHouse.ServiceBus
             endpointConfiguration.Pipeline.Register(typeof(CommandHandlingFeedbackBehavior),
                 "Publishes an event indicating the result of command handling");
 
-            var containerBuilder = new ContainerBuilder();
+	        endpointConfiguration.Pipeline.Register(typeof(PublishPersistedEventsBehavior),
+		        "Publishes all persisted events.");
+
+			endpointConfiguration.UseTransport<MsmqTransport>()
+				.Routing()
+				.RegisterPublisher(typeof(EventsAssemblyMarker).Assembly,
+					Constants.EndpointName);
+
+			var containerBuilder = new ContainerBuilder();
 
             containerBuilder.RegisterAssemblyTypes(typeof(ApplicationAssemblyMarker).Assembly)
                 .AsClosedTypesOf(typeof(ICommandHandler<>)).AsImplementedInterfaces();
@@ -59,13 +72,21 @@ namespace AuctionHouse.ServiceBus
                     .InstancePerLifetimeScope();
 
 	        containerBuilder.RegisterType<TimeProvider>().As<ITimeProvider>();
-            var container = containerBuilder.Build();
+	        containerBuilder.RegisterType<NServiceBusEventPublisher>().As<IEventPublisher>();
 
-            endpointConfiguration.UseContainer<AutofacBuilder>(
+			containerBuilder.RegisterAssemblyTypes(typeof(ApplicationAssemblyMarker).Assembly)
+				.AsClosedTypesOf(typeof(IEventHandler<>)).AsImplementedInterfaces();
+
+			containerBuilder.RegisterType<NServiceBusCommandQueue>().As<ICommandQueue>();
+	        containerBuilder.RegisterType<NsbCommandQueueConfiguration>().As<INServiceBusCommandQueueConfiguration>();
+			var container = containerBuilder.Build();
+			RegisterNsbEventHandlers(endpointConfiguration, container);
+
+			endpointConfiguration.UseContainer<AutofacBuilder>(
                 customizations => { customizations.ExistingLifetimeScope(container); });
 
             var endpointInstance = Endpoint.Start(endpointConfiguration).Result;
-            var updaterContainerBuilder = new ContainerBuilder();
+			var updaterContainerBuilder = new ContainerBuilder();
             updaterContainerBuilder.RegisterInstance(endpointInstance).As<IEndpointInstance>();
             updaterContainerBuilder.Update(container);
 
@@ -80,7 +101,22 @@ namespace AuctionHouse.ServiceBus
             }
         }
 
-        private static void RegisterEventStoreConnection(ContainerBuilder containerBuilder)
+	    private static void RegisterNsbEventHandlers(EndpointConfiguration endpointConfiguration,
+		    IComponentContext container)
+	    {
+		    var eventHandlerTypesData =
+			    EventsAssemblyMarker.GetEventTypes()
+				    .Select(t => new {EventHandlerType = typeof(IEventHandler<>).MakeGenericType(t), EventType = t})
+				    .Where(t => container.IsRegistered(t.EventHandlerType));
+
+		    var nsbEventHandlerTypes =
+			    eventHandlerTypesData.Select(
+				    t => typeof(NServiceBusEventMessageHandler<,>).MakeGenericType(t.EventHandlerType, t.EventType));
+
+		    endpointConfiguration.ExecuteTheseHandlersFirst(nsbEventHandlerTypes);
+	    }
+
+	    private static void RegisterEventStoreConnection(ContainerBuilder containerBuilder)
         {
             containerBuilder.Register(c =>
             {

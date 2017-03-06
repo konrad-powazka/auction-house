@@ -1,5 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using AuctionHouse.Core;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.ReadModel;
 using AuctionHouse.Messages.Events.Auctions;
@@ -11,15 +11,28 @@ namespace AuctionHouse.ReadModel.Builders
 	{
 		public async Task Apply(IEvent @event, IReadModelDbContext readModelDbContext)
 		{
-			if (@event is AuctionCreatedEvent)
+			TypeSwitch.Do(@event, TypeSwitch.Case<AuctionCreatedEvent>(auctionCreatedEvent =>
 			{
-				var auctionDetails = new AuctionDetailsReadModel();
-				var auctionCreatedEvent = (AuctionCreatedEvent)@event;
-				auctionDetails.Id = auctionCreatedEvent.Id;
-				auctionDetails.Title = auctionCreatedEvent.Title;
-				auctionDetails.Description = auctionCreatedEvent.Description;
+				var auctionDetails = new AuctionDetailsReadModel
+				{
+					Id = auctionCreatedEvent.Id,
+					Title = auctionCreatedEvent.Title,
+					Description = auctionCreatedEvent.Description,
+					EndDate = auctionCreatedEvent.EndDateTime,
+					BuyNowPrice = null, // TODO
+					WasFinished = false,
+					StartingPrice = auctionCreatedEvent.StartingPrice,
+					MinimalPriceForNextBidder = auctionCreatedEvent.MinimalPriceForNextBidder
+				};
+
 				readModelDbContext.CreateOrOverwrite(auctionDetails, auctionCreatedEvent.Id);
-			}
+			}), TypeSwitch.Case<AuctionFinishedEvent>(auctionFinishedEvent =>
+			{
+				//TODO async
+				var auctionDetails = readModelDbContext.Get<AuctionDetailsReadModel>(auctionFinishedEvent.AuctionId).Result;
+				auctionDetails.WasFinished = true;
+				readModelDbContext.CreateOrOverwrite(auctionDetails, auctionFinishedEvent.AuctionId);
+			}));
 		}
 	}
 }

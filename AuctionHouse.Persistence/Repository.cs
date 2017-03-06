@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Core;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Domain;
 
@@ -18,39 +20,75 @@ namespace AuctionHouse.Persistence
 			_eventsDatabase = eventsDatabase;
 		}
 
-		public async Task Save(TAggregateRoot aggregateRoot, int previousAggregateRootVersion)
+		public async Task Save(TAggregateRoot aggregateRoot, string changeId,
+			ExpectedAggregateRootVersion expectedAggregateRootVersion, int? specificExpectedAggregateRootVersion)
 		{
-			throw new NotImplementedException();
-		}
+			var expectedStreamVersion = GetExpectedStreamversion(expectedAggregateRootVersion);
 
-		public async Task Create(TAggregateRoot aggregateRoot)
-		{
-			var eventEnvelopes = aggregateRoot.Changes.Select((e, i) =>
+			if (expectedAggregateRootVersion == ExpectedAggregateRootVersion.Specific &&
+			    !specificExpectedAggregateRootVersion.HasValue)
 			{
-				var eventGuidName = $"{GetAggregateRootStreamName(aggregateRoot)}-0-{i}";
-				var deterministicEventId = GuidGenerator.CreateDeterministicGuid(NamespaceGuid, eventGuidName);
-				return new MessageEnvelope<IEvent>(e, deterministicEventId);
-			});
+				throw new ArgumentNullException(nameof(specificExpectedAggregateRootVersion));
+			}
+
+			var streamName = GetAggregateRootStreamName(aggregateRoot.Id);
+			var eventEnvelopes = WrapAggregateRootChangesIntoEnvelopes(aggregateRoot, changeId).ToList();
 
 			await
-				_eventsDatabase.AppendToStream(GetAggregateRootStreamName(aggregateRoot),
-					null, eventEnvelopes);
+				_eventsDatabase.AppendToStream(streamName, eventEnvelopes, expectedStreamVersion,
+					specificExpectedAggregateRootVersion);
+		}
+
+		public async Task Create(TAggregateRoot aggregateRoot, string changeId)
+		{
+			var streamName = GetAggregateRootStreamName(aggregateRoot.Id);
+			var eventEnvelopes = WrapAggregateRootChangesIntoEnvelopes(aggregateRoot, changeId).ToList();
+
+			await
+				_eventsDatabase.AppendToStream(streamName, eventEnvelopes, ExpectedStreamVersion.NotExisting);
 		}
 
 		public async Task<TAggregateRoot> Get(Guid aggregateRootId)
 		{
-			var eventsToReplay = new IEvent[0]; //TODO: Get from ES
+			var streamName = GetAggregateRootStreamName(aggregateRootId);
+			var eventsToReplay = (await _eventsDatabase.ReadStream(streamName)).Select(e => e.Message).ToList();
 			var aggregateRoot = CreateEmptyAggregateRootInstance();
 			aggregateRoot.ReplayEvents(eventsToReplay);
 
 			return aggregateRoot;
 		}
 
+		private static ExpectedStreamVersion GetExpectedStreamversion(
+			ExpectedAggregateRootVersion expectedAggregateRootVersion)
+		{
+			switch (expectedAggregateRootVersion)
+			{
+				case ExpectedAggregateRootVersion.Specific:
+					return ExpectedStreamVersion.SpecificExisting;
+				case ExpectedAggregateRootVersion.Any:
+					return ExpectedStreamVersion.AnyExisting;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(expectedAggregateRootVersion));
+			}
+		}
+
 		protected abstract TAggregateRoot CreateEmptyAggregateRootInstance();
 
-		private string GetAggregateRootStreamName(TAggregateRoot aggregateRoot)
+		private static IEnumerable<MessageEnvelope<IEvent>> WrapAggregateRootChangesIntoEnvelopes(
+			TAggregateRoot aggregateRoot, string changeId)
 		{
-			return $"{aggregateRoot.GetType().Name}-{aggregateRoot.Id}";
+			return aggregateRoot.Changes.Select((e, i) =>
+			{
+				var streamName = GetAggregateRootStreamName(aggregateRoot.Id);
+				var eventGuidName = $"{streamName}-{changeId}-{i}";
+				var deterministicEventId = GuidGenerator.GenerateDeterministicGuid(NamespaceGuid, eventGuidName);
+				return new MessageEnvelope<IEvent>(e, deterministicEventId);
+			});
+		}
+
+		private static string GetAggregateRootStreamName(Guid aggregateRootId)
+		{
+			return $"{typeof(TAggregateRoot).Name}-{aggregateRootId}";
 		}
 	}
 }

@@ -21,9 +21,9 @@ namespace AuctionHouse.Core
 		///     <a href="http://code.logos.com/blog/2011/04/generating_a_deterministic_guid.html">Generating a deterministic GUID</a>
 		///     .
 		/// </remarks>
-		public static Guid CreateDeterministicGuid(Guid namespaceId, string name)
+		public static Guid GenerateDeterministicGuid(Guid namespaceId, string name)
 		{
-			return CreateDeterministicGuid(namespaceId, name, 5);
+			return GenerateDeterministicGuid(namespaceId, name, 5);
 		}
 
 		/// <summary>
@@ -41,7 +41,7 @@ namespace AuctionHouse.Core
 		///     <a href="http://code.logos.com/blog/2011/04/generating_a_deterministic_guid.html">Generating a deterministic GUID</a>
 		///     .
 		/// </remarks>
-		public static Guid CreateDeterministicGuid(Guid namespaceId, string name, int version)
+		public static Guid GenerateDeterministicGuid(Guid namespaceId, string name, int version)
 		{
 			if (name == null)
 				throw new ArgumentNullException("name");

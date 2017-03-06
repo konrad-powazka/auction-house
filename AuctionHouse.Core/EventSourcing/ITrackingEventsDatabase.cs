@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Persistence;
 
-namespace AuctionHouse.ServiceBus
+namespace AuctionHouse.Core.EventSourcing
 {
     public interface ITrackingEventsDatabase : IEventsDatabase
     {

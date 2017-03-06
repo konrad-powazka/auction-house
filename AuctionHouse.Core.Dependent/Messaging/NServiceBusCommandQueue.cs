@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Time;
 using NServiceBus;
-using ICommand = AuctionHouse.Core.Messaging.ICommand;
 
-namespace AuctionHouse.Web.Cqrs
+namespace AuctionHouse.Core.Messaging
 {
 	public class NServiceBusCommandQueue : ICommandQueue
 	{
+		private readonly INServiceBusCommandQueueConfiguration _configuration;
 		private readonly IEndpointInstance _endpoint;
 		private readonly ITimeProvider _timeProvider;
 
-		public NServiceBusCommandQueue(IEndpointInstance endpoint, ITimeProvider timeProvider)
+		public NServiceBusCommandQueue(IEndpointInstance endpoint, ITimeProvider timeProvider,
+			INServiceBusCommandQueueConfiguration configuration)
 		{
 			if (endpoint == null)
 			{
@@ -26,6 +26,7 @@ namespace AuctionHouse.Web.Cqrs
 
 			_endpoint = endpoint;
 			_timeProvider = timeProvider;
+			_configuration = configuration;
 		}
 
 		public async Task QueueCommand<TCommand>(TCommand command, Guid commandId, string senderUserName,
@@ -34,13 +35,17 @@ namespace AuctionHouse.Web.Cqrs
 		{
 			var sendOptions = new SendOptions();
 			sendOptions.SetMessageId(commandId.ToString());
-			sendOptions.SetDestination(Configuration.NServiceBusCommandHandlingDestination);
+			sendOptions.SetDestination(_configuration.NServiceBusCommandHandlingDestination);
 			sendOptions.SetHeader(MessageHeaderNames.SenderUserName, senderUserName);
 
 			if (delayedUntil.HasValue)
 			{
 				var deliveryDelay = delayedUntil.Value - _timeProvider.Now;
-				sendOptions.DelayDeliveryWith(deliveryDelay);
+
+				if (deliveryDelay > TimeSpan.Zero)
+				{
+					sendOptions.DelayDeliveryWith(deliveryDelay);
+				}
 			}
 
 			await _endpoint.Send(command, sendOptions);

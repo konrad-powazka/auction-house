@@ -1,4 +1,5 @@
-﻿using AuctionHouse.Core.Time;
+﻿using AuctionHouse.Core.EventSourcing;
+using AuctionHouse.Core.Time;
 using AuctionHouse.Domain.Auctions;
 
 namespace AuctionHouse.Persistence

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Persistence;
 
-namespace AuctionHouse.ServiceBus
+namespace AuctionHouse.Core.EventSourcing
 {
     public class TrackingEventsDatabase : ITrackingEventsDatabase
     {
@@ -24,15 +23,19 @@ namespace AuctionHouse.ServiceBus
 
         public IReadOnlyCollection<MessageEnvelope<IEvent>> WrittenEventEnvelopes => _writtenEventEnvelopes.ToList();
 
-        public async Task AppendToStream(string streamName, int? expectedStreamVersion,
-            IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend)
+        public async Task AppendToStream(string streamName, IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend, ExpectedStreamVersion expectedStreamVersion, int? specificExpectedStreamVersion)
         {
             eventEnvelopesToAppend = eventEnvelopesToAppend.ToList();
-            await _eventsDatabase.AppendToStream(streamName, expectedStreamVersion, eventEnvelopesToAppend);
+            await _eventsDatabase.AppendToStream(streamName, eventEnvelopesToAppend, expectedStreamVersion, specificExpectedStreamVersion);
             _writtenEventEnvelopes.AddRange(eventEnvelopesToAppend);
         }
 
-        public Task<IDisposable> ReadAllExistingEventsAndSubscribe(
+	    public Task<IEnumerable<IMessageEnvelope<IEvent>>> ReadStream(string streamName)
+	    {
+		    return _eventsDatabase.ReadStream(streamName);
+	    }
+
+	    public Task<IDisposable> ReadAllExistingEventsAndSubscribe(
             Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback)
         {
             return _eventsDatabase.ReadAllExistingEventsAndSubscribe(handleEventEnvelopeCallback);
