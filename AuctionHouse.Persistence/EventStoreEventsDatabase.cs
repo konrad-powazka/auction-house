@@ -74,10 +74,20 @@ namespace AuctionHouse.Persistence
 				throw new ArgumentNullException(nameof(handleEventEnvelopeCallback));
 			}
 
-			// TODO: Handle subscription dropped
-			var subscription = _eventStoreConnection.SubscribeToAllFrom(null, CatchUpSubscriptionSettings.Default,
+			EventStoreCatchUpSubscription subscription = null;
+			SubscribeToAllFrom(AllCheckpoint.AllStart, s => subscription = s, handleEventEnvelopeCallback);
+			return Disposable.Create(() => subscription.Stop());
+		}
+
+		private void SubscribeToAllFrom(Position? subscriptionCheckpoint,
+			Action<EventStoreAllCatchUpSubscription> setSubscription, Action<PersistedEventEnvelope> handleEventEnvelopeCallback)
+		{
+			var subscription = _eventStoreConnection.SubscribeToAllFrom(subscriptionCheckpoint,
+				CatchUpSubscriptionSettings.Default,
 				(s, e) =>
 				{
+					subscriptionCheckpoint = e.OriginalPosition;
+
 					if (CheckIfIsInternalEventStoreEvent(e))
 					{
 						return;
@@ -85,9 +95,13 @@ namespace AuctionHouse.Persistence
 
 					var eventEnvelope = MapToEventEnvelope(e.Event);
 					handleEventEnvelopeCallback(eventEnvelope);
-				}, subscriptionDropped: SubscriptionDropped);
+				}, subscriptionDropped: (droppedSubscription, subscriptionDropReason, exception) =>
+				{
+					droppedSubscription.Stop();
+					SubscribeToAllFrom(subscriptionCheckpoint, setSubscription, handleEventEnvelopeCallback);
+				});
 
-			return Disposable.Create(() => subscription.Stop());
+			setSubscription(subscription);
 		}
 
 		private static int GetEventStoreExpectedStreamVersion(ExpectedStreamVersion expectedStreamVersion,
@@ -124,12 +138,6 @@ namespace AuctionHouse.Persistence
 				recordedEvent.EventNumber);
 
 			return eventEnvelope;
-		}
-
-		private void SubscriptionDropped(EventStoreCatchUpSubscription eventStoreCatchUpSubscription,
-			SubscriptionDropReason subscriptionDropReason, Exception arg3)
-		{
-			//TODO: Resume subscription
 		}
 
 		private static bool CheckIfIsInternalEventStoreEvent(ResolvedEvent eventStoreEvent)

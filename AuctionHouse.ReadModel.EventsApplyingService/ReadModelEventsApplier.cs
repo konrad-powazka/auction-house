@@ -6,13 +6,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AuctionHouse.Core.EventSourcing;
-using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.ReadModel;
 using AuctionHouse.Messages.Events.Technical;
 using AuctionHouse.ReadModel.Repositories;
 using Nest;
 using NServiceBus;
-using IEvent = AuctionHouse.Core.Messaging.IEvent;
 
 namespace AuctionHouse.ReadModel.EventsApplyingService
 {
@@ -49,7 +47,8 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 			_eventsSubscription =
 				await _eventsDatabase.ReadAllExistingEventsAndSubscribe(e => _eventsQueue.Add(e));
 
-			Task.Run(() => ProcessQueue());
+			var queueProcessingThread = new Thread(ProcessQueue);
+			queueProcessingThread.Start();
 		}
 
 		private void ProcessQueue()
