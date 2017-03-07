@@ -66,6 +66,10 @@
       <Project>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</Project>
       <Name>AuctionHouse.Messages.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Persistence.Shared\AuctionHouse.Persistence.Shared.csproj">
+      <Project>{730E1583-E5FE-4770-91EA-7225447ECF70}</Project>
+      <Name>AuctionHouse.Persistence.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.ReadModel.Dtos\AuctionHouse.ReadModel.Dtos.csproj">
       <Project>{B8A92522-DB4B-49CB-9DB3-D0AC5B51BB96}</Project>
       <Name>AuctionHouse.ReadModel.Dtos</Name>

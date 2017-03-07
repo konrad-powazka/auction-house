@@ -45,9 +45,9 @@ namespace AuctionHouse.Persistence
 					eventDataList);
 		}
 
-		public async Task<IEnumerable<IMessageEnvelope<IEvent>>> ReadStream(string streamName)
+		public async Task<IEnumerable<PersistedEventEnvelope>> ReadStream(string streamName)
 		{
-			var eventEnvelopes = new List<MessageEnvelope<IEvent>>();
+			var eventEnvelopes = new List<PersistedEventEnvelope>();
 
 			StreamEventsSlice eventsSlice;
 			var nextSliceStart = StreamPosition.Start;
@@ -67,7 +67,7 @@ namespace AuctionHouse.Persistence
 		}
 
 		public async Task<IDisposable> ReadAllExistingEventsAndSubscribe(
-			Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback)
+			Action<PersistedEventEnvelope> handleEventEnvelopeCallback)
 		{
 			if (handleEventEnvelopeCallback == null)
 			{
@@ -113,13 +113,16 @@ namespace AuctionHouse.Persistence
 			}
 		}
 
-		private MessageEnvelope<IEvent> MapToEventEnvelope(RecordedEvent recordedEvent)
+		private static PersistedEventEnvelope MapToEventEnvelope(RecordedEvent recordedEvent)
 		{
 			var eventType =
 				EventsAssemblyMarker.GetEventTypes().Single(t => t.Name == recordedEvent.EventType);
 
 			var @event = DeserializeEvent(recordedEvent.Data, eventType);
-			var eventEnvelope = new MessageEnvelope<IEvent>(@event, recordedEvent.EventId);
+
+			var eventEnvelope = new PersistedEventEnvelope(@event, recordedEvent.EventId, recordedEvent.EventStreamId,
+				recordedEvent.EventNumber);
+
 			return eventEnvelope;
 		}
 

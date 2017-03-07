@@ -49,7 +49,7 @@
 	var GeneratedCommandHandlers_1 = __webpack_require__(5);
 	var SecurityService_1 = __webpack_require__(7);
 	var SecurityUiService_1 = __webpack_require__(8);
-	var SignInDialogComponent_1 = __webpack_require__(27);
+	var SignInDialogComponent_1 = __webpack_require__(9);
 	var ApplicationCtrl_1 = __webpack_require__(11);
 	var Routing_1 = __webpack_require__(12);
 	var GeneratedQueryHandlers_1 = __webpack_require__(13);
@@ -130,6 +130,8 @@
 	            .addTemplateOptionValueMessage('minlength', 'minlength', '', 'is the minimum length', 'Too short');
 	        formlyValidationMessages
 	            .addTemplateOptionValueMessage('required', 'label', '', 'is required', 'This field is required');
+	        formlyValidationMessages
+	            .addTemplateOptionValueMessage('min', 'min', 'Minimal value is', '', 'Too small');
 	        formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
 	    };
 	    ;
@@ -580,8 +582,77 @@
 
 
 /***/ },
-/* 9 */,
-/* 10 */,
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var SignInDialogCtrl_1 = __webpack_require__(10);
+	var SignInDialogComponent = (function () {
+	    function SignInDialogComponent() {
+	        this.controller = SignInDialogCtrl_1.SignInDialogCtrl;
+	        this.templateUrl = 'Template/Security/SignInDialog';
+	        this.registerAs = 'signInDialog';
+	        this.bindings = {
+	            modalInstance: '<'
+	        };
+	    }
+	    return SignInDialogComponent;
+	}());
+	exports.SignInDialogComponent = SignInDialogComponent;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var SignInDialogCtrl = (function () {
+	    function SignInDialogCtrl(securityService) {
+	        this.securityService = securityService;
+	        this.fields = [
+	            {
+	                key: 'userName',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'User name',
+	                    required: true
+	                }
+	            },
+	            {
+	                key: 'password',
+	                type: 'input',
+	                templateOptions: {
+	                    type: 'password',
+	                    label: 'Password',
+	                    required: true
+	                }
+	            }
+	        ];
+	    }
+	    SignInDialogCtrl.prototype.login = function () {
+	        var _this = this;
+	        if (!this.form.$valid) {
+	            return;
+	        }
+	        this.securityService
+	            .signIn(this.model.userName, this.model.password)
+	            .then(function () {
+	            _this.modalInstance.close();
+	        }, function () {
+	            // TODO: create generic notification dialogs
+	            alert('error');
+	        });
+	    };
+	    SignInDialogCtrl.prototype.cancel = function () {
+	        this.modalInstance.dismiss();
+	    };
+	    return SignInDialogCtrl;
+	}());
+	SignInDialogCtrl.$inject = ['securityService'];
+	exports.SignInDialogCtrl = SignInDialogCtrl;
+
+
+/***/ },
 /* 11 */
 /***/ function(module, exports) {
 
@@ -784,29 +855,38 @@
 
 	"use strict";
 	var DisplayAuctionCtrl = (function () {
-	    function DisplayAuctionCtrl(getAuctionDetailsQueryHandler, securityUiService, createAuctionCommandUiHandler, genericModalService) {
+	    function DisplayAuctionCtrl(getAuctionDetailsQueryHandler, securityUiService, makeBidCommandUiHandler, genericModalService) {
 	        var _this = this;
+	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
 	        this.securityUiService = securityUiService;
-	        this.createAuctionCommandUiHandler = createAuctionCommandUiHandler;
+	        this.makeBidCommandUiHandler = makeBidCommandUiHandler;
 	        this.genericModalService = genericModalService;
 	        getAuctionDetailsQueryHandler.handle({
 	            id: this.auctionId
 	        })
 	            .then(function (auction) {
-	            _this.auction = auction;
-	            _this.makeBidFields = [
-	                {
-	                    key: 'price',
-	                    type: 'input',
-	                    defaultValue: _this.auction.minimalPriceForNextBidder,
-	                    templateOptions: {
-	                        label: '',
-	                        required: true
-	                    }
-	                }
-	            ];
+	            _this.auctionLoadedCallback(auction);
 	        });
 	    }
+	    DisplayAuctionCtrl.prototype.auctionLoadedCallback = function (auction) {
+	        this.auction = auction;
+	        this.initMakeBidFields(auction);
+	        this.makeBidModel.price = auction.minimalPriceForNextBidder;
+	    };
+	    DisplayAuctionCtrl.prototype.initMakeBidFields = function (auction) {
+	        this.makeBidFields = [
+	            {
+	                key: 'price',
+	                type: 'input',
+	                templateOptions: {
+	                    label: '',
+	                    required: true,
+	                    type: 'number',
+	                    min: this.auction.minimalPriceForNextBidder
+	                }
+	            }
+	        ];
+	    };
 	    DisplayAuctionCtrl.prototype.makeBid = function () {
 	        var _this = this;
 	        this.securityUiService.ensureUserIsAuthenticated()
@@ -815,11 +895,26 @@
 	                _this.genericModalService.showErrorNotification('You cannot bid at your own auction.');
 	                return;
 	            }
+	            var makeBidCommand = {
+	                auctionId: _this.auctionId,
+	                expectedAuctionVersion: _this.auction.version,
+	                price: _this.makeBidModel.price
+	            };
+	            _this.makeBidCommandUiHandler.handle(makeBidCommand, true)
+	                .then(function () {
+	                return _this.getAuctionDetailsQueryHandler.handle({
+	                    id: _this.auctionId
+	                });
+	            })
+	                .then(function (auction) {
+	                _this.auctionLoadedCallback(auction);
+	                // TODO: check if is highest bidder
+	            });
 	        });
 	    };
 	    return DisplayAuctionCtrl;
 	}());
-	DisplayAuctionCtrl.$inject = ['getAuctionDetailsQueryHandler', 'securityUiService', 'createAuctionCommandUiHandler', 'genericModalService'];
+	DisplayAuctionCtrl.$inject = ['getAuctionDetailsQueryHandler', 'securityUiService', 'makeBidCommandUiHandler', 'genericModalService'];
 	exports.DisplayAuctionCtrl = DisplayAuctionCtrl;
 
 
@@ -1158,77 +1253,6 @@
 	GenericModalService.$inject = ['$uibModal'];
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = GenericModalService;
-
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var SignInDialogCtrl_1 = __webpack_require__(28);
-	var SignInDialogComponent = (function () {
-	    function SignInDialogComponent() {
-	        this.controller = SignInDialogCtrl_1.SignInDialogCtrl;
-	        this.templateUrl = 'Template/Security/SignInDialog';
-	        this.registerAs = 'signInDialog';
-	        this.bindings = {
-	            modalInstance: '<'
-	        };
-	    }
-	    return SignInDialogComponent;
-	}());
-	exports.SignInDialogComponent = SignInDialogComponent;
-
-
-/***/ },
-/* 28 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var SignInDialogCtrl = (function () {
-	    function SignInDialogCtrl(securityService) {
-	        this.securityService = securityService;
-	        this.fields = [
-	            {
-	                key: 'userName',
-	                type: 'input',
-	                templateOptions: {
-	                    label: 'User name',
-	                    required: true
-	                }
-	            },
-	            {
-	                key: 'password',
-	                type: 'input',
-	                templateOptions: {
-	                    type: 'password',
-	                    label: 'Password',
-	                    required: true
-	                }
-	            }
-	        ];
-	    }
-	    SignInDialogCtrl.prototype.login = function () {
-	        var _this = this;
-	        if (!this.form.$valid) {
-	            return;
-	        }
-	        this.securityService
-	            .signIn(this.model.userName, this.model.password)
-	            .then(function () {
-	            _this.modalInstance.close();
-	        }, function () {
-	            // TODO: create generic notification dialogs
-	            alert('error');
-	        });
-	    };
-	    SignInDialogCtrl.prototype.cancel = function () {
-	        this.modalInstance.dismiss();
-	    };
-	    return SignInDialogCtrl;
-	}());
-	SignInDialogCtrl.$inject = ['securityService'];
-	exports.SignInDialogCtrl = SignInDialogCtrl;
 
 
 /***/ }

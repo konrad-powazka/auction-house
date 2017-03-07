@@ -30,4 +30,5 @@ class AuctionDetailsReadModel extends AuctionListItemReadModel
 {
 	public startingPrice: number;
 	public highestBidderUserName: string;
+	public version: number;
 }

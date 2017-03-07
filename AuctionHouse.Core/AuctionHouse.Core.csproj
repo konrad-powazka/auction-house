@@ -41,9 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\DictionaryExtensions.cs" />
+    <Compile Include="Domain\AggregateRoot.cs" />
+    <Compile Include="Domain\Entity.cs" />
     <Compile Include="EventSourcing\ExpectedStreamVersion.cs" />
     <Compile Include="EventSourcing\IEventsDatabase.cs" />
     <Compile Include="EventSourcing\ITrackingEventsDatabase.cs" />
+    <Compile Include="EventSourcing\PersistedEventEnvelope.cs" />
     <Compile Include="EventSourcing\TrackingEventsDatabase.cs" />
     <Compile Include="GuidGenerator.cs" />
     <Compile Include="Messaging\ICommandQueue.cs" />
@@ -52,6 +55,7 @@
     <Compile Include="Messaging\IMessageEnvelope.cs" />
     <Compile Include="ReadModel\IReadModelBuilder.cs" />
     <Compile Include="ReadModel\IReadModelDbContext.cs" />
+    <Compile Include="ReadModel\ReadModelDbContextExtensions.cs" />
     <Compile Include="Messaging\CommandEnvelope.cs" />
     <Compile Include="Messaging\MessageHeaderNames.cs" />
     <Compile Include="Messaging\ICommand.cs" />
@@ -69,9 +73,7 @@
     <Compile Include="Time\TimeProvider.cs" />
     <Compile Include="TypeSwitch.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configuration\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

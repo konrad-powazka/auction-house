@@ -6,5 +6,6 @@ namespace AuctionHouse.ReadModel.Dtos.Auctions.Details
     {
 		public decimal StartingPrice { get; set; }
 		public string HighestBidderUserName { get; set; }
+		public int Version { get; set; }
 	}
 }

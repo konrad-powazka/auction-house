@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AuctionHouse.Domain
+namespace AuctionHouse.Core.Domain
 {
     public abstract class Entity
     {

@@ -2,8 +2,8 @@
 	<h2>{{ $ctrl.auction.title }}</h2>
 </div>
 <div class="row">
-	<div class="panel panel-default col-md-4">
-		<div class="panel-body">
+	<div class="col-md-4">
+		<div class="panel panel-default panel-body">
 			<dl class="dl-horizontal">
 				<dt>
 					Seller
@@ -42,6 +42,8 @@
 					<span class="fa fa-user"></span> {{ $ctrl.auction.HighestBidderUserName }}
 				</dd>
 			</dl>
+		</div>
+		<div class="panel panel-default panel-body">
 			<form ng-submit="$ctrl.makeBid()" name="$ctrl.makeBidForm" novalidate>
 				<formly-form model="$ctrl.makeBidModel" fields="$ctrl.makeBidFields" form="$ctrl.makeBidForm">
 					<button type="submit" class="btn btn-primary submit-button">Make bid</button>
@@ -50,6 +52,6 @@
 		</div>
 	</div>
 	<div class="col-md-8">
-			{{ $ctrl.auction.description }}
+		{{ $ctrl.auction.description }}
 	</div>
 </div>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AuctionHouse.Domain;
+using AuctionHouse.Core.Domain;
 
 namespace AuctionHouse.Persistence
 {

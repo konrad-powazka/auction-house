@@ -27,6 +27,5 @@ class MakeBidCommand
 {
 	public auctionId: string;
 	public price: number;
-	public id: string;
 	public expectedAuctionVersion: number;
 }

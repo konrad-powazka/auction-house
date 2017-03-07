@@ -15,30 +15,40 @@ export class DisplayAuctionCtrl implements ng.IController {
 		price: number;
 	};
 
-	static $inject = ['getAuctionDetailsQueryHandler', 'securityUiService', 'createAuctionCommandUiHandler', 'genericModalService'];
+	static $inject = ['getAuctionDetailsQueryHandler', 'securityUiService', 'makeBidCommandUiHandler', 'genericModalService'];
 
-	constructor(getAuctionDetailsQueryHandler: IQueryHandler<GetAuctionDetailsQuery, AuctionDetailsReadModel>,
+	constructor(
+		private getAuctionDetailsQueryHandler: IQueryHandler<GetAuctionDetailsQuery, AuctionDetailsReadModel>,
 		public securityUiService: SecurityUiService,
-		private createAuctionCommandUiHandler: ICommandHandler<MakeBidCommand>,
+		private makeBidCommandUiHandler: ICommandHandler<MakeBidCommand>,
 		private genericModalService: GenericModalService) {
 		getAuctionDetailsQueryHandler.handle({
 				id: this.auctionId
 			})
 			.then(auction => {
-				this.auction = auction;
-
-				this.makeBidFields = [
-					{
-						key: 'price',
-						type: 'input',
-						defaultValue: this.auction.minimalPriceForNextBidder,
-						templateOptions: {
-							label: '',
-							required: true
-						}
-					}
-				];
+				this.auctionLoadedCallback(auction);
 			});
+	}
+
+	private auctionLoadedCallback(auction: AuctionDetailsReadModel) {
+		this.auction = auction;
+		this.initMakeBidFields(auction);
+		this.makeBidModel.price = auction.minimalPriceForNextBidder;
+	}
+
+	private initMakeBidFields(auction: AuctionDetailsReadModel) {
+		this.makeBidFields = [
+			{
+				key: 'price',
+				type: 'input',
+				templateOptions: {
+					label: '',
+					required: true,
+					type: 'number',
+					min: this.auction.minimalPriceForNextBidder
+				}
+			}
+		];
 	}
 
 	makeBid(): void {
@@ -48,6 +58,24 @@ export class DisplayAuctionCtrl implements ng.IController {
 					this.genericModalService.showErrorNotification('You cannot bid at your own auction.');
 					return;
 				}
+
+				const makeBidCommand: MakeBidCommand = {
+					auctionId: this.auctionId,
+					expectedAuctionVersion: this.auction.version,
+					price: this.makeBidModel.price
+				};
+
+				this.makeBidCommandUiHandler.handle(makeBidCommand, true)
+					.then(() => {
+						return this.getAuctionDetailsQueryHandler.handle({
+							id: this.auctionId
+						});
+					})
+					.then(auction => {
+						this.auctionLoadedCallback(auction);
+
+						// TODO: check if is highest bidder
+					});
 			});
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using AuctionHouse.Core.Domain;
 using AuctionHouse.Core.Time;
+using AuctionHouse.Domain.Money;
 using AuctionHouse.Messages.Events.Auctions;
 
 namespace AuctionHouse.Domain.Auctions
@@ -36,6 +38,8 @@ namespace AuctionHouse.Domain.Auctions
 		public static Auction Create(Guid id, string title, string description, DateTime endDate, decimal startingPrice,
 			decimal? buyNowPrice, string createdByUserName, ITimeProvider timeProvider)
 		{
+			MoneyValidator.ValidateMoneyAmount(startingPrice);
+
 			if (string.IsNullOrWhiteSpace(title))
 			{
 				throw new ArgumentException("Value cannot be null or whitespace.", nameof(title));
@@ -46,9 +50,14 @@ namespace AuctionHouse.Domain.Auctions
 				throw new ArgumentOutOfRangeException(nameof(endDate));
 			}
 
-			if (buyNowPrice.HasValue && buyNowPrice < startingPrice)
+			if (buyNowPrice.HasValue)
 			{
-				throw new ArgumentOutOfRangeException(nameof(buyNowPrice));
+				MoneyValidator.ValidateMoneyAmount(buyNowPrice.Value);
+
+				if (buyNowPrice < startingPrice)
+				{
+					throw new ArgumentOutOfRangeException(nameof(buyNowPrice));
+				}
 			}
 
 			var auction = new Auction(timeProvider);
@@ -72,6 +81,8 @@ namespace AuctionHouse.Domain.Auctions
 
 		public void MakeBid(string bidderUserName, decimal bidPrice)
 		{
+			MoneyValidator.ValidateMoneyAmount(bidPrice);
+
 			if (!IsInProgress)
 			{
 				throw new InvalidOperationException("An auction must be in progress in order to bid.");

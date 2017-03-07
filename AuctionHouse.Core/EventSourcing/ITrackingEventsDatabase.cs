@@ -3,8 +3,8 @@ using AuctionHouse.Core.Messaging;
 
 namespace AuctionHouse.Core.EventSourcing
 {
-    public interface ITrackingEventsDatabase : IEventsDatabase
-    {
-        IReadOnlyCollection<MessageEnvelope<IEvent>> WrittenEventEnvelopes { get; }
-    }
+	public interface ITrackingEventsDatabase : IEventsDatabase
+	{
+		IReadOnlyCollection<IMessageEnvelope<IEvent>> WrittenEventEnvelopes { get; }
+	}
 }

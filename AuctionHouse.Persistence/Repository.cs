@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Core;
+using AuctionHouse.Core.Domain;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Domain;
 
 namespace AuctionHouse.Persistence
 {
@@ -74,7 +74,7 @@ namespace AuctionHouse.Persistence
 
 		protected abstract TAggregateRoot CreateEmptyAggregateRootInstance();
 
-		private static IEnumerable<MessageEnvelope<IEvent>> WrapAggregateRootChangesIntoEnvelopes(
+		private IEnumerable<MessageEnvelope<IEvent>> WrapAggregateRootChangesIntoEnvelopes(
 			TAggregateRoot aggregateRoot, string changeId)
 		{
 			return aggregateRoot.Changes.Select((e, i) =>
@@ -86,9 +86,6 @@ namespace AuctionHouse.Persistence
 			});
 		}
 
-		private static string GetAggregateRootStreamName(Guid aggregateRootId)
-		{
-			return $"{typeof(TAggregateRoot).Name}-{aggregateRootId}";
-		}
+		protected abstract string GetAggregateRootStreamName(Guid aggregateRootId);
 	}
 }

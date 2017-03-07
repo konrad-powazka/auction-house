@@ -12,6 +12,7 @@ namespace AuctionHouse.Application.Auctions
 {
 	public class AuctionsService :
 		ICommandHandler<CreateAuctionCommand>,
+		ICommandHandler<MakeBidCommand>,
 		ICommandHandler<FinishAuctionCommand>,
 		IEventHandler<AuctionCreatedEvent>
 	{
@@ -30,10 +31,22 @@ namespace AuctionHouse.Application.Auctions
 		public async Task Handle(CommandEnvelope<CreateAuctionCommand> commandEnvelope)
 		{
 			var command = commandEnvelope.Message;
+
 			var createdAuction = Auction.Create(command.AuctionId, command.Title, command.Description, command.EndDate,
 				command.StartingPrice, command.BuyNowPrice, commandEnvelope.SenderUserName, _timeProvider);
 
 			await _auctionsRepository.Create(createdAuction, commandEnvelope.MessageId.ToString());
+		}
+
+		public async Task Handle(CommandEnvelope<MakeBidCommand> commandEnvelope)
+		{
+			var makeBidCommand = commandEnvelope.Message;
+			var auction = await _auctionsRepository.Get(makeBidCommand.AuctionId);
+			auction.MakeBid(commandEnvelope.SenderUserName, makeBidCommand.Price);
+
+			await
+				_auctionsRepository.Save(auction, commandEnvelope.MessageId.ToString(), ExpectedAggregateRootVersion.Specific,
+					makeBidCommand.ExpectedAuctionVersion);
 		}
 
 		public async Task Handle(CommandEnvelope<FinishAuctionCommand> commandEnvelope)

@@ -1,6 +1,8 @@
-﻿using AuctionHouse.Core.EventSourcing;
+﻿using System;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Time;
 using AuctionHouse.Domain.Auctions;
+using AuctionHouse.Persistence.Shared;
 
 namespace AuctionHouse.Persistence
 {
@@ -16,6 +18,11 @@ namespace AuctionHouse.Persistence
 		protected override Auction CreateEmptyAggregateRootInstance()
 		{
 			return new Auction(_timeProvider);
+		}
+
+		protected override string GetAggregateRootStreamName(Guid aggregateRootId)
+		{
+			return StreamNameGenerator.GenerateAuctionStreamName(aggregateRootId);
 		}
 	}
 }

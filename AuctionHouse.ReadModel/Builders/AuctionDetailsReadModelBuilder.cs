@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AuctionHouse.Core;
-using AuctionHouse.Core.Messaging;
+using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.ReadModel;
 using AuctionHouse.Messages.Events.Auctions;
+using AuctionHouse.Persistence.Shared;
 using AuctionHouse.ReadModel.Dtos.Auctions.Details;
 
 namespace AuctionHouse.ReadModel.Builders
@@ -10,10 +12,22 @@ namespace AuctionHouse.ReadModel.Builders
 	// TODO: Not all data exposed by this RM should be visible to all users
 	public class AuctionDetailsReadModelBuilder : IReadModelBuilder
 	{
-		public async Task Apply(IEvent @event, IReadModelDbContext readModelDbContext)
+		public async Task Apply(PersistedEventEnvelope eventEnvelope, IReadModelDbContext readModelDbContext)
 		{
+			Guid auctionId;
+
+			if (StreamNameGenerator.TryExtractAuctionId(eventEnvelope.StreamName, out auctionId))
+			{
+				var readModel = await readModelDbContext.TryGet<AuctionDetailsReadModel>(auctionId);
+
+				if (readModel != null)
+				{
+					readModel.Version = eventEnvelope.StreamVersion;
+				}
+			}
+
 			//TODO async
-			TypeSwitch.Do(@event,
+			TypeSwitch.Do(eventEnvelope.Message,
 				TypeSwitch.Case<AuctionCreatedEvent>(auctionCreatedEvent =>
 				{
 					var auctionDetails = new AuctionDetailsReadModel

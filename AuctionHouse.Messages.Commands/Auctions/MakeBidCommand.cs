@@ -7,7 +7,6 @@ namespace AuctionHouse.Messages.Commands.Auctions
     {
         public Guid AuctionId { get; set; }
         public decimal Price { get; set; }
-        public Guid Id { get; set; }
         public int ExpectedAuctionVersion { get; set; }
     }
 }

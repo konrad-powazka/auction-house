@@ -20,29 +20,6 @@ namespace AuctionHouse.ReadModel.Repositories
 			_elasticClient = elasticClient;
 		}
 
-		public async Task<TReadModel> Get<TReadModel>(Guid id) where TReadModel : class
-		{
-			var changesForReadModelType = _changes.GetOrAdd(typeof(TReadModel), () => new Dictionary<Guid, ReadModelChange>());
-			ReadModelChange readModelChange;
-
-			if (changesForReadModelType.TryGetValue(id, out readModelChange))
-			{
-				return (TReadModel) readModelChange.ReadModel;
-			}
-
-			var readModel = (await _elasticClient.GetAsync<TReadModel>(id)).Source;
-
-			if (readModel == null)
-			{
-				throw new KeyNotFoundException();
-			}
-
-			readModelChange = new ReadModelChange<TReadModel>(ChangeType.CreateOrOverwrite, id, readModel);
-			changesForReadModelType[id] = readModelChange;
-
-			return readModel;
-		}
-
 		public void CreateOrOverwrite<TReadModel>(TReadModel readModel, Guid id) where TReadModel : class
 		{
 			var changesForReadModelType = _changes.GetOrAdd(typeof(TReadModel), () => new Dictionary<Guid, ReadModelChange>());
@@ -79,6 +56,29 @@ namespace AuctionHouse.ReadModel.Repositories
 				await _elasticClient.BulkAsync(bulkDescriptor.Refresh(Refresh.WaitFor));
 				_changes.Clear();
 			}
+		}
+
+		public async Task<TReadModel> TryGet<TReadModel>(Guid id) where TReadModel : class
+		{
+			var changesForReadModelType = _changes.GetOrAdd(typeof(TReadModel), () => new Dictionary<Guid, ReadModelChange>());
+			ReadModelChange readModelChange;
+
+			if (changesForReadModelType.TryGetValue(id, out readModelChange))
+			{
+				return (TReadModel) readModelChange.ReadModel;
+			}
+
+			var readModel = (await _elasticClient.GetAsync<TReadModel>(id)).Source;
+
+			if (readModel == null)
+			{
+				return null;
+			}
+
+			readModelChange = new ReadModelChange<TReadModel>(ChangeType.CreateOrOverwrite, id, readModel);
+			changesForReadModelType[id] = readModelChange;
+
+			return readModel;
 		}
 
 		private abstract class ReadModelChange

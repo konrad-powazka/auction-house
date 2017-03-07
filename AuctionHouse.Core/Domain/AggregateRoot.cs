@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using AuctionHouse.Core.Messaging;
 
-namespace AuctionHouse.Domain
+namespace AuctionHouse.Core.Domain
 {
     public abstract class AggregateRoot : Entity
     {     

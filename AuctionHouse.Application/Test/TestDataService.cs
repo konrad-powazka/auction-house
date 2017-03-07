@@ -34,17 +34,18 @@ namespace AuctionHouse.Application.Test
 				var auctionTemplateFaker = new Faker<AuctionTemplate>()
 					.RuleFor(a => a.Title, s =>
 					{
-						var title = s.Commerce.Product();
+						var title = s.Commerce.ProductName();
 						return title;
 					})
 					.RuleFor(a => a.Description, s =>
 					{
-						var numberOfParagraphs = s.Random.Int(1, 4);
-						return s.Lorem.Paragraph(numberOfParagraphs);
+						var numberOfParagraphs = s.Random.Int(5, 25);
+						return s.Lorem.Sentences(numberOfParagraphs);
 					})
 					.RuleFor(a => a.EndDate, s => s.Date.Between(_timeProvider.Now.AddMinutes(1), _timeProvider.Now.AddDays(21)))
-					.RuleFor(a => a.StartingPrice, s => s.Random.Bool() ? s.Random.Decimal(1, 10000) : 0)
-					.RuleFor(a => a.BuyNowPrice, (s, a) => s.Random.Bool() ? s.Random.Decimal(a.StartingPrice, 20000) : (decimal?) null)
+					.RuleFor(a => a.StartingPrice, s => s.Random.Bool() ? decimal.Round(s.Random.Decimal(1, 10000), 2) : 0)
+					.RuleFor(a => a.BuyNowPrice,
+						(s, a) => s.Random.Bool() ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?) null)
 					.RuleFor(a => a.CreatedByUserName, s =>
 					{
 						var separator = s.Random.Bool() ? "_" : string.Empty;

@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using AuctionHouse.Core.Messaging;
+using AuctionHouse.Core.EventSourcing;
 
 namespace AuctionHouse.Core.ReadModel
 {
 	public interface IReadModelBuilder
 	{
-		Task Apply(IEvent @event, IReadModelDbContext readModelDbContext);
+		Task Apply(PersistedEventEnvelope @event, IReadModelDbContext readModelDbContext);
 	}
 }

@@ -10,8 +10,8 @@ namespace AuctionHouse.Core.EventSourcing
 		Task AppendToStream(string streamName, IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend,
 			ExpectedStreamVersion expectedStreamVersion, int? specificExpectedStreamVersion = null);
 
-		Task<IEnumerable<IMessageEnvelope<IEvent>>> ReadStream(string streamName);
+		Task<IEnumerable<PersistedEventEnvelope>> ReadStream(string streamName);
 
-		Task<IDisposable> ReadAllExistingEventsAndSubscribe(Action<MessageEnvelope<IEvent>> handleEventEnvelopeCallback);
+		Task<IDisposable> ReadAllExistingEventsAndSubscribe(Action<PersistedEventEnvelope> handleEventEnvelopeCallback);
 	}
 }

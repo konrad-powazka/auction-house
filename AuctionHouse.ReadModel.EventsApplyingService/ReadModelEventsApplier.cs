@@ -21,8 +21,8 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 		private const int BatchConstructionTimeoutMilliseconds = 1000; // TODO: Move to cfg
 		private readonly IEventsDatabase _eventsDatabase;
 
-		private readonly BlockingCollection<MessageEnvelope<IEvent>> _eventsQueue =
-			new BlockingCollection<MessageEnvelope<IEvent>>();
+		private readonly BlockingCollection<PersistedEventEnvelope> _eventsQueue =
+			new BlockingCollection<PersistedEventEnvelope>();
 
 		private readonly IEndpointInstance _nServiceBusEndpointInstance;
 		private readonly CancellationTokenSource _processingStoppedCancellationTokenSource = new CancellationTokenSource();
@@ -110,7 +110,7 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 			}
 		}
 
-		private void HandleEventEnvelope(MessageEnvelope<IEvent> eventEnvelope)
+		private void HandleEventEnvelope(PersistedEventEnvelope eventEnvelope)
 		{
 			// In real life this would be handled by a decorator
 			if (Configuration.EventsApplicationToReadModelDelayInMilliseconds.HasValue)
@@ -120,7 +120,7 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 
 			foreach (var readModelBuilder in _readModelBuilders)
 			{
-				readModelBuilder.Apply(eventEnvelope.Message, _readModelDbContext).Wait();
+				readModelBuilder.Apply(eventEnvelope, _readModelDbContext).Wait();
 			}
 		}
 
