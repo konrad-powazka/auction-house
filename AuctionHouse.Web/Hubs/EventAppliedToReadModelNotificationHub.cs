@@ -47,6 +47,7 @@ namespace AuctionHouse.Web.Hubs
             var connectionId = Context.ConnectionId;
             var subscriptionId = Guid.NewGuid();
 
+			// TODO: There is a race condition
             var subscription = new Subscription(subscriptionId, connectionId, unappliedEventIds,
 				_eventsAppliedToReadModelTracker, _hubContext);
 

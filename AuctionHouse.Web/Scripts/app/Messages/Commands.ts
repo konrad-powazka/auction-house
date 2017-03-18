@@ -10,7 +10,7 @@ class PopulateDatabaseWithTestDataCommand
 export
 class CreateAuctionCommand
 {
-	public auctionId: string;
+	public id: string;
 	public title: string;
 	public description: string;
 	public startingPrice: number;

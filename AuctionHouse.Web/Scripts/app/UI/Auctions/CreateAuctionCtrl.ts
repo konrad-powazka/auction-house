@@ -1,7 +1,6 @@
 ﻿import { CreateAuctionCommand } from '../../Messages/Commands';
 import { CreateAuctionCommandHandler } from '../../CommandHandling/GeneratedCommandHandlers';
 import { ICommandUiHandler } from '../Shared/CommandHandling/ICommandUiHandler';
-import { CommandHandlingErrorType } from '../../CommandHandling/CommandHandlingErrorType';
 import {IQueryHandler as QueryHandler} from '../../QueryHandling/IQueryHandler';
 import {GetAuctionDetailsQuery as AuctionDetailsQuery} from '../../Messages/Queries';
 import {AuctionDetailsReadModel} from '../../ReadModel';
@@ -10,7 +9,8 @@ import GuidGenerator from '../../Infrastructure/GuidGenerator';
 export class CreateAuctionCtrl implements ng.IController {
     fields: AngularFormly.IFieldArray;
     model: CreateAuctionCommand;
-    form: ng.IFormController;
+	form: ng.IFormController;
+	createAuctionCommandId = GuidGenerator.generateGuid();
 
     static $inject = ['createAuctionCommandUiHandler', 'getAuctionDetailsQueryHandler', '$state'];
 
@@ -18,7 +18,7 @@ export class CreateAuctionCtrl implements ng.IController {
         private getAuctionDetailsQueryHandler: QueryHandler<AuctionDetailsQuery, AuctionDetailsReadModel>,
         private stateService: ng.ui.IStateService) {
         this.model = {
-            auctionId: GuidGenerator.generateGuid(),
+            id: GuidGenerator.generateGuid(),
             title: '',
             description: '',
             startingPrice: 5,
@@ -63,13 +63,13 @@ export class CreateAuctionCtrl implements ng.IController {
             return;
         }
 
-        this.createAuctionCommandUiHandler
-            .handle(this.model, true)
-            .then(() => {
-                this.stateService.go('displayAuction', { auctionId: this.model.auctionId });
-            })
-			.catch((commandHandlingErrorType: CommandHandlingErrorType) =>
-				// TODO: To modal with proper error handling
-                alert(`Command processing error: ${CommandHandlingErrorType[commandHandlingErrorType]}`));
+	    this.createAuctionCommandUiHandler
+		    .handle(this.model, this.createAuctionCommandId, true)
+		    .then(() => {
+			    this.stateService.go('displayAuction', { auctionId: this.model.id });
+		    })
+		    .catch(() => {
+			    // TODO: To modal with proper error handling
+		    });
     } 
 }

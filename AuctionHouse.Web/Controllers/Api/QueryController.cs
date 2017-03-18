@@ -1,30 +1,28 @@
 ﻿using System;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AuctionHouse.Core.Messaging;
 
 namespace AuctionHouse.Web.Controllers.Api
 {
-    public abstract class QueryController<TQuery, TQueryResult> : ApiController where TQuery : IQuery<TQueryResult>
-    {
-        private readonly IQueryHandler<TQuery, TQueryResult> _handler;
+	public abstract class QueryController<TQuery, TQueryResult> : ApiController where TQuery : IQuery<TQueryResult>
+	{
+		private readonly IQueryHandler<TQuery, TQueryResult> _handler;
 
-        protected QueryController(IQueryHandler<TQuery, TQueryResult> handler)
-        {
-            if (handler == null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
+		protected QueryController(IQueryHandler<TQuery, TQueryResult> handler)
+		{
+			if (handler == null)
+			{
+				throw new ArgumentNullException(nameof(handler));
+			}
 
-            _handler = handler;
-        }
+			_handler = handler;
+		}
 
-        [HttpGet]
-        public async Task<TQueryResult> Handle([FromUri] TQuery query)
-        {
-            return await _handler.Handle(query);
-        }
-    }
+		[HttpGet]
+		public async Task<TQueryResult> Handle([FromUri] TQuery query)
+		{
+			return await _handler.Handle(query);
+		}
+	}
 }

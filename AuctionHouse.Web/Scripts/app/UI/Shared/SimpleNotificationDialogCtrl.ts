@@ -10,6 +10,14 @@ export class SimpleNotificationDialogCtrl implements ng.IController {
 		notificationType: NotificationType;
 	}
 
+	get isInformationNotification(): boolean {
+		return this.resolve.notificationType === NotificationType.Information;
+	}
+
+	get isSuccessNotification(): boolean {
+		return this.resolve.notificationType === NotificationType.Success;
+	}
+
 	get isErrorNotification(): boolean {
 		return this.resolve.notificationType === NotificationType.Error;
 	}

@@ -5,6 +5,7 @@ import {SecurityUiService} from '../Shared/SecurityUiService';
 import {MakeBidCommand} from '../../Messages/Commands';
 import {ICommandHandler } from '../../CommandHandling/ICommandHandler';
 import GenericModalService from '../Shared/GenericModalService';
+import GuidGenerator from '../../Infrastructure/GuidGenerator';
 
 export class DisplayAuctionCtrl implements ng.IController {
 	auctionId: string;
@@ -65,7 +66,7 @@ export class DisplayAuctionCtrl implements ng.IController {
 					price: this.makeBidModel.price
 				};
 
-				this.makeBidCommandUiHandler.handle(makeBidCommand, true)
+				this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator.generateGuid(), true)
 					.then(() => {
 						return this.getAuctionDetailsQueryHandler.handle({
 							id: this.auctionId

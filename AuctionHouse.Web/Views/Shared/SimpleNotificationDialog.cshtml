@@ -1,5 +1,8 @@
-﻿<div class="modal-header bg-danger text-danger">
+﻿<div class="modal-header"
+	 ng-class="{ 'bg-info text-info': $ctrl.isInformationNotification, 'bg-success text-success': $ctrl.isSuccessNotification, 'bg-danger text-danger': $ctrl.isErrorNotification }">
 	<span class="modal-title">
+		<span ng-if="$ctrl.isInformationNotification"><span class="fa fa-info-circle"></span> Information</span>
+		<span ng-if="$ctrl.isSuccessNotification"><span class="fa fa-check-circle"></span> Success</span>
 		<span ng-if="$ctrl.isErrorNotification"><span class="fa fa-times-circle"></span> Error</span>
 	</span>
 </div>

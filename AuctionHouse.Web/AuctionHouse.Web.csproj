@@ -254,7 +254,7 @@
     <Compile Include="Controllers\View\HomeController.cs" />
     <Compile Include="Cqrs\CommandHandlingFeedbackEventHandler.cs" />
     <Compile Include="CodeGen\CqrsControllerTypesGenerator.cs" />
-    <Compile Include="EventSourcing\CommandHandlingFeedbackEventHandler.cs" />
+    <Compile Include="EventSourcing\EventsAppliedToReadModelEventHandler.cs" />
     <Compile Include="EventSourcing\EventAppliedEventArgs.cs" />
     <Compile Include="EventSourcing\EventsAppliedToReadModelTracker.cs" />
     <Compile Include="EventSourcing\IEventsAppliedToReadModelTracker.cs" />
@@ -465,6 +465,7 @@
     <TypeScriptCompile Include="Scripts\app\QueryHandling\IQueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\QueryHandling\QueryHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\ReadModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\Configuration.ts" />
     <TypeScriptCompile Include="Scripts\app\Routing.ts" />
     <TypeScriptCompile Include="Scripts\app\Security\SecurityService.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\AuctionsListComponent.ts" />

@@ -5,6 +5,7 @@ import { IEventAppliedToReadModelNotificationHubServer } from
 import { NotifyOnEventsAppliedToReadModelResponse } from '../Infrastructure/NotifyOnEventsAppliedToReadModelResponse';
 import { CommandHandlingSucceededEvent, CommandHandlingFailedEvent } from '../Events';
 import GuidGenerator from '../Infrastructure/GuidGenerator';
+import Configuration from '../Configuration';
 
 export abstract class CommandHandler<TCommand> implements ICommandHandler<TCommand> {
     private static wasSignalrRInitialized = false;
@@ -13,12 +14,13 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
     private static eventsAppliedToReadModelCallbacks = $.Callbacks();
     private static eventAppliedToReadModelNotificationHubServer: IEventAppliedToReadModelNotificationHubServer;
 
-    static $inject = ['$http', '$q', '$timeout'];
+	static $inject = ['$http', '$q', '$timeout', 'configuration'];
 
     constructor(
         private httpService: ng.IHttpService,
         private qService: ng.IQService,
-        private timeoutService: ng.ITimeoutService) {
+		private timeoutService: ng.ITimeoutService,
+		private configuration: Configuration) {
         if (!CommandHandler.wasSignalrRInitialized) {
             const connection = ($.connection as any);
             const commandHandlingFeedbackHub = connection.commandHandlingFeedbackHub;
@@ -45,8 +47,7 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
         }
     }
 
-    handle(command: TCommand, shouldWaitForEventsApplicationToReadModel: boolean): ng.IPromise<void> {
-        const commandId = GuidGenerator.generateGuid();
+	handle(command: TCommand, commandId: string, shouldWaitForEventsApplicationToReadModel: boolean): ng.IPromise<void> {
         const deferred = this.qService.defer<void>();
 
         this.connectSignalR()
@@ -62,9 +63,11 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
         commandId: string,
         shouldWaitForEventsApplicationToReadModel: boolean,
         deferred: ng.IDeferred<void>): void {
+	    var commandProcessingFinishedAndSucceeded = false;
 
         const commandHandlingSuccessCallback = (commandHandlingSucceededEvent: CommandHandlingSucceededEvent) => {
             if (commandHandlingSucceededEvent.commandId === commandId) {
+	            commandProcessingFinishedAndSucceeded = true;
 
                 if (!shouldWaitForEventsApplicationToReadModel) {
                     deferred.resolve();
@@ -88,13 +91,13 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
 
         this.sendCommand(command, commandId)
             .then(() => {
-                const commandHandlingTimeoutMilliseconds = 15 * 1000;
-
-                this.timeoutService(commandHandlingTimeoutMilliseconds)
-                    .then(() => {
-                        deferred.reject(CommandHandlingErrorType.Timeout);
-                    });
-            })
+		        this.timeoutService(this.configuration.commandHandlingTimeoutMilliseconds)
+					.then(() => {
+						if (!commandProcessingFinishedAndSucceeded) {
+							deferred.reject(CommandHandlingErrorType.ProcessingTimeout);
+						}
+			        });
+	        })
             .catch(() => deferred.reject(CommandHandlingErrorType.FailedToQueue));
 
         const removeCallbacks = () => {
@@ -115,7 +118,13 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
         CommandHandler
             .eventAppliedToReadModelNotificationHubServer
             .notifyOnEventsApplied(publishedEventIds)
-            .done((notifyOnEventsAppliedToReadModelResponse: NotifyOnEventsAppliedToReadModelResponse) => {
+			.done((notifyOnEventsAppliedToReadModelResponse: NotifyOnEventsAppliedToReadModelResponse) => {
+		        var readModelChangeNotificationTimeoutPromise = this
+			        .timeoutService(this.configuration.readModelChangeNotificationTimeoutMilliseconds)
+			        .then(() => {
+				        deferred.reject(CommandHandlingErrorType.ReadModelChangeNotificationTimeout);
+			        });
+
                 if (notifyOnEventsAppliedToReadModelResponse.wereAllEventsAlreadyApplied) {
                     deferred.resolve();
                     return;
@@ -123,7 +132,8 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
 
                 const eventsAppliedCallback = (currentSubscriptionId: string) => {
                     if (currentSubscriptionId === notifyOnEventsAppliedToReadModelResponse.subscriptionId) {
-                        deferred.resolve();
+						deferred.resolve();
+	                    this.timeoutService.cancel(readModelChangeNotificationTimeoutPromise);
                     }
                 };
 

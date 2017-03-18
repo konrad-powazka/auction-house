@@ -14,6 +14,7 @@ import {AuctionsListComponent} from './UI/Auctions/AuctionsListComponent';
 import BusyIndicatingHttpInterceptor from './UI/Shared/BusyIndicatingHttpInterceptor';
 import {SimpleNotificationDialogComponent} from './UI/Shared/SimpleNotificationDialogComponent';
 import GenericModalService from './UI/Shared/GenericModalService';
+import Configuration from './Configuration';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
@@ -60,6 +61,7 @@ export class Application {
 		module.service('securityUiService', SecurityUiService);
 		module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor);
 		module.service('genericModalService', GenericModalService);
+		module.service('configuration', Configuration);
 	}
 
 	private static registerConstants(module: ng.IModule): void {

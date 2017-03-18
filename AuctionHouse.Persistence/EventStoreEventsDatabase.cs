@@ -79,6 +79,7 @@ namespace AuctionHouse.Persistence
 			return Disposable.Create(() => subscription.Stop());
 		}
 
+		// TODO: Is it thread safe?
 		private void SubscribeToAllFrom(Position? subscriptionCheckpoint,
 			Action<EventStoreAllCatchUpSubscription> setSubscription, Action<PersistedEventEnvelope> handleEventEnvelopeCallback)
 		{

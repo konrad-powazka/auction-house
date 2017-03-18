@@ -1,7 +1,8 @@
 ﻿export enum CommandHandlingErrorType {
     FailedToConnectToFeedbackHub,
     FailedToQueue,
-    Timeout,
+    ProcessingTimeout,
     FailedToProcess,
-    FailedToSubscribeToReadModelChangeNotification
+	FailedToSubscribeToReadModelChangeNotification,
+	ReadModelChangeNotificationTimeout
 }

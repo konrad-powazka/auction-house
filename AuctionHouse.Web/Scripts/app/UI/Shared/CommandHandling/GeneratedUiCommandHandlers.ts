@@ -4,13 +4,18 @@ import { ICommandHandler } from '../../../CommandHandling/ICommandHandler';
 import * as Commands from '../../../Messages/Commands';
 import {SecurityUiService } from '../SecurityUiService';
 import BusyIndicator from '../BusyIndicator';
+import GenericModalService from '../GenericModalService';
 
 	export class PopulateDatabaseWithTestDataCommandUiHandler extends CommandUiHandler<Commands.PopulateDatabaseWithTestDataCommand> {
-		static $inject: ['populateDatabaseWithTestDataCommandHandler', 'busyIndicator', 'securityUiService'];
+		static $inject = ['populateDatabaseWithTestDataCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 
 		constructor(
-			private populateDatabaseWithTestDataCommandHandler: ICommandHandler<Commands.PopulateDatabaseWithTestDataCommand>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
-			super(busyIndicator, securityUiService);
+			private populateDatabaseWithTestDataCommandHandler: ICommandHandler<Commands.PopulateDatabaseWithTestDataCommand>, 
+				busyIndicator: BusyIndicator, 
+				securityUiService: SecurityUiService,
+				qService: ng.IQService,
+				genericModalService: GenericModalService) {
+			super(busyIndicator, securityUiService, qService, genericModalService);
 		}
 
 		protected getCommandHandler(): ICommandHandler<Commands.PopulateDatabaseWithTestDataCommand> {
@@ -18,11 +23,15 @@ import BusyIndicator from '../BusyIndicator';
 		}
 	}
 	export class CreateAuctionCommandUiHandler extends CommandUiHandler<Commands.CreateAuctionCommand> {
-		static $inject: ['createAuctionCommandHandler', 'busyIndicator', 'securityUiService'];
+		static $inject = ['createAuctionCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 
 		constructor(
-			private createAuctionCommandHandler: ICommandHandler<Commands.CreateAuctionCommand>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
-			super(busyIndicator, securityUiService);
+			private createAuctionCommandHandler: ICommandHandler<Commands.CreateAuctionCommand>, 
+				busyIndicator: BusyIndicator, 
+				securityUiService: SecurityUiService,
+				qService: ng.IQService,
+				genericModalService: GenericModalService) {
+			super(busyIndicator, securityUiService, qService, genericModalService);
 		}
 
 		protected getCommandHandler(): ICommandHandler<Commands.CreateAuctionCommand> {
@@ -30,11 +39,15 @@ import BusyIndicator from '../BusyIndicator';
 		}
 	}
 	export class FinishAuctionCommandUiHandler extends CommandUiHandler<Commands.FinishAuctionCommand> {
-		static $inject: ['finishAuctionCommandHandler', 'busyIndicator', 'securityUiService'];
+		static $inject = ['finishAuctionCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 
 		constructor(
-			private finishAuctionCommandHandler: ICommandHandler<Commands.FinishAuctionCommand>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
-			super(busyIndicator, securityUiService);
+			private finishAuctionCommandHandler: ICommandHandler<Commands.FinishAuctionCommand>, 
+				busyIndicator: BusyIndicator, 
+				securityUiService: SecurityUiService,
+				qService: ng.IQService,
+				genericModalService: GenericModalService) {
+			super(busyIndicator, securityUiService, qService, genericModalService);
 		}
 
 		protected getCommandHandler(): ICommandHandler<Commands.FinishAuctionCommand> {
@@ -42,11 +55,15 @@ import BusyIndicator from '../BusyIndicator';
 		}
 	}
 	export class MakeBidCommandUiHandler extends CommandUiHandler<Commands.MakeBidCommand> {
-		static $inject: ['makeBidCommandHandler', 'busyIndicator', 'securityUiService'];
+		static $inject = ['makeBidCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 
 		constructor(
-			private makeBidCommandHandler: ICommandHandler<Commands.MakeBidCommand>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
-			super(busyIndicator, securityUiService);
+			private makeBidCommandHandler: ICommandHandler<Commands.MakeBidCommand>, 
+				busyIndicator: BusyIndicator, 
+				securityUiService: SecurityUiService,
+				qService: ng.IQService,
+				genericModalService: GenericModalService) {
+			super(busyIndicator, securityUiService, qService, genericModalService);
 		}
 
 		protected getCommandHandler(): ICommandHandler<Commands.MakeBidCommand> {

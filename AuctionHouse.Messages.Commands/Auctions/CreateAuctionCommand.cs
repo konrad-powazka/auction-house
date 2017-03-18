@@ -5,7 +5,7 @@ namespace AuctionHouse.Messages.Commands.Auctions
 {
     public class CreateAuctionCommand : ICommand
     {
-        public Guid AuctionId { get; set; }
+        public Guid Id { get; set; }
 
         public string Title { get; set; }
 

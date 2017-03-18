@@ -32,7 +32,7 @@ namespace AuctionHouse.Application.Auctions
 		{
 			var command = commandEnvelope.Message;
 
-			var createdAuction = Auction.Create(command.AuctionId, command.Title, command.Description, command.EndDate,
+			var createdAuction = Auction.Create(command.Id, command.Title, command.Description, command.EndDate,
 				command.StartingPrice, command.BuyNowPrice, commandEnvelope.SenderUserName, _timeProvider);
 
 			await _auctionsRepository.Create(createdAuction, commandEnvelope.MessageId.ToString());

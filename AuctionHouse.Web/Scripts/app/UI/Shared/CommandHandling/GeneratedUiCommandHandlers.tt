@@ -11,15 +11,20 @@ import { ICommandHandler } from '../../../CommandHandling/ICommandHandler';
 import * as Commands from '../../../Messages/Commands';
 import {SecurityUiService } from '../SecurityUiService';
 import BusyIndicator from '../BusyIndicator';
+import GenericModalService from '../GenericModalService';
 
 <# foreach(var commandType in CommandsAssemblyMarker.GetCommandTypes())
 { #>
 	export class <#= commandType.Name #>UiHandler extends CommandUiHandler<Commands.<#= commandType.Name #>> {
-		static $inject: ['<#= commandType.Name.LowerCaseFirstLetter() #>Handler', 'busyIndicator', 'securityUiService'];
+		static $inject = ['<#= commandType.Name.LowerCaseFirstLetter() #>Handler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 
 		constructor(
-			private <#= commandType.Name.LowerCaseFirstLetter() #>Handler: ICommandHandler<Commands.<#= commandType.Name #>>, busyIndicator: BusyIndicator, securityUiService: SecurityUiService) {
-			super(busyIndicator, securityUiService);
+			private <#= commandType.Name.LowerCaseFirstLetter() #>Handler: ICommandHandler<Commands.<#= commandType.Name #>>, 
+				busyIndicator: BusyIndicator, 
+				securityUiService: SecurityUiService,
+				qService: ng.IQService,
+				genericModalService: GenericModalService) {
+			super(busyIndicator, securityUiService, qService, genericModalService);
 		}
 
 		protected getCommandHandler(): ICommandHandler<Commands.<#= commandType.Name #>> {
