@@ -7,8 +7,8 @@
     <ProjectGuid>{7CE32E28-FB89-4EEB-9222-8DA5330BBF99}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AuctionHouse.ServiceBus</RootNamespace>
-    <AssemblyName>AuctionHouse.ServiceBus</AssemblyName>
+    <RootNamespace>AuctionHouse.CommandQueueService</RootNamespace>
+    <AssemblyName>AuctionHouse.CommandQueueService</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

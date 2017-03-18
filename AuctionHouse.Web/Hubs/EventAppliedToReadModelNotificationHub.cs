@@ -36,8 +36,8 @@ namespace AuctionHouse.Web.Hubs
                 throw new ArgumentNullException(nameof(eventIds));
             }
 
-            var unappliedEventIds =
-                eventIds.Where(i => !_eventsAppliedToReadModelTracker.CheckIfEventWasApplied(i)).ToArray();
+		    var unappliedEventIds =
+			    eventIds.Where(i => !_eventsAppliedToReadModelTracker.CheckIfEventWasApplied(i)).Distinct().ToArray();
 
             if (!unappliedEventIds.Any())
             {

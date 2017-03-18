@@ -7,8 +7,8 @@ using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Time;
 using AuctionHouse.Messages.Events;
 using AuctionHouse.Persistence;
-using AuctionHouse.ServiceBus.Behaviors;
-using AuctionHouse.ServiceBus.Handlers;
+using AuctionHouse.CommandQueueService.Behaviors;
+using AuctionHouse.CommandQueueService.Handlers;
 using Autofac;
 using EventStore.ClientAPI;
 using NServiceBus;
@@ -16,13 +16,13 @@ using ICommand = AuctionHouse.Core.Messaging.ICommand;
 using IEvent = AuctionHouse.Core.Messaging.IEvent;
 using IMessage = AuctionHouse.Core.Messaging.IMessage;
 
-namespace AuctionHouse.ServiceBus
+namespace AuctionHouse.CommandQueueService
 {
     public class Program
     {
         public static void Main()
         {
-            Console.Title = "AuctionHouse.ServiceBus";
+            Console.Title = "AuctionHouse.CommandQueueService";
             var endpointConfiguration = new EndpointConfiguration(Constants.EndpointName);          
             endpointConfiguration.SendFailedMessagesTo("error");
             endpointConfiguration.UseSerialization<JsonSerializer>();

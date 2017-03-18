@@ -46,7 +46,7 @@
 
 	"use strict";
 	var CreateAuctionComponent_1 = __webpack_require__(1);
-	var GeneratedCommandHandlers_1 = __webpack_require__(5);
+	var GeneratedCommandHandlers_1 = __webpack_require__(4);
 	var SecurityService_1 = __webpack_require__(7);
 	var SecurityUiService_1 = __webpack_require__(8);
 	var SignInDialogComponent_1 = __webpack_require__(9);
@@ -56,10 +56,10 @@
 	var DisplayAuctionComponent_1 = __webpack_require__(15);
 	var BusyIndicator_1 = __webpack_require__(17);
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
-	var AuctionsListComponent_1 = __webpack_require__(19);
-	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(21);
-	var SimpleNotificationDialogComponent_1 = __webpack_require__(22);
-	var GenericModalService_1 = __webpack_require__(25);
+	var AuctionsListComponent_1 = __webpack_require__(21);
+	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(23);
+	var SimpleNotificationDialogComponent_1 = __webpack_require__(24);
+	var GenericModalService_1 = __webpack_require__(26);
 	var Configuration_1 = __webpack_require__(27);
 	var Application = (function () {
 	    function Application() {
@@ -155,7 +155,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var CreateAuctionCtrl_1 = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./CreateAuctionCtrl\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var CreateAuctionCtrl_1 = __webpack_require__(2);
 	var CreateAuctionComponent = (function () {
 	    function CreateAuctionComponent() {
 	        this.controller = CreateAuctionCtrl_1.CreateAuctionCtrl;
@@ -168,10 +168,111 @@
 
 
 /***/ },
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var GuidGenerator_1 = __webpack_require__(3);
+	var CreateAuctionCtrl = (function () {
+	    function CreateAuctionCtrl(createAuctionCommandUiHandler, getAuctionDetailsQueryHandler, stateService) {
+	        this.createAuctionCommandUiHandler = createAuctionCommandUiHandler;
+	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
+	        this.stateService = stateService;
+	        this.createAuctionCommandId = GuidGenerator_1.default.generateGuid();
+	        this.model = {
+	            id: GuidGenerator_1.default.generateGuid(),
+	            title: '',
+	            description: '',
+	            startingPrice: 5,
+	            buyNowPrice: 10,
+	            endDate: undefined
+	        };
+	        this.fields = [
+	            {
+	                key: 'title',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'Title',
+	                    required: true,
+	                    minlength: 5,
+	                    maxlength: 200
+	                }
+	            },
+	            {
+	                key: 'description',
+	                type: 'textarea',
+	                templateOptions: {
+	                    label: 'Description',
+	                    required: true,
+	                    minlength: 10,
+	                    maxlength: 10000
+	                }
+	            },
+	            {
+	                key: 'endDate',
+	                type: 'dateTimePicker',
+	                templateOptions: {
+	                    label: 'End date and time',
+	                    required: true
+	                }
+	            }
+	        ];
+	    }
+	    CreateAuctionCtrl.prototype.submit = function () {
+	        var _this = this;
+	        if (!this.form.$valid) {
+	            return;
+	        }
+	        this.createAuctionCommandUiHandler
+	            .handle(this.model, this.createAuctionCommandId, true)
+	            .then(function () {
+	            _this.stateService.go('displayAuction', { auctionId: _this.model.id });
+	        })
+	            .catch(function () {
+	            // TODO: To modal with proper error handling
+	        });
+	    };
+	    return CreateAuctionCtrl;
+	}());
+	CreateAuctionCtrl.$inject = ['createAuctionCommandUiHandler', 'getAuctionDetailsQueryHandler', '$state'];
+	exports.CreateAuctionCtrl = CreateAuctionCtrl;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var GuidGenerator = (function () {
+	    function GuidGenerator() {
+	    }
+	    GuidGenerator.generateGuid = function () {
+	        function s4() {
+	            return Math.floor((1 + Math.random()) * 0x10000)
+	                .toString(16)
+	                .substring(1);
+	        }
+	        return s4() +
+	            s4() +
+	            '-' +
+	            s4() +
+	            '-' +
+	            s4() +
+	            '-' +
+	            s4() +
+	            '-' +
+	            s4() +
+	            s4() +
+	            s4();
+	    };
+	    return GuidGenerator;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = GuidGenerator;
+
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -180,7 +281,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandHandler_1 = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./CommandHandler\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var CommandHandler_1 = __webpack_require__(5);
 	var PopulateDatabaseWithTestDataCommandHandler = (function (_super) {
 	    __extends(PopulateDatabaseWithTestDataCommandHandler, _super);
 	    function PopulateDatabaseWithTestDataCommandHandler() {
@@ -240,7 +341,159 @@
 
 
 /***/ },
-/* 6 */,
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var CommandHandlingErrorType_1 = __webpack_require__(6);
+	var CommandHandler = (function () {
+	    function CommandHandler(httpService, qService, timeoutService, configuration) {
+	        this.httpService = httpService;
+	        this.qService = qService;
+	        this.timeoutService = timeoutService;
+	        this.configuration = configuration;
+	        if (!CommandHandler.wasSignalrRInitialized) {
+	            var connection = $.connection;
+	            var commandHandlingFeedbackHub = connection.commandHandlingFeedbackHub;
+	            commandHandlingFeedbackHub.client.handleCommandSuccess = function (commandHandlingSucceededEvent) {
+	                CommandHandler.commandHandlingSuccessCallbacks.fire(commandHandlingSucceededEvent);
+	            };
+	            commandHandlingFeedbackHub.client.handleCommandFailure = function (commandHandlingFailedEvent) {
+	                CommandHandler.commandHandlingFailureCallbacks.fire(commandHandlingFailedEvent);
+	            };
+	            var eventAppliedToReadModelNotificationHub = connection.eventAppliedToReadModelNotificationHub;
+	            eventAppliedToReadModelNotificationHub.client
+	                .handleEventsAppliedToReadModel = function (subscriptionId) {
+	                CommandHandler.eventsAppliedToReadModelCallbacks.fire(subscriptionId);
+	            };
+	            CommandHandler
+	                .eventAppliedToReadModelNotificationHubServer = eventAppliedToReadModelNotificationHub.server;
+	            CommandHandler.wasSignalrRInitialized = true;
+	        }
+	    }
+	    CommandHandler.prototype.handle = function (command, commandId, shouldWaitForEventsApplicationToReadModel) {
+	        var _this = this;
+	        var deferred = this.qService.defer();
+	        this.connectSignalR()
+	            .then(function () {
+	            _this.sendCommandAndWaitForHandling(command, commandId, shouldWaitForEventsApplicationToReadModel, deferred);
+	        })
+	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
+	        return deferred.promise;
+	    };
+	    CommandHandler.prototype.sendCommandAndWaitForHandling = function (command, commandId, shouldWaitForEventsApplicationToReadModel, deferred) {
+	        var _this = this;
+	        var commandProcessingFinishedAndSucceeded = false;
+	        var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
+	            if (commandHandlingSucceededEvent.commandId === commandId) {
+	                commandProcessingFinishedAndSucceeded = true;
+	                if (!shouldWaitForEventsApplicationToReadModel) {
+	                    deferred.resolve();
+	                }
+	                else {
+	                    _this
+	                        .waitForEventsApplicationToReadModel(commandHandlingSucceededEvent
+	                        .publishedEventIds, deferred);
+	                }
+	            }
+	        };
+	        var commandHandlingFailureCallback = function (commandHandlingFailedEvent) {
+	            if (commandHandlingFailedEvent.commandId === commandId) {
+	                deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess);
+	            }
+	        };
+	        CommandHandler.commandHandlingSuccessCallbacks.add(commandHandlingSuccessCallback);
+	        CommandHandler.commandHandlingFailureCallbacks.add(commandHandlingFailureCallback);
+	        this.sendCommand(command, commandId)
+	            .then(function () {
+	            _this.timeoutService(_this.configuration.commandHandlingTimeoutMilliseconds)
+	                .then(function () {
+	                if (!commandProcessingFinishedAndSucceeded) {
+	                    deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.ProcessingTimeout);
+	                }
+	            });
+	        })
+	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
+	        var removeCallbacks = function () {
+	            CommandHandler.commandHandlingSuccessCallbacks.remove(commandHandlingSuccessCallback);
+	            CommandHandler.commandHandlingFailureCallbacks.remove(commandHandlingFailureCallback);
+	        };
+	        deferred.promise.finally(removeCallbacks);
+	    };
+	    CommandHandler.prototype.sendCommand = function (command, commandId) {
+	        var url = "api/" + this.getCommandName() + "/Handle?commandId=" + commandId;
+	        return this.httpService.post(url, command);
+	    };
+	    CommandHandler.prototype.waitForEventsApplicationToReadModel = function (publishedEventIds, deferred) {
+	        var _this = this;
+	        CommandHandler
+	            .eventAppliedToReadModelNotificationHubServer
+	            .notifyOnEventsApplied(publishedEventIds)
+	            .done(function (notifyOnEventsAppliedToReadModelResponse) {
+	            var readModelChangeNotificationTimeoutPromise = _this
+	                .timeoutService(_this.configuration.readModelChangeNotificationTimeoutMilliseconds)
+	                .then(function () {
+	                deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.ReadModelChangeNotificationTimeout);
+	            });
+	            if (notifyOnEventsAppliedToReadModelResponse.wereAllEventsAlreadyApplied) {
+	                deferred.resolve();
+	                return;
+	            }
+	            var eventsAppliedCallback = function (currentSubscriptionId) {
+	                if (currentSubscriptionId === notifyOnEventsAppliedToReadModelResponse.subscriptionId) {
+	                    deferred.resolve();
+	                    _this.timeoutService.cancel(readModelChangeNotificationTimeoutPromise);
+	                }
+	            };
+	            CommandHandler.eventsAppliedToReadModelCallbacks.add(eventsAppliedCallback);
+	            deferred.promise.finally(function () { return CommandHandler.eventsAppliedToReadModelCallbacks
+	                .remove(eventsAppliedCallback); });
+	            deferred.promise.catch(function () {
+	                // TODO: cancel subscription on timeout
+	            });
+	        })
+	            .fail(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToSubscribeToReadModelChangeNotification); });
+	    };
+	    CommandHandler.prototype.connectSignalR = function () {
+	        var deferred = this.qService.defer();
+	        if ($.connection.hub.state === 1 /* Connected */) {
+	            deferred.resolve();
+	        }
+	        else {
+	            $.connection.hub
+	                .start()
+	                .done(function () { return deferred.resolve(); })
+	                .fail(function () { return deferred.reject(); });
+	        }
+	        return deferred.promise;
+	    };
+	    return CommandHandler;
+	}());
+	CommandHandler.wasSignalrRInitialized = false;
+	CommandHandler.commandHandlingSuccessCallbacks = $.Callbacks();
+	CommandHandler.commandHandlingFailureCallbacks = $.Callbacks();
+	CommandHandler.eventsAppliedToReadModelCallbacks = $.Callbacks();
+	CommandHandler.$inject = ['$http', '$q', '$timeout', 'configuration'];
+	exports.CommandHandler = CommandHandler;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var CommandHandlingErrorType;
+	(function (CommandHandlingErrorType) {
+	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToConnectToFeedbackHub"] = 0] = "FailedToConnectToFeedbackHub";
+	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToQueue"] = 1] = "FailedToQueue";
+	    CommandHandlingErrorType[CommandHandlingErrorType["ProcessingTimeout"] = 2] = "ProcessingTimeout";
+	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToProcess"] = 3] = "FailedToProcess";
+	    CommandHandlingErrorType[CommandHandlingErrorType["FailedToSubscribeToReadModelChangeNotification"] = 4] = "FailedToSubscribeToReadModelChangeNotification";
+	    CommandHandlingErrorType[CommandHandlingErrorType["ReadModelChangeNotificationTimeout"] = 5] = "ReadModelChangeNotificationTimeout";
+	})(CommandHandlingErrorType = exports.CommandHandlingErrorType || (exports.CommandHandlingErrorType = {}));
+
+
+/***/ },
 /* 7 */
 /***/ function(module, exports) {
 
@@ -592,7 +845,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var DisplayAuctionCtrl_1 = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./DisplayAuctionCtrl\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var DisplayAuctionCtrl_1 = __webpack_require__(16);
 	var DisplayAuctionComponent = (function () {
 	    function DisplayAuctionComponent() {
 	        this.controller = DisplayAuctionCtrl_1.DisplayAuctionCtrl;
@@ -608,7 +861,76 @@
 
 
 /***/ },
-/* 16 */,
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var GuidGenerator_1 = __webpack_require__(3);
+	var DisplayAuctionCtrl = (function () {
+	    function DisplayAuctionCtrl(getAuctionDetailsQueryHandler, securityUiService, makeBidCommandUiHandler, genericModalService) {
+	        var _this = this;
+	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
+	        this.securityUiService = securityUiService;
+	        this.makeBidCommandUiHandler = makeBidCommandUiHandler;
+	        this.genericModalService = genericModalService;
+	        getAuctionDetailsQueryHandler.handle({
+	            id: this.auctionId
+	        })
+	            .then(function (auction) {
+	            _this.auctionLoadedCallback(auction);
+	        });
+	    }
+	    DisplayAuctionCtrl.prototype.auctionLoadedCallback = function (auction) {
+	        this.auction = auction;
+	        this.initMakeBidFields(auction);
+	        this.makeBidModel.price = auction.minimalPriceForNextBidder;
+	    };
+	    DisplayAuctionCtrl.prototype.initMakeBidFields = function (auction) {
+	        this.makeBidFields = [
+	            {
+	                key: 'price',
+	                type: 'input',
+	                templateOptions: {
+	                    label: '',
+	                    required: true,
+	                    type: 'number',
+	                    min: this.auction.minimalPriceForNextBidder
+	                }
+	            }
+	        ];
+	    };
+	    DisplayAuctionCtrl.prototype.makeBid = function () {
+	        var _this = this;
+	        this.securityUiService.ensureUserIsAuthenticated()
+	            .then(function () {
+	            if (_this.securityUiService.currentUserName === _this.auction.createdByUserName) {
+	                _this.genericModalService.showErrorNotification('You cannot bid at your own auction.');
+	                return;
+	            }
+	            var makeBidCommand = {
+	                auctionId: _this.auctionId,
+	                expectedAuctionVersion: _this.auction.version,
+	                price: _this.makeBidModel.price
+	            };
+	            _this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator_1.default.generateGuid(), true)
+	                .then(function () {
+	                return _this.getAuctionDetailsQueryHandler.handle({
+	                    id: _this.auctionId
+	                });
+	            })
+	                .then(function (auction) {
+	                _this.auctionLoadedCallback(auction);
+	                // TODO: check if is highest bidder
+	            });
+	        });
+	    };
+	    return DisplayAuctionCtrl;
+	}());
+	DisplayAuctionCtrl.$inject = ['getAuctionDetailsQueryHandler', 'securityUiService', 'makeBidCommandUiHandler', 'genericModalService'];
+	exports.DisplayAuctionCtrl = DisplayAuctionCtrl;
+
+
+/***/ },
 /* 17 */
 /***/ function(module, exports) {
 
@@ -664,7 +986,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandUiHandler_1 = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./CommandUiHandler\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var CommandUiHandler_1 = __webpack_require__(19);
 	var PopulateDatabaseWithTestDataCommandUiHandler = (function (_super) {
 	    __extends(PopulateDatabaseWithTestDataCommandUiHandler, _super);
 	    function PopulateDatabaseWithTestDataCommandUiHandler(populateDatabaseWithTestDataCommandHandler, busyIndicator, securityUiService, qService, genericModalService) {
@@ -740,7 +1062,81 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var AuctionsListCtrl_1 = __webpack_require__(20);
+	var CommandHandlingErrorType_1 = __webpack_require__(6);
+	var NotificationType_1 = __webpack_require__(20);
+	var CommandUiHandler = (function () {
+	    function CommandUiHandler(busyIndicator, securityUiService, qService, genericModalService) {
+	        this.busyIndicator = busyIndicator;
+	        this.securityUiService = securityUiService;
+	        this.qService = qService;
+	        this.genericModalService = genericModalService;
+	        this.$inject = ['busyIndicator', 'securityUiService', '$q', 'genericModalService'];
+	    }
+	    CommandUiHandler.prototype.handle = function (command, commandId, shouldWaitForEventsApplicationToReadModel) {
+	        var _this = this;
+	        return this.securityUiService.ensureUserIsAuthenticated()
+	            .then(function () {
+	            var promise = _this.getCommandHandler().handle(command, commandId, shouldWaitForEventsApplicationToReadModel);
+	            return _this.busyIndicator.attachToPromise(promise)
+	                .catch(function (commandHandlingErrorType) {
+	                var actionData = _this.getActionDataForCommandHandlingErrorType(commandHandlingErrorType);
+	                _this.genericModalService
+	                    .showNotification(actionData.notificationMessage, actionData.notificationType);
+	                return _this.qService.reject();
+	            });
+	        });
+	    };
+	    CommandUiHandler.prototype.getActionDataForCommandHandlingErrorType = function (commandHandlingErrorType) {
+	        switch (commandHandlingErrorType) {
+	            case CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub:
+	            case CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue:
+	            case CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToProcess:
+	                return {
+	                    notificationType: NotificationType_1.NotificationType.Error,
+	                    notificationMessage: 'Failed to process you request. Please try again.'
+	                };
+	            case CommandHandlingErrorType_1.CommandHandlingErrorType.ProcessingTimeout:
+	                return {
+	                    notificationType: NotificationType_1.NotificationType.Error,
+	                    notificationMessage: 'Your request timed out. Please check whether its effects are visible or try again.'
+	                };
+	            case CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToSubscribeToReadModelChangeNotification:
+	            case CommandHandlingErrorType_1.CommandHandlingErrorType.ReadModelChangeNotificationTimeout:
+	                return {
+	                    notificationType: NotificationType_1.NotificationType.Information,
+	                    notificationMessage: 'Your request was handled, but its effects may not be visible for a while.'
+	                };
+	            default:
+	                return {
+	                    notificationType: NotificationType_1.NotificationType.Error,
+	                    notificationMessage: 'An unknown error occurred.'
+	                };
+	        }
+	    };
+	    return CommandUiHandler;
+	}());
+	exports.CommandUiHandler = CommandUiHandler;
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var NotificationType;
+	(function (NotificationType) {
+	    NotificationType[NotificationType["Information"] = 0] = "Information";
+	    NotificationType[NotificationType["Success"] = 1] = "Success";
+	    NotificationType[NotificationType["Error"] = 2] = "Error";
+	})(NotificationType = exports.NotificationType || (exports.NotificationType = {}));
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var AuctionsListCtrl_1 = __webpack_require__(22);
 	var AuctionsListComponent = (function () {
 	    function AuctionsListComponent() {
 	        this.controller = AuctionsListCtrl_1.AuctionsListCtrl;
@@ -756,7 +1152,7 @@
 
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -810,7 +1206,7 @@
 
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -850,11 +1246,11 @@
 
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var SimpleNotificationDialogCtrl_1 = __webpack_require__(23);
+	var SimpleNotificationDialogCtrl_1 = __webpack_require__(25);
 	var SimpleNotificationDialogComponent = (function () {
 	    function SimpleNotificationDialogComponent() {
 	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
@@ -871,11 +1267,11 @@
 
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var NotificationType_1 = __webpack_require__(24);
+	var NotificationType_1 = __webpack_require__(20);
 	var SimpleNotificationDialogCtrl = (function () {
 	    function SimpleNotificationDialogCtrl() {
 	    }
@@ -906,24 +1302,11 @@
 
 
 /***/ },
-/* 24 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var NotificationType;
-	(function (NotificationType) {
-	    NotificationType[NotificationType["Information"] = 0] = "Information";
-	    NotificationType[NotificationType["Success"] = 1] = "Success";
-	    NotificationType[NotificationType["Error"] = 2] = "Error";
-	})(NotificationType = exports.NotificationType || (exports.NotificationType = {}));
-
-
-/***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var NotificationType_1 = __webpack_require__(24);
+	var NotificationType_1 = __webpack_require__(20);
 	var GenericModalService = (function () {
 	    function GenericModalService(modalService) {
 	        this.modalService = modalService;
@@ -955,7 +1338,6 @@
 
 
 /***/ },
-/* 26 */,
 /* 27 */
 /***/ function(module, exports) {
 

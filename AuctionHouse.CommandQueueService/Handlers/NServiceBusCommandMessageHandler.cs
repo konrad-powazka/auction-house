@@ -5,7 +5,7 @@ using Autofac;
 using NServiceBus;
 using ICommand = AuctionHouse.Core.Messaging.ICommand;
 
-namespace AuctionHouse.ServiceBus.Handlers
+namespace AuctionHouse.CommandQueueService.Handlers
 {
     public class NServiceBusCommandMessageHandler : IHandleMessages<ICommand>
     {

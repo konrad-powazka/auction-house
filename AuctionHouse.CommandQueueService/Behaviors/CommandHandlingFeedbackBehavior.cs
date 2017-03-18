@@ -7,7 +7,7 @@ using NServiceBus;
 using NServiceBus.Pipeline;
 using NServiceBus.Transport;
 
-namespace AuctionHouse.ServiceBus.Behaviors
+namespace AuctionHouse.CommandQueueService.Behaviors
 {
 	public class CommandHandlingFeedbackBehavior :
 		Behavior<ITransportReceiveContext>

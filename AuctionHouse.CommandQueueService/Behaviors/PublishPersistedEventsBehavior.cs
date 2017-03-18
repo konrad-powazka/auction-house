@@ -4,7 +4,7 @@ using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using NServiceBus.Pipeline;
 
-namespace AuctionHouse.ServiceBus.Behaviors
+namespace AuctionHouse.CommandQueueService.Behaviors
 {
     public class PublishPersistedEventsBehavior :
         Behavior<ITransportReceiveContext>

@@ -4,7 +4,7 @@ using AuctionHouse.Core.Messaging;
 using NServiceBus;
 using IEvent = AuctionHouse.Core.Messaging.IEvent;
 
-namespace AuctionHouse.ServiceBus.Handlers
+namespace AuctionHouse.CommandQueueService.Handlers
 {
 	public class NServiceBusEventMessageHandler<TEventHandler, TEvent> : IHandleMessages<TEvent>
 		where TEventHandler : IEventHandler<TEvent> where TEvent : IEvent

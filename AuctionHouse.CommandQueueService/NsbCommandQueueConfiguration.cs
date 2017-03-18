@@ -1,6 +1,6 @@
 ﻿using AuctionHouse.Core.Messaging;
 
-namespace AuctionHouse.ServiceBus
+namespace AuctionHouse.CommandQueueService
 {
 	public class NsbCommandQueueConfiguration : INServiceBusCommandQueueConfiguration
 	{
