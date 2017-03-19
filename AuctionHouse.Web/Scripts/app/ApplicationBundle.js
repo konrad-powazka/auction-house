@@ -1344,8 +1344,8 @@
 	"use strict";
 	var Configuration = (function () {
 	    function Configuration() {
-	        this.commandHandlingTimeoutMilliseconds = 5 * 1000;
-	        this.readModelChangeNotificationTimeoutMilliseconds = 5 * 1000;
+	        this.commandHandlingTimeoutMilliseconds = 10 * 1000;
+	        this.readModelChangeNotificationTimeoutMilliseconds = 10 * 1000;
 	    }
 	    return Configuration;
 	}());

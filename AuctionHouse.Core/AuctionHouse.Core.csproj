@@ -49,6 +49,7 @@
     <Compile Include="EventSourcing\PersistedEventEnvelope.cs" />
     <Compile Include="EventSourcing\TrackingEventsDatabase.cs" />
     <Compile Include="GuidGenerator.cs" />
+    <Compile Include="Messaging\DelayedCommandHandler.cs" />
     <Compile Include="Messaging\ICommandQueue.cs" />
     <Compile Include="Messaging\IEventPublisher.cs" />
     <Compile Include="Messaging\IEventHandler.cs" />

@@ -12,12 +12,12 @@ using JetBrains.Annotations;
 
 namespace AuctionHouse.Application.Test
 {
-	public class TestDataService : ICommandHandler<PopulateDatabaseWithTestDataCommand>
+	public class PopulateDatabaseWithTestDataCommandHandler : ICommandHandler<PopulateDatabaseWithTestDataCommand>
 	{
 		private readonly IRepository<Auction> _repository;
 		private readonly ITimeProvider _timeProvider;
 
-		public TestDataService(IRepository<Auction> repository, ITimeProvider timeProvider)
+		public PopulateDatabaseWithTestDataCommandHandler(IRepository<Auction> repository, ITimeProvider timeProvider)
 		{
 			_repository = repository;
 			_timeProvider = timeProvider;

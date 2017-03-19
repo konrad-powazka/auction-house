@@ -112,9 +112,9 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 		private void HandleEventEnvelope(PersistedEventEnvelope eventEnvelope)
 		{
 			// In real life this would be handled by a decorator
-			if (Configuration.EventsApplicationToReadModelDelayInMilliseconds.HasValue)
+			if (Configuration.EventsApplicationToReadModelDelayMilliseconds.HasValue)
 			{
-				Thread.Sleep(Configuration.EventsApplicationToReadModelDelayInMilliseconds.Value);
+				Thread.Sleep(Configuration.EventsApplicationToReadModelDelayMilliseconds.Value);
 			}
 
 			foreach (var readModelBuilder in _readModelBuilders)

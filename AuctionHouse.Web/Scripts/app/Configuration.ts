@@ -1,4 +1,4 @@
 ﻿export default class Configuration {
-	commandHandlingTimeoutMilliseconds = 5 * 1000;
-	readModelChangeNotificationTimeoutMilliseconds = 5 * 1000;
+	commandHandlingTimeoutMilliseconds = 10 * 1000;
+	readModelChangeNotificationTimeoutMilliseconds = 10 * 1000;
 }
