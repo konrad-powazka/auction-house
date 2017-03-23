@@ -11,7 +11,7 @@ class AuctionListItemReadModel
 	public title: string;
 	public description: string;
 	public endDate: string;
-	public buyNowPrice: number;
+	public buyNowPrice: number | null;
 	public minimalPriceForNextBidder: number;
 	public wasFinished: boolean;
 	public numberOfBids: number;

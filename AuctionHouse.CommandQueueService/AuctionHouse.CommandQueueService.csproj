@@ -61,7 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviors\PublishPersistedEventsBehavior.cs" />
-    <Compile Include="Behaviors\CommandHandlingFeedbackBehavior.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Handlers\NServiceBusEventMessageHandler.cs" />
     <Compile Include="Handlers\NServiceBusCommandMessageHandler.cs" />

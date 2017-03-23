@@ -75,7 +75,11 @@ export class DisplayAuctionCtrl implements ng.IController {
 					.then(auction => {
 						this.auctionLoadedCallback(auction);
 
-						// TODO: check if is highest bidder
+						if (auction.highestBidderUserName === this.securityUiService.currentUserName) {
+							this.genericModalService.showSuccessNotification('Congratulations, you are now the highest bidder!');
+						} else {
+							this.genericModalService.showInformationNotification('Unfortunately your offer was not the highest.');
+						}
 					});
 			});
 	}

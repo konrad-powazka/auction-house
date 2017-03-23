@@ -183,8 +183,8 @@
 	            id: GuidGenerator_1.default.generateGuid(),
 	            title: '',
 	            description: '',
-	            startingPrice: 5,
-	            buyNowPrice: 10,
+	            startingPrice: 0,
+	            buyNowPrice: null,
 	            endDate: undefined
 	        };
 	        this.fields = [
@@ -209,11 +209,44 @@
 	                }
 	            },
 	            {
+	                key: 'startingPrice',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'Starting price',
+	                    required: true,
+	                    type: 'number',
+	                    min: 0
+	                }
+	            },
+	            {
+	                key: 'buyNowPrice',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'Buy now price',
+	                    required: false,
+	                    type: 'number',
+	                    min: 0
+	                }
+	            },
+	            {
 	                key: 'endDate',
 	                type: 'dateTimePicker',
 	                templateOptions: {
 	                    label: 'End date and time',
 	                    required: true
+	                },
+	                validators: {
+	                    futureDate: {
+	                        expression: function ($viewValue, $modelValue) {
+	                            var rawValue = $modelValue || $viewValue;
+	                            var momentValue = moment(rawValue);
+	                            return momentValue.isSameOrAfter(moment().add(5, 'minutes'));
+	                        },
+	                        message: function ($viewValue, $modelValue) {
+	                            var rawValue = $modelValue || $viewValue;
+	                            return moment(rawValue).format('Do MMMM YYYY, h:mm:ss A') + " is not in the future";
+	                        }
+	                    }
 	                }
 	            }
 	        ];
@@ -227,9 +260,6 @@
 	            .handle(this.model, this.createAuctionCommandId, true)
 	            .then(function () {
 	            _this.stateService.go('displayAuction', { auctionId: _this.model.id });
-	        })
-	            .catch(function () {
-	            // TODO: To modal with proper error handling
 	        });
 	    };
 	    return CreateAuctionCtrl;
@@ -920,7 +950,12 @@
 	            })
 	                .then(function (auction) {
 	                _this.auctionLoadedCallback(auction);
-	                // TODO: check if is highest bidder
+	                if (auction.highestBidderUserName === _this.securityUiService.currentUserName) {
+	                    _this.genericModalService.showSuccessNotification('Congratulations, you are now the highest bidder!');
+	                }
+	                else {
+	                    _this.genericModalService.showInformationNotification('Unfortunately your offer was not the highest.');
+	                }
 	            });
 	        });
 	    };

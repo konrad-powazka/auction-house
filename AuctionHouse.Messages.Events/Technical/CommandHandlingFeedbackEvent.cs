@@ -6,5 +6,6 @@ namespace AuctionHouse.Messages.Events.Technical
     public abstract class CommandHandlingFeedbackEvent : IEvent
     {
         public Guid CommandId { get; set; }
+		public string CommandSenderUserName { get; set; }
     }
 }

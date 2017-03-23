@@ -9,6 +9,7 @@ using AuctionHouse.Messages.Queries;
 using AuctionHouse.ReadModel.Dtos;
 using Reinforced.Typings;
 using Reinforced.Typings.Ast;
+using Reinforced.Typings.Attributes;
 using Reinforced.Typings.Fluent;
 using Reinforced.Typings.Generators;
 
@@ -43,18 +44,18 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
                 c =>
                 {
                     c.PathToFile = fileName;
-                    c.WithCodeGenerator<ExportKeywordPrependingClassCodeGenerator>();
+	                c.WithCodeGenerator<ExportKeywordPrependingClassCodeGenerator>();
 
                     c.DontIncludeToNamespace().WithProperties(
                         p =>
                             !TypeOverrides.ContainsKey(p.PropertyType) && p.GetGetMethod() != null,
-                        pc => pc.CamelCase());
+                        pc => pc.CamelCase().WithCodeGenerator<OptionalPropertyCodeGenerator>());
 
                     foreach (var typeOverride in TypeOverrides)
                     {
-                        c.WithProperties(
-                            p => p.PropertyType == typeOverride.Key && p.GetGetMethod() != null,
-                            pc => pc.CamelCase().Type(typeOverride.Value));
+	                    c.WithProperties(
+		                    p => p.PropertyType == typeOverride.Key && p.GetGetMethod() != null,
+		                    pc => pc.CamelCase().Type(typeOverride.Value));
                     }
                 });
         }
@@ -109,12 +110,18 @@ namespace AuctionHouse.Web.TypeScriptCodeGen
 
         private class OptionalPropertyCodeGenerator : PropertyCodeGenerator
         {
-            public override RtField GenerateNode(MemberInfo element, RtField result, TypeResolver resolver)
-            {
-                var baseResult = base.GenerateNode(element, result, resolver);
-                baseResult.Type = new RtSimpleTypeName($"{baseResult.Type} | null");
-                return baseResult;
-            }
-        }
+			public override RtField GenerateNode(MemberInfo element, RtField result, TypeResolver resolver)
+			{
+				var baseResult = base.GenerateNode(element, result, resolver);
+
+				var propertyElement = element as PropertyInfo;
+				if (propertyElement != null && Nullable.GetUnderlyingType(propertyElement.PropertyType) != null)
+				{
+					baseResult.Type = new RtSimpleTypeName($"{baseResult.Type} | null");
+				}
+
+				return baseResult;
+			}
+		}
     }
 }

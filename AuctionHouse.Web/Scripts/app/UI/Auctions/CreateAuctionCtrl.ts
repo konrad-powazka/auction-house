@@ -21,8 +21,8 @@ export class CreateAuctionCtrl implements ng.IController {
             id: GuidGenerator.generateGuid(),
             title: '',
             description: '',
-            startingPrice: 5,
-            buyNowPrice: 10,
+            startingPrice: 0,
+            buyNowPrice: null,
             endDate: undefined as any
 		};
 
@@ -46,19 +46,52 @@ export class CreateAuctionCtrl implements ng.IController {
                     minlength: 10,
                     maxlength: 10000
                 }
-            },
+			},
+			{
+				key: 'startingPrice',
+				type: 'input',
+				templateOptions: {
+					label: 'Starting price',
+					required: true,
+					type: 'number',
+					min: 0
+				}
+			},
+			{
+				key: 'buyNowPrice',
+				type: 'input',
+				templateOptions: {
+					label: 'Buy now price',
+					required: false,
+					type: 'number',
+					min: 0
+				}
+			},
             {
                 key: 'endDate',
                 type: 'dateTimePicker',
                 templateOptions: {
                     label: 'End date and time',
                     required: true
-                }
+				},
+				validators: {
+		            futureDate: {
+			            expression($viewValue: any, $modelValue: any) {
+				            const rawValue = $modelValue || $viewValue;
+				            const momentValue = moment(rawValue);
+				            return momentValue.isSameOrAfter(moment().add(5, 'minutes'));
+			            },
+						message($viewValue: any, $modelValue: any) {
+							const rawValue = $modelValue || $viewValue;
+							return `${moment(rawValue).format('Do MMMM YYYY, h:mm:ss A')} is not in the future`;
+						}
+		            }
+	            }
             }
         ];
     }
 
-    submit(): void {
+    submit() {
         if (!this.form.$valid) {
             return;
         }
@@ -67,9 +100,6 @@ export class CreateAuctionCtrl implements ng.IController {
 		    .handle(this.model, this.createAuctionCommandId, true)
 		    .then(() => {
 			    this.stateService.go('displayAuction', { auctionId: this.model.id });
-		    })
-		    .catch(() => {
-			    // TODO: To modal with proper error handling
 		    });
     } 
 }

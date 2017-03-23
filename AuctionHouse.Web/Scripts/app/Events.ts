@@ -12,6 +12,7 @@ export
 class CommandHandlingFeedbackEvent
 {
 	public commandId: string;
+	public commandSenderUserName: string;
 }
 export
 class AuctionCreatedEvent
@@ -23,7 +24,7 @@ class AuctionCreatedEvent
 	public minimalPriceForNextBidder: number;
 	public createdByUserName: string;
 	public endDateTime: string;
-	public buyNowPrice: number;
+	public buyNowPrice: number | null;
 }
 export
 class AuctionFinishedEvent

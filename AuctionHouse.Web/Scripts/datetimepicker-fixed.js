@@ -98,6 +98,7 @@ angular.module('ui.bootstrap.datetimepicker', ["ui.bootstrap.dateparser", "ui.bo
                   "is-open=\"innerDateOpened\" " +
                   "datepicker-options=\"dateOptions\" " +
                   "uib-datepicker-popup=\"{{dateFormat}}\"" +
+				  "ng-model-options=\"{ allowInvalid: true }\" " +
                   "ng-model=\"ngModel\" " + [
                     ["dayFormat"],
                     ["monthFormat"],
@@ -141,34 +142,40 @@ angular.module('ui.bootstrap.datetimepicker', ["ui.bootstrap.dateparser", "ui.bo
             },
             controller: ['$scope', '$attrs',
               function ($scope, $attrs) {
-                  $scope.date_change = function () {
-                      // If we changed the date only, set the time (h,m) on it.
-                      // This is important in case the previous date was null.
-                      // This solves the issue when the user set a date and time, cleared the date, and chose another date,
-                      // and then, the time was cleared too - which is unexpected
-                      var time = $scope.time;
-                      if ($scope.ngModel && $scope.time) { // if ngModel is null, that's because the user cleared the date field
-                          $scope.ngModel.setHours(time.getHours(), time.getMinutes(), 0, 0);
-                      }
-                  };
-                  $scope.time_change = function () {
-                      if ($scope.ngModel && $scope.time) {
-                          $scope.ngModel.setHours($scope.time.getHours(), $scope.time.getMinutes(), 0, 0);
-                      }  // else the time is invalid, keep the current Date value in datepicker
-                  };
-                  $scope.open = function ($event) {
-                      $event.preventDefault();
-                      $event.stopPropagation();
-                      $scope.innerDateOpened = true;
-                  };
-                  $attrs.$observe('dateFormat', function (newDateFormat, oldValue) {
-                      $scope.dateFormat = newDateFormat;
-                  });
-                  $scope.dateOptions = angular.isDefined($scope.dateOptions) ? $scope.dateOptions : {};
-                  $scope.dateOptions.dateDisabled = $scope.dateDisabled;
+                  
               }
             ],
             link: function (scope, element, attrs, ctrl) {
+            	scope.date_change = function () {
+            		// If we changed the date only, set the time (h,m) on it.
+            		// This is important in case the previous date was null.
+            		// This solves the issue when the user set a date and time, cleared the date, and chose another date,
+            		// and then, the time was cleared too - which is unexpected
+            		var time = scope.time;
+            		if (scope.ngModel && scope.time) { // if ngModel is null, that's because the user cleared the date field
+            			scope.ngModel.setHours(time.getHours(), time.getMinutes(), 0, 0);
+            		}
+            		//ctrl.$validate();
+            	};
+            	scope.time_change = function () {
+            		if (scope.ngModel && scope.time) {
+            			scope.ngModel.setHours(scope.time.getHours(), scope.time.getMinutes(), 0, 0);
+            		}  // else the time is invalid, keep the current Date value in datepicker
+            		ctrl.$validate();
+            		ctrl.$options = ctrl.$options || {};
+		            ctrl.$options.allowInvalid = true;
+	            };
+            	scope.open = function ($event) {
+            		$event.preventDefault();
+            		$event.stopPropagation();
+            		scope.innerDateOpened = true;
+            	};
+            	attrs.$observe('dateFormat', function (newDateFormat, oldValue) {
+            		scope.dateFormat = newDateFormat;
+            	});
+            	scope.dateOptions = angular.isDefined(scope.dateOptions) ? scope.dateOptions : {};
+            	scope.dateOptions.dateDisabled = scope.dateDisabled;
+
                 var updateMinTime = function () {
                     if (!scope.ngModel) {
                         return;

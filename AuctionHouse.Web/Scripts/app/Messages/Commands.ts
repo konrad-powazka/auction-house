@@ -14,7 +14,7 @@ class CreateAuctionCommand
 	public title: string;
 	public description: string;
 	public startingPrice: number;
-	public buyNowPrice: number;
+	public buyNowPrice: number | null;
 	public endDate: string;
 }
 export

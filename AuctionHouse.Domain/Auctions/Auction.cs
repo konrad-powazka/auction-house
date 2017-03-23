@@ -68,7 +68,7 @@ namespace AuctionHouse.Domain.Auctions
 				Title = title,
 				Description = description,
 				StartingPrice = startingPrice,
-				MinimalPriceForNextBidder = startingPrice,
+				MinimalPriceForNextBidder = Math.Max(startingPrice, 0.01m),
 				CreatedByUserName = createdByUserName,
 				EndDateTime = endDate,
 				BuyNowPrice = buyNowPrice
@@ -95,7 +95,7 @@ namespace AuctionHouse.Domain.Auctions
 
 			if (bidderUserName == CreatedByUserName)
 			{
-				throw new ArgumentException(nameof(bidderUserName), "A user cannot make bids in his own auction.");
+				throw new ArgumentException("A user cannot make bids at his own auction.", nameof(bidderUserName));
 			}
 
 			var newBidIsHighest = !HighestBidPrice.HasValue || bidPrice > HighestBidPrice;

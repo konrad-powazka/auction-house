@@ -39,9 +39,6 @@ namespace AuctionHouse.CommandQueueService
 				.Delayed(delayed => { delayed.NumberOfRetries(0); })
 				.Immediate(immediate => { immediate.NumberOfRetries(0); });
 
-			endpointConfiguration.Pipeline.Register(typeof(CommandHandlingFeedbackBehavior),
-				"Publishes an event indicating the result of command handling");
-
 			endpointConfiguration.Pipeline.Register(typeof(PublishPersistedEventsBehavior),
 				"Publishes all persisted events.");
 
