@@ -11,30 +11,22 @@ namespace AuctionHouse.ReadModel.Builders
 	{
 		public async Task Apply(PersistedEventEnvelope eventEnvelope, IReadModelDbContext readModelDbContext)
 		{
-			//// TODO: To async
-			//TypeSwitch.Do(eventEnvelope.Event,
-			//	TypeSwitch.Case<UserMessageSentEvent>(userMessageSentEvent =>
-			//	{
-			//		var sentUserMessage = new UserMessageReadModel
-			//		{
-			//			Id = userMessageSentEvent.MessageId,
-			//			RecipientUserName = userMessageSentEvent.RecipientUserName,
-			//			SentDateTime = userMessageSentEvent.SentDateTime,
-			//			SenderUserName = userMessageSentEvent.SenderUserName,
-			//			Body = userMessageSentEvent.MessageBody,
-			//			Subject = userMessageSentEvent.MessageSubject
-			//		};
+			// TODO: To async
+			TypeSwitch.Do(eventEnvelope.Event,
+				TypeSwitch.Case<UserMessageSentEvent>(userMessageSentEvent =>
+				{
+					var sentUserMessage = new UserMessageReadModel
+					{
+						Id = userMessageSentEvent.MessageId,
+						RecipientUserName = userMessageSentEvent.RecipientUserName,
+						SentDateTime = userMessageSentEvent.SentDateTime,
+						SenderUserName = userMessageSentEvent.SenderUserName,
+						Body = userMessageSentEvent.MessageBody,
+						Subject = userMessageSentEvent.MessageSubject
+					};
 
-			//		var userInboxReadModel = readModelDbContext.TryGet<UserInboxReadModel>(sentUserMessage.RecipientUserName).Result;
-
-			//		if (userInboxReadModel == null)
-			//		{
-			//			userInboxReadModel = new UserInboxReadModel();
-			//			readModelDbContext.CreateOrOverwrite(userInboxReadModel, sentUserMessage.RecipientUserName);
-			//		}
-
-			//		userInboxReadModel.Messages.Add(sentUserMessage);
-			//	}));
+					readModelDbContext.CreateOrOverwrite(sentUserMessage, sentUserMessage.Id.ToString());
+				}));
 		}
 	}
 }

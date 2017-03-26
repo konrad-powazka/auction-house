@@ -7,6 +7,8 @@
 export
 class GetUserInboxQuery
 {
+	public pageSize: number;
+	public pageNumber: number;
 }
 export
 class GetAuctionDetailsQuery

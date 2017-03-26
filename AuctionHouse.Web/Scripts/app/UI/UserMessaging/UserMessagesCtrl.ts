@@ -1,10 +1,9 @@
-﻿import { AuctionsListReadModel } from '../../ReadModel';
+﻿import { UserInboxReadModel } from '../../ReadModel';
 import {IQueryHandler} from '../../QueryHandling/IQueryHandler';
-import { SearchAuctionsQuery } from '../../Messages/Queries';
+import { GetUserInboxQuery } from '../../Messages/Queries';
+import {SecurityUiService} from '../Shared/SecurityUiService';
 
 export class UserMessagesCtrl implements ng.IController {
-	queryString: string;
-
 	tastyInitCfg = {
 		'count': 10,
 		'page': 1
@@ -18,34 +17,33 @@ export class UserMessagesCtrl implements ng.IController {
 				style: { width: '30%' }
 			},
 			{
-				key: 'Description',
-				name: 'Description',
+				key: 'body',
+				name: 'Message',
 				style: { width: '70%' }
 			}
 		]
 	};
 
-	static $inject = ['searchAuctionsQueryHandler'];
+	static $inject = ['getUserInboxQueryHandler'];
 
-	constructor(private searchAuctionsQueryHandler: IQueryHandler<SearchAuctionsQuery, AuctionsListReadModel>) {
+	constructor(private getUserInboxQueryHandler: IQueryHandler<GetUserInboxQuery, UserInboxReadModel>, private securityUiService: SecurityUiService) {
 	}
 
 	getResource = (paramsString: string, paramsObject: any): ng.IPromise<any> => {
-		const query = {
-			queryString: this.queryString,
+		const query: GetUserInboxQuery = {
 			pageSize: paramsObject.count,
 			pageNumber: paramsObject.page
 		};
 
-		return this.searchAuctionsQueryHandler.handle(query)
-			.then(auctionsList => {
+		return this.getUserInboxQueryHandler.handle(query)
+			.then(userInbox => {
 				return {
-					rows: auctionsList.pageItems,
+					rows: userInbox.pageItems,
 					pagination: {
-						count: auctionsList.pageSize,
-						page: auctionsList.pageNumber,
-						pages: auctionsList.totalPagesCount,
-						size: auctionsList.totalItemsCount
+						count: userInbox.pageSize,
+						page: userInbox.pageNumber,
+						pages: userInbox.totalPagesCount,
+						size: userInbox.totalItemsCount
 					},
 					header: this.staticResource.header
 				};

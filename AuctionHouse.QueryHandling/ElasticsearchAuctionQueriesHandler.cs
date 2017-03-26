@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
+using AuctionHouse.Core;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Messages.Queries.Auctions;
 using AuctionHouse.ReadModel.Dtos.Auctions;
 using AuctionHouse.ReadModel.Dtos.Auctions.Details;
+using AuctionHouse.ReadModel.Dtos.Auctions.List;
 using Nest;
 
 namespace AuctionHouse.QueryHandling
@@ -28,32 +30,16 @@ namespace AuctionHouse.QueryHandling
 		public async Task<AuctionsListReadModel> Handle(
 			IQueryEnvelope<SearchAuctionsQuery, AuctionsListReadModel> queryEnvelope)
 		{
-			var query = queryEnvelope.Query;
-			var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
-			var firstAuctionIndex = (pageNumber - 1)*query.PageSize;
-
-			var elasticResult =
+			return
 				await
-					_elasticClient.SearchAsync<AuctionDetailsReadModel>(
-						s =>
-							s.Query(
-								q =>
-									q.MultiMatch(
-										mq =>
-											mq.Fields(f => f.Fields(a => a.Title, a => a.Description))
-												.Query(query.QueryString)
-												.Fuzziness(Fuzziness.Auto)))
-								.From(firstAuctionIndex)
-								.Take(query.PageSize));
-
-			return new AuctionsListReadModel
-			{
-				PageNumber = pageNumber,
-				PageItems = elasticResult.Documents,
-				TotalItemsCount = elasticResult.Total,
-				TotalPagesCount = (elasticResult.Total + query.PageSize - 1)/query.PageSize,
-				PageSize = query.PageSize
-			};
+					_elasticClient
+						.RunPagedQuery<SearchAuctionsQuery, AuctionsListReadModel, AuctionListItemReadModel, AuctionDetailsReadModel>(
+							queryEnvelope.Query, q =>
+								q.MultiMatch(
+									mq =>
+										mq.Fields(f => f.Fields(a => a.Title, a => a.Description))
+											.Query(queryEnvelope.Query.QueryString)
+											.Fuzziness(Fuzziness.Auto)));
 		}
 	}
 }

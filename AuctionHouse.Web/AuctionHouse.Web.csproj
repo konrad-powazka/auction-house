@@ -386,9 +386,9 @@
     <Content Include="Views\Auctions\Display.cshtml" />
     <Content Include="Views\Auctions\List.cshtml" />
     <Content Include="Views\Shared\SimpleNotificationDialog.cshtml" />
-    <Content Include="Views\UserMessaging\MessagesList.cshtml" />
     <Content Include="Views\UserMessaging\ComposeMessageDialog.cshtml" />
     <Content Include="Views\Shared\UserReference.cshtml" />
+    <Content Include="Views\UserMessaging\UserMessages.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,11 +1,8 @@
-﻿import { AuctionsListCtrl } from './AuctionsListCtrl';
-import { INamedComponentOptions } from '../../Infrastructure/INamedComponentOptions';
+﻿import { INamedComponentOptions } from '../../Infrastructure/INamedComponentOptions';
+import {UserMessagesCtrl} from './UserMessagesCtrl';
 
-export class AuctionsListComponent implements INamedComponentOptions {
-	controller = AuctionsListCtrl;
-    templateUrl = 'Template/Auctions/List';
-    registerAs = 'auctionsList';
-	bindings = {
-		queryString: '<'
-    }
+export class UserMessagesComponent implements INamedComponentOptions {
+	controller = UserMessagesCtrl;
+	templateUrl = 'Template/UserMessaging/UserMessages';
+	registerAs = 'userMessages';
 }

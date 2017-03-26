@@ -67,6 +67,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AuctionHouse.Core.Dependent\AuctionHouse.Core.Dependent.csproj">
+      <Project>{51A79491-5EF4-454B-8A12-807BF87B54C1}</Project>
+      <Name>AuctionHouse.Core.Dependent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
       <Name>AuctionHouse.Core</Name>

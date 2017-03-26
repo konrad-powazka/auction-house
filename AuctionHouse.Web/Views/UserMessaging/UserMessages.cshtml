@@ -2,13 +2,9 @@
 	<table class="table table-striped table-condensed" style="table-layout: fixed; width: 100%;">
 		<thead tasty-thead></thead>
 		<tbody>
-		<tr ng-repeat="auction in rows">
-			<td class="text-cell">
-				<a ui-sref="displayAuction({ auctionId: auction.id })">
-					{{ auction.title }}
-				</a> 
-			</td>
-			<td class="text-cell">{{ auction.description }}</td>
+		<tr ng-repeat="message in rows">
+			<td class="text-cell">{{ message.subject }}</td>
+			<td class="text-cell">{{ message.body }}</td>
 		</tr>
 		</tbody>
 	</table>

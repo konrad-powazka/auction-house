@@ -29,6 +29,11 @@
 				resolve: {
 					auctionId: ['$stateParams', ($stateParams: angular.ui.IStateParamsService) => $stateParams['auctionId']]
 				}
+			},
+			{
+				name: 'userMessages',
+				url: '/userMessages',
+				component: 'userMessages'
 			}
 		];
 

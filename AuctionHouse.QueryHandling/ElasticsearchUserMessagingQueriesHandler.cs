@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AuctionHouse.Core;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.Core.Paging;
 using AuctionHouse.Messages.Queries.Auctions;
 using AuctionHouse.Messages.Queries.UserMessaging;
+using AuctionHouse.ReadModel.Dtos.Auctions;
 using AuctionHouse.ReadModel.Dtos.Auctions.Details;
 using AuctionHouse.ReadModel.Dtos.Auctions.List;
 using AuctionHouse.ReadModel.Dtos.UserMessaging;
@@ -21,11 +22,14 @@ namespace AuctionHouse.QueryHandling
 			_elasticClient = elasticClient;
 		}
 
-
-		Task<UserInboxReadModel> IQueryHandler<GetUserInboxQuery, UserInboxReadModel>.Handle(
-			IQueryEnvelope<GetUserInboxQuery, UserInboxReadModel> queryEnvelope)
+		public async Task<UserInboxReadModel> Handle(IQueryEnvelope<GetUserInboxQuery, UserInboxReadModel> queryEnvelope)
 		{
-			throw new NotImplementedException();
-		}	
+			return
+				await
+					_elasticClient
+						.RunPagedQuery<GetUserInboxQuery, UserInboxReadModel, UserMessageReadModel, UserMessageReadModel>(
+							queryEnvelope.Query, q => q.Term(
+								mqd => mqd.Field(m => m.RecipientUserName).Value(queryEnvelope.SenderUserName)));
+		}
 	}
 }

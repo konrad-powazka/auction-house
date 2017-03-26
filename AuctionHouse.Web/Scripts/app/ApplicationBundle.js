@@ -64,6 +64,7 @@
 	var FormatDateTimeFilterFactory_1 = __webpack_require__(28);
 	var ComposeUserMessageDialogComponent_1 = __webpack_require__(29);
 	var UserReferenceComponent_1 = __webpack_require__(31);
+	var UserMessagesComponent_1 = __webpack_require__(33);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -150,7 +151,8 @@
 	    new SignInDialogComponent_1.SignInDialogComponent(),
 	    new SimpleNotificationDialogComponent_1.SimpleNotificationDialogComponent(),
 	    new UserReferenceComponent_1.UserReferenceComponent(),
-	    new ComposeUserMessageDialogComponent_1.ComposeUserMessageDialogComponent()
+	    new ComposeUserMessageDialogComponent_1.ComposeUserMessageDialogComponent(),
+	    new UserMessagesComponent_1.UserMessagesComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -825,6 +827,11 @@
 	                resolve: {
 	                    auctionId: ['$stateParams', function ($stateParams) { return $stateParams['auctionId']; }]
 	                }
+	            },
+	            {
+	                name: 'userMessages',
+	                url: '/userMessages',
+	                component: 'userMessages'
 	            }
 	        ];
 	        for (var _i = 0, states_1 = states; _i < states_1.length; _i++) {
@@ -1595,6 +1602,77 @@
 	}());
 	UserReferenceCtrl.$inject = ['$uibModal', 'securityUiService'];
 	exports.UserReferenceCtrl = UserReferenceCtrl;
+
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserMessagesCtrl_1 = __webpack_require__(34);
+	var UserMessagesComponent = (function () {
+	    function UserMessagesComponent() {
+	        this.controller = UserMessagesCtrl_1.UserMessagesCtrl;
+	        this.templateUrl = 'Template/UserMessaging/UserMessages';
+	        this.registerAs = 'userMessages';
+	    }
+	    return UserMessagesComponent;
+	}());
+	exports.UserMessagesComponent = UserMessagesComponent;
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var UserMessagesCtrl = (function () {
+	    function UserMessagesCtrl(getUserInboxQueryHandler, securityUiService) {
+	        var _this = this;
+	        this.getUserInboxQueryHandler = getUserInboxQueryHandler;
+	        this.securityUiService = securityUiService;
+	        this.tastyInitCfg = {
+	            'count': 10,
+	            'page': 1
+	        };
+	        this.staticResource = {
+	            header: [
+	                {
+	                    key: 'subject',
+	                    name: 'Subject',
+	                    style: { width: '30%' }
+	                },
+	                {
+	                    key: 'body',
+	                    name: 'Message',
+	                    style: { width: '70%' }
+	                }
+	            ]
+	        };
+	        this.getResource = function (paramsString, paramsObject) {
+	            var query = {
+	                pageSize: paramsObject.count,
+	                pageNumber: paramsObject.page
+	            };
+	            return _this.getUserInboxQueryHandler.handle(query)
+	                .then(function (userInbox) {
+	                return {
+	                    rows: userInbox.pageItems,
+	                    pagination: {
+	                        count: userInbox.pageSize,
+	                        page: userInbox.pageNumber,
+	                        pages: userInbox.totalPagesCount,
+	                        size: userInbox.totalItemsCount
+	                    },
+	                    header: _this.staticResource.header
+	                };
+	            });
+	        };
+	    }
+	    return UserMessagesCtrl;
+	}());
+	UserMessagesCtrl.$inject = ['getUserInboxQueryHandler'];
+	exports.UserMessagesCtrl = UserMessagesCtrl;
 
 
 /***/ }
