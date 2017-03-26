@@ -61,6 +61,7 @@
 	var SimpleNotificationDialogComponent_1 = __webpack_require__(24);
 	var GenericModalService_1 = __webpack_require__(26);
 	var Configuration_1 = __webpack_require__(27);
+	var FormatDateTimeFilterFactory_1 = __webpack_require__(28);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -95,6 +96,7 @@
 	        module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor_1.default);
 	        module.service('genericModalService', GenericModalService_1.default);
 	        module.service('configuration', Configuration_1.default);
+	        module.filter('formatDateTime', FormatDateTimeFilterFactory_1.default.createFilterFunction);
 	    };
 	    Application.registerConstants = function (module) {
 	        module.constant('busyIndicator', new BusyIndicator_1.default());
@@ -175,6 +177,7 @@
 	var GuidGenerator_1 = __webpack_require__(3);
 	var CreateAuctionCtrl = (function () {
 	    function CreateAuctionCtrl(createAuctionCommandUiHandler, getAuctionDetailsQueryHandler, stateService) {
+	        var _this = this;
 	        this.createAuctionCommandUiHandler = createAuctionCommandUiHandler;
 	        this.getAuctionDetailsQueryHandler = getAuctionDetailsQueryHandler;
 	        this.stateService = stateService;
@@ -215,17 +218,29 @@
 	                    label: 'Starting price',
 	                    required: true,
 	                    type: 'number',
-	                    min: 0
+	                    min: 0,
+	                    onChange: function () {
+	                        _this.form['buyNowPrice'].$validate();
+	                    }
 	                }
 	            },
 	            {
 	                key: 'buyNowPrice',
+	                name: 'buyNowPrice',
 	                type: 'input',
 	                templateOptions: {
 	                    label: 'Buy now price',
 	                    required: false,
 	                    type: 'number',
-	                    min: 0
+	                },
+	                validators: {
+	                    greaterOrEqualToStartingPrice: {
+	                        expression: function ($viewValue, $modelValue) {
+	                            var value = $modelValue || $viewValue;
+	                            return !_(value).isNumber() || !_(_this.model.startingPrice).isNumber() || value >= _this.model.startingPrice;
+	                        },
+	                        message: function () { return 'Buy now price cannot be smaller than starting price'; }
+	                    }
 	                }
 	            },
 	            {
@@ -244,7 +259,7 @@
 	                        },
 	                        message: function ($viewValue, $modelValue) {
 	                            var rawValue = $modelValue || $viewValue;
-	                            return moment(rawValue).format('Do MMMM YYYY, h:mm:ss A') + " is not in the future";
+	                            return 'Please select a date at least 5 minutes in the future';
 	                        }
 	                    }
 	                }
@@ -549,6 +564,8 @@
 	        return this.httpService.post('api/Authentication/SignIn', loginCommand)
 	            .then(function () {
 	            _this.currentUserName = userName;
+	            // User name might have changed, so a new SignalR connection must be established
+	            $.connection.hub.stop(false, true);
 	        });
 	    };
 	    SecurityService.prototype.signOut = function () {
@@ -913,7 +930,7 @@
 	    DisplayAuctionCtrl.prototype.auctionLoadedCallback = function (auction) {
 	        this.auction = auction;
 	        this.initMakeBidFields(auction);
-	        this.makeBidModel.price = auction.minimalPriceForNextBidder;
+	        this.makeBidModel = { price: auction.minimalPriceForNextBidder };
 	    };
 	    DisplayAuctionCtrl.prototype.initMakeBidFields = function (auction) {
 	        this.makeBidFields = [
@@ -958,6 +975,9 @@
 	                }
 	            });
 	        });
+	    };
+	    DisplayAuctionCtrl.prototype.checkIfAuctionIsInProgress = function () {
+	        return this.auction ? moment(this.auction.endDate).isAfter(new Date()) : null;
 	    };
 	    return DisplayAuctionCtrl;
 	}());
@@ -1386,6 +1406,26 @@
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = Configuration;
+
+
+/***/ },
+/* 28 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var FormatDateTimeFilterFactory = (function () {
+	    function FormatDateTimeFilterFactory() {
+	    }
+	    FormatDateTimeFilterFactory.createFilterFunction = function () {
+	        return function (value) {
+	            return moment(value).format('Do MMMM YYYY, h:mm:ss A');
+	        };
+	    };
+	    return FormatDateTimeFilterFactory;
+	}());
+	FormatDateTimeFilterFactory.$inject = [''];
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = FormatDateTimeFilterFactory;
 
 
 /***/ }

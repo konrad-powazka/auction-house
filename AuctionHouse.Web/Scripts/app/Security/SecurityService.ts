@@ -21,6 +21,8 @@
 		return this.httpService.post('api/Authentication/SignIn', loginCommand)
 			.then(() => {
 				this.currentUserName = userName;
+				// User name might have changed, so a new SignalR connection must be established
+				$.connection.hub.stop(false, true);
 			});
 	}
 

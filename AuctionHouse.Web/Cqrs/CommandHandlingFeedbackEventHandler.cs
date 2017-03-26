@@ -26,7 +26,8 @@ namespace AuctionHouse.Web.Cqrs
 
 		public async Task Handle(CommandHandlingSucceededEvent message, IMessageHandlerContext context)
 		{
-			await _commandHandlingFeedbackHubContext.Clients.All.HandleCommandSuccess(message);
+			await
+				_commandHandlingFeedbackHubContext.Clients.User(message.CommandSenderUserName).HandleCommandSuccess(message);
 		}
 	}
 }

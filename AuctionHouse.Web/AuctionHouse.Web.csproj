@@ -484,6 +484,7 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\ICommandUiHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\CommandUiHandler.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\FormatDateTimeFilterFactory.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SimpleNotificationDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\ApplicationCtrl.ts" />

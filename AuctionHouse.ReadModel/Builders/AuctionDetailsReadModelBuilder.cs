@@ -52,6 +52,7 @@ namespace AuctionHouse.ReadModel.Builders
 					var auctionDetails = readModelDbContext.Get<AuctionDetailsReadModel>(bidMadeEvent.AuctionId).Result;
 					auctionDetails.HighestBidderUserName = bidMadeEvent.HighestBidderUserName;
 					auctionDetails.MinimalPriceForNextBidder = bidMadeEvent.MinimalPriceForNextBidder;
+					auctionDetails.NumberOfBids++;
 					readModelDbContext.CreateOrOverwrite(auctionDetails, bidMadeEvent.AuctionId);
 				}),
 				TypeSwitch.Case<AuctionFinishedEvent>(auctionFinishedEvent =>

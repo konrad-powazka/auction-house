@@ -15,6 +15,7 @@ import BusyIndicatingHttpInterceptor from './UI/Shared/BusyIndicatingHttpInterce
 import {SimpleNotificationDialogComponent} from './UI/Shared/SimpleNotificationDialogComponent';
 import GenericModalService from './UI/Shared/GenericModalService';
 import Configuration from './Configuration';
+import FormatDateTimeFilterFactory from './UI/Shared/FormatDateTimeFilterFactory';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
@@ -62,6 +63,7 @@ export class Application {
 		module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor);
 		module.service('genericModalService', GenericModalService);
 		module.service('configuration', Configuration);
+		module.filter('formatDateTime', FormatDateTimeFilterFactory.createFilterFunction);
 	}
 
 	private static registerConstants(module: ng.IModule): void {

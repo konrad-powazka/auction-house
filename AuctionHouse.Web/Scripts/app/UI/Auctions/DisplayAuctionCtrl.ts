@@ -34,7 +34,7 @@ export class DisplayAuctionCtrl implements ng.IController {
 	private auctionLoadedCallback(auction: AuctionDetailsReadModel) {
 		this.auction = auction;
 		this.initMakeBidFields(auction);
-		this.makeBidModel.price = auction.minimalPriceForNextBidder;
+		this.makeBidModel = { price: auction.minimalPriceForNextBidder };
 	}
 
 	private initMakeBidFields(auction: AuctionDetailsReadModel) {
@@ -82,5 +82,9 @@ export class DisplayAuctionCtrl implements ng.IController {
 						}
 					});
 			});
+	}
+
+	checkIfAuctionIsInProgress() {
+		return this.auction ? moment(this.auction.endDate).isAfter(new Date()) : null;
 	}
 }

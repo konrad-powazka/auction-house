@@ -54,17 +54,30 @@ export class CreateAuctionCtrl implements ng.IController {
 					label: 'Starting price',
 					required: true,
 					type: 'number',
-					min: 0
+					min: 0,
+					onChange: () => {
+						(this.form['buyNowPrice'] as ng.INgModelController).$validate();
+					}
 				}
 			},
 			{
 				key: 'buyNowPrice',
+				name: 'buyNowPrice',
 				type: 'input',
 				templateOptions: {
 					label: 'Buy now price',
 					required: false,
 					type: 'number',
-					min: 0
+					
+				},
+				validators: {
+					greaterOrEqualToStartingPrice: {
+						expression: ($viewValue: any, $modelValue: any) => {
+							const value = $modelValue || $viewValue;
+							return !_(value).isNumber() || !_(this.model.startingPrice).isNumber() || value >= this.model.startingPrice;
+						},
+						message: () => 'Buy now price cannot be smaller than starting price'
+					}
 				}
 			},
             {
@@ -83,7 +96,7 @@ export class CreateAuctionCtrl implements ng.IController {
 			            },
 						message($viewValue: any, $modelValue: any) {
 							const rawValue = $modelValue || $viewValue;
-							return `${moment(rawValue).format('Do MMMM YYYY, h:mm:ss A')} is not in the future`;
+							return 'Please select a date at least 5 minutes in the future';
 						}
 		            }
 	            }
