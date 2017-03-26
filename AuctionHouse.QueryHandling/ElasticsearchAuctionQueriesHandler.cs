@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Messages.Queries.Auctions;
+using AuctionHouse.ReadModel.Dtos.Auctions;
 using AuctionHouse.ReadModel.Dtos.Auctions.Details;
-using AuctionHouse.ReadModel.Dtos.Auctions.List;
 using Nest;
 
 namespace AuctionHouse.QueryHandling
@@ -18,14 +18,17 @@ namespace AuctionHouse.QueryHandling
 			_elasticClient = elasticClient;
 		}
 
-		public async Task<AuctionDetailsReadModel> Handle(GetAuctionDetailsQuery query)
+		public async Task<AuctionDetailsReadModel> Handle(
+			IQueryEnvelope<GetAuctionDetailsQuery, AuctionDetailsReadModel> queryEnvelope)
 		{
-			var response = await _elasticClient.GetAsync<AuctionDetailsReadModel>(query.Id);
+			var response = await _elasticClient.GetAsync<AuctionDetailsReadModel>(queryEnvelope.Query.Id);
 			return response.Source;
 		}
 
-		public async Task<AuctionsListReadModel> Handle(SearchAuctionsQuery query)
+		public async Task<AuctionsListReadModel> Handle(
+			IQueryEnvelope<SearchAuctionsQuery, AuctionsListReadModel> queryEnvelope)
 		{
+			var query = queryEnvelope.Query;
 			var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
 			var firstAuctionIndex = (pageNumber - 1)*query.PageSize;
 

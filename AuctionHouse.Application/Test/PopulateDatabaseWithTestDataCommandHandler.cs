@@ -23,7 +23,7 @@ namespace AuctionHouse.Application.Test
 			_timeProvider = timeProvider;
 		}
 
-		public async Task Handle(CommandEnvelope<PopulateDatabaseWithTestDataCommand> commandEnvelope)
+		public async Task Handle(ICommandEnvelope<PopulateDatabaseWithTestDataCommand> commandEnvelope)
 		{
 			const int numberOfAuctionsToGenerate = 502;
 

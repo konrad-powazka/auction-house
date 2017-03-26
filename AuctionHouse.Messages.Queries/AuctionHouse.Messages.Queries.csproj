@@ -45,6 +45,7 @@
     <Compile Include="QueriesAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryTypeInfo.cs" />
+    <Compile Include="UserMessaging\GetUserInboxQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">

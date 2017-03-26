@@ -51,7 +51,7 @@ namespace AuctionHouse.Persistence
 		public async Task<TAggregateRoot> Get(Guid aggregateRootId)
 		{
 			var streamName = GetAggregateRootStreamName(aggregateRootId);
-			var eventsToReplay = (await _eventsDatabase.ReadStream(streamName)).Select(e => e.Message).ToList();
+			var eventsToReplay = (await _eventsDatabase.ReadStream(streamName)).Select(e => e.Event).ToList();
 			var aggregateRoot = CreateEmptyAggregateRootInstance();
 			aggregateRoot.ReplayEvents(eventsToReplay);
 
@@ -74,7 +74,7 @@ namespace AuctionHouse.Persistence
 
 		protected abstract TAggregateRoot CreateEmptyAggregateRootInstance();
 
-		private IEnumerable<MessageEnvelope<IEvent>> WrapAggregateRootChangesIntoEnvelopes(
+		private IEnumerable<IEventEnvelope<IEvent>> WrapAggregateRootChangesIntoEnvelopes(
 			TAggregateRoot aggregateRoot, string changeId)
 		{
 			return aggregateRoot.Changes.Select((e, i) =>
@@ -82,7 +82,7 @@ namespace AuctionHouse.Persistence
 				var streamName = GetAggregateRootStreamName(aggregateRoot.Id);
 				var eventGuidName = $"{streamName}-{changeId}-{i}";
 				var deterministicEventId = GuidGenerator.GenerateDeterministicGuid(NamespaceGuid, eventGuidName);
-				return new MessageEnvelope<IEvent>(e, deterministicEventId);
+				return new EventEnvelope<IEvent>(e, deterministicEventId);
 			});
 		}
 

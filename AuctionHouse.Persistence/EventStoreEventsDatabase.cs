@@ -21,7 +21,7 @@ namespace AuctionHouse.Persistence
 			_eventStoreConnection = eventStoreConnection;
 		}
 
-		public async Task AppendToStream(string streamName, IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend,
+		public async Task AppendToStream(string streamName, IEnumerable<IEventEnvelope<IEvent>> eventEnvelopesToAppend,
 			ExpectedStreamVersion expectedStreamVersion, int? specificExpectedStreamVersion)
 		{
 			if (eventEnvelopesToAppend == null)
@@ -32,8 +32,8 @@ namespace AuctionHouse.Persistence
 			var eventDataList =
 				eventEnvelopesToAppend.Select(e =>
 				{
-					var serializedEvent = SerializeEvent(e.Message);
-					return new EventData(e.MessageId, e.Message.GetType().Name, true, serializedEvent, null);
+					var serializedEvent = SerializeEvent(e.Event);
+					return new EventData(e.EventId, e.Event.GetType().Name, true, serializedEvent, null);
 				});
 
 			var eventStoreExpectedStreamVersion = GetEventStoreExpectedStreamVersion(expectedStreamVersion,

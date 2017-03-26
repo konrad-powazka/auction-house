@@ -43,6 +43,7 @@
     <Compile Include="Auctions\Auction.cs" />
     <Compile Include="Money\MoneyValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserMessaging\SentUserMessage.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

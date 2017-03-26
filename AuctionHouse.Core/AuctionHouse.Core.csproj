@@ -49,11 +49,17 @@
     <Compile Include="EventSourcing\PersistedEventEnvelope.cs" />
     <Compile Include="EventSourcing\TrackingEventsDatabase.cs" />
     <Compile Include="GuidGenerator.cs" />
+    <Compile Include="Messaging\EventEnvelope.cs" />
+    <Compile Include="Messaging\ICommandEnvelope.cs" />
+    <Compile Include="Messaging\IEventEnvelope.cs" />
+    <Compile Include="Messaging\IQueryEnvelope.cs" />
+    <Compile Include="Messaging\QueryEnvelope.cs" />
     <Compile Include="Messaging\DelayedCommandHandler.cs" />
     <Compile Include="Messaging\ICommandQueue.cs" />
     <Compile Include="Messaging\IEventPublisher.cs" />
     <Compile Include="Messaging\IEventHandler.cs" />
-    <Compile Include="Messaging\IMessageEnvelope.cs" />
+    <Compile Include="Paging\IPagedQuery.cs" />
+    <Compile Include="Paging\PagedResult.cs" />
     <Compile Include="ReadModel\IReadModelBuilder.cs" />
     <Compile Include="ReadModel\IReadModelDbContext.cs" />
     <Compile Include="ReadModel\ReadModelDbContextExtensions.cs" />
@@ -66,7 +72,6 @@
     <Compile Include="Messaging\IQuery.cs" />
     <Compile Include="Messaging\IQueryHandler.cs" />
     <Compile Include="Emit\TypeBuilderExtensions.cs" />
-    <Compile Include="Messaging\MessageEnvelope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\TypeExtensions.cs" />
     <Compile Include="Text\StringExtensions.cs" />

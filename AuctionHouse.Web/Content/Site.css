@@ -120,3 +120,7 @@ textarea {
 	vertical-align: bottom;
 	margin-right: 10px;
 }
+
+.side-note {
+	font-style: italic;
+}

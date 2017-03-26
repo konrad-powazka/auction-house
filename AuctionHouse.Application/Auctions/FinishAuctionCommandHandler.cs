@@ -15,11 +15,11 @@ namespace AuctionHouse.Application.Auctions
 			_auctionsRepository = auctionsRepository;
 		}
 
-		public async Task Handle(CommandEnvelope<FinishAuctionCommand> commandEnvelope)
+		public async Task Handle(ICommandEnvelope<FinishAuctionCommand> commandEnvelope)
 		{
-			var auction = await _auctionsRepository.Get(commandEnvelope.Message.Id);
+			var auction = await _auctionsRepository.Get(commandEnvelope.Command.Id);
 			auction.Finish();
-			await _auctionsRepository.Save(auction, commandEnvelope.MessageId.ToString(), ExpectedAggregateRootVersion.Any);
+			await _auctionsRepository.Save(auction, commandEnvelope.CommandId.ToString(), ExpectedAggregateRootVersion.Any);
 		}
 	}
 }

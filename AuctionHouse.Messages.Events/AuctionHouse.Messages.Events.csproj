@@ -49,6 +49,7 @@
     <Compile Include="Technical\CommandHandlingSucceededEvent.cs" />
     <Compile Include="Technical\CommandHandlingFailedEvent.cs" />
     <Compile Include="Technical\CommandHandlingFeedbackEvent.cs" />
+    <Compile Include="UserMessaging\UserMessageSentEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">

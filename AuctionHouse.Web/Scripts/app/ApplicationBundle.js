@@ -62,6 +62,8 @@
 	var GenericModalService_1 = __webpack_require__(26);
 	var Configuration_1 = __webpack_require__(27);
 	var FormatDateTimeFilterFactory_1 = __webpack_require__(28);
+	var ComposeUserMessageDialogComponent_1 = __webpack_require__(29);
+	var UserReferenceComponent_1 = __webpack_require__(31);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -146,7 +148,9 @@
 	    new CreateAuctionComponent_1.CreateAuctionComponent(),
 	    new DisplayAuctionComponent_1.DisplayAuctionComponent(),
 	    new SignInDialogComponent_1.SignInDialogComponent(),
-	    new SimpleNotificationDialogComponent_1.SimpleNotificationDialogComponent()
+	    new SimpleNotificationDialogComponent_1.SimpleNotificationDialogComponent(),
+	    new UserReferenceComponent_1.UserReferenceComponent(),
+	    new ComposeUserMessageDialogComponent_1.ComposeUserMessageDialogComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -231,7 +235,7 @@
 	                templateOptions: {
 	                    label: 'Buy now price',
 	                    required: false,
-	                    type: 'number',
+	                    type: 'number'
 	                },
 	                validators: {
 	                    greaterOrEqualToStartingPrice: {
@@ -327,6 +331,17 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var CommandHandler_1 = __webpack_require__(5);
+	var SendUserMessageCommandHandler = (function (_super) {
+	    __extends(SendUserMessageCommandHandler, _super);
+	    function SendUserMessageCommandHandler() {
+	        return _super.apply(this, arguments) || this;
+	    }
+	    SendUserMessageCommandHandler.prototype.getCommandName = function () {
+	        return 'SendUserMessageCommand';
+	    };
+	    return SendUserMessageCommandHandler;
+	}(CommandHandler_1.CommandHandler));
+	exports.SendUserMessageCommandHandler = SendUserMessageCommandHandler;
 	var PopulateDatabaseWithTestDataCommandHandler = (function (_super) {
 	    __extends(PopulateDatabaseWithTestDataCommandHandler, _super);
 	    function PopulateDatabaseWithTestDataCommandHandler() {
@@ -377,6 +392,7 @@
 	    return AngularCommandHandlersRegistry;
 	}());
 	AngularCommandHandlersRegistry.commandHandlers = {
+	    'sendUserMessageCommandHandler': SendUserMessageCommandHandler,
 	    'populateDatabaseWithTestDataCommandHandler': PopulateDatabaseWithTestDataCommandHandler,
 	    'createAuctionCommandHandler': CreateAuctionCommandHandler,
 	    'finishAuctionCommandHandler': FinishAuctionCommandHandler,
@@ -833,6 +849,17 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var QueryHandler_1 = __webpack_require__(14);
+	var GetUserInboxQueryHandler = (function (_super) {
+	    __extends(GetUserInboxQueryHandler, _super);
+	    function GetUserInboxQueryHandler() {
+	        return _super.apply(this, arguments) || this;
+	    }
+	    GetUserInboxQueryHandler.prototype.getQueryName = function () {
+	        return 'GetUserInboxQuery';
+	    };
+	    return GetUserInboxQueryHandler;
+	}(QueryHandler_1.QueryHandler));
+	exports.GetUserInboxQueryHandler = GetUserInboxQueryHandler;
 	var GetAuctionDetailsQueryHandler = (function (_super) {
 	    __extends(GetAuctionDetailsQueryHandler, _super);
 	    function GetAuctionDetailsQueryHandler() {
@@ -861,6 +888,7 @@
 	    return AngularQueryHandlersRegistry;
 	}());
 	AngularQueryHandlersRegistry.queryHandlers = {
+	    'getUserInboxQueryHandler': GetUserInboxQueryHandler,
 	    'getAuctionDetailsQueryHandler': GetAuctionDetailsQueryHandler,
 	    'searchAuctionsQueryHandler': SearchAuctionsQueryHandler,
 	};
@@ -1042,6 +1070,20 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var CommandUiHandler_1 = __webpack_require__(19);
+	var SendUserMessageCommandUiHandler = (function (_super) {
+	    __extends(SendUserMessageCommandUiHandler, _super);
+	    function SendUserMessageCommandUiHandler(sendUserMessageCommandHandler, busyIndicator, securityUiService, qService, genericModalService) {
+	        var _this = _super.call(this, busyIndicator, securityUiService, qService, genericModalService) || this;
+	        _this.sendUserMessageCommandHandler = sendUserMessageCommandHandler;
+	        return _this;
+	    }
+	    SendUserMessageCommandUiHandler.prototype.getCommandHandler = function () {
+	        return this.sendUserMessageCommandHandler;
+	    };
+	    return SendUserMessageCommandUiHandler;
+	}(CommandUiHandler_1.CommandUiHandler));
+	SendUserMessageCommandUiHandler.$inject = ['sendUserMessageCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
+	exports.SendUserMessageCommandUiHandler = SendUserMessageCommandUiHandler;
 	var PopulateDatabaseWithTestDataCommandUiHandler = (function (_super) {
 	    __extends(PopulateDatabaseWithTestDataCommandUiHandler, _super);
 	    function PopulateDatabaseWithTestDataCommandUiHandler(populateDatabaseWithTestDataCommandHandler, busyIndicator, securityUiService, qService, genericModalService) {
@@ -1104,6 +1146,7 @@
 	    return AngularCommandUiHandlersRegistry;
 	}());
 	AngularCommandUiHandlersRegistry.commandUiHandlers = {
+	    'sendUserMessageCommandUiHandler': SendUserMessageCommandUiHandler,
 	    'populateDatabaseWithTestDataCommandUiHandler': PopulateDatabaseWithTestDataCommandUiHandler,
 	    'createAuctionCommandUiHandler': CreateAuctionCommandUiHandler,
 	    'finishAuctionCommandUiHandler': FinishAuctionCommandUiHandler,
@@ -1426,6 +1469,132 @@
 	FormatDateTimeFilterFactory.$inject = [''];
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = FormatDateTimeFilterFactory;
+
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(30);
+	var ComposeUserMessageDialogComponent = (function () {
+	    function ComposeUserMessageDialogComponent() {
+	        this.controller = ComposeUserMessageDialogCtrl_1.ComposeUserMessageDialogCtrl;
+	        this.templateUrl = 'Template/UserMessaging/ComposeMessageDialog';
+	        this.registerAs = 'composeUserMessageDialog';
+	        this.bindings = {
+	            modalInstance: '<',
+	            resolve: '<'
+	        };
+	    }
+	    return ComposeUserMessageDialogComponent;
+	}());
+	exports.ComposeUserMessageDialogComponent = ComposeUserMessageDialogComponent;
+
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var GuidGenerator_1 = __webpack_require__(3);
+	var ComposeUserMessageDialogCtrl = (function () {
+	    function ComposeUserMessageDialogCtrl(sendUserMessageCommandUiHandler, genericModalService) {
+	        this.sendUserMessageCommandUiHandler = sendUserMessageCommandUiHandler;
+	        this.genericModalService = genericModalService;
+	        this.sendUserMessageCommandId = GuidGenerator_1.default.generateGuid();
+	        this.model = {
+	            recipientUserName: '',
+	            messageSubject: '',
+	            messageBody: ''
+	        };
+	        this.model.recipientUserName = this.resolve.recipientUserName;
+	        this.fields = [
+	            {
+	                key: 'messageSubject',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'Subject',
+	                    required: true
+	                }
+	            },
+	            {
+	                key: 'messageBody',
+	                type: 'textarea',
+	                templateOptions: {
+	                    label: 'Message',
+	                    required: true,
+	                    maxlength: 10000
+	                }
+	            },
+	        ];
+	    }
+	    ComposeUserMessageDialogCtrl.prototype.sendMessage = function () {
+	        var _this = this;
+	        if (!this.form.$valid) {
+	            return;
+	        }
+	        this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, false)
+	            .then(function () {
+	            _this.modalInstance.close();
+	            _this.genericModalService.showSuccessNotification('Your message was sent successfully.');
+	        });
+	    };
+	    ComposeUserMessageDialogCtrl.prototype.cancel = function () {
+	        this.modalInstance.dismiss();
+	    };
+	    return ComposeUserMessageDialogCtrl;
+	}());
+	ComposeUserMessageDialogCtrl.$inject = ['sendUserMessageCommandUiHandler', 'genericModalService'];
+	exports.ComposeUserMessageDialogCtrl = ComposeUserMessageDialogCtrl;
+
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserReferenceCtrl_1 = __webpack_require__(32);
+	var UserReferenceComponent = (function () {
+	    function UserReferenceComponent() {
+	        this.controller = UserReferenceCtrl_1.UserReferenceCtrl;
+	        this.templateUrl = 'Template/Shared/UserReference';
+	        this.registerAs = 'userReference';
+	        this.bindings = {
+	            userName: '<'
+	        };
+	    }
+	    return UserReferenceComponent;
+	}());
+	exports.UserReferenceComponent = UserReferenceComponent;
+
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var UserReferenceCtrl = (function () {
+	    function UserReferenceCtrl(modalService, securityUiService) {
+	        this.modalService = modalService;
+	        this.securityUiService = securityUiService;
+	    }
+	    UserReferenceCtrl.prototype.opendMessageCompositionDialog = function () {
+	        var _this = this;
+	        this.modalService.open({
+	            component: 'ComposeUserMessageDialog',
+	            resolve: {
+	                recipientUserName: function () { return _this.userName; }
+	            }
+	        });
+	    };
+	    UserReferenceCtrl.prototype.checkIfUserIsCurrentUser = function () {
+	        return this.userName === this.securityUiService.currentUserName;
+	    };
+	    return UserReferenceCtrl;
+	}());
+	UserReferenceCtrl.$inject = ['$uibModal', 'securityUiService'];
+	exports.UserReferenceCtrl = UserReferenceCtrl;
 
 
 /***/ }

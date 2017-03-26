@@ -17,17 +17,17 @@ namespace AuctionHouse.Application.Auctions
 			_commandQueue = commandQueue;
 		}
 
-		public async Task Handle(IMessageEnvelope<AuctionCreatedEvent> eventEnvelope)
+		public async Task Handle(IEventEnvelope<AuctionCreatedEvent> eventEnvelope)
 		{
 			var finishAuctionCommand = new FinishAuctionCommand
 			{
-				Id = eventEnvelope.Message.Id
+				Id = eventEnvelope.Event.Id
 			};
 
 			var commandId = GuidGenerator.GenerateDeterministicGuid(HandleAuctionCreatedEventNamespaceId,
-				eventEnvelope.MessageId.ToString());
+				eventEnvelope.EventId.ToString());
 
-			await _commandQueue.QueueCommand(finishAuctionCommand, commandId, "system", eventEnvelope.Message.EndDateTime);
+			await _commandQueue.QueueCommand(finishAuctionCommand, commandId, "system", eventEnvelope.Event.EndDateTime);
 		}
 	}
 }

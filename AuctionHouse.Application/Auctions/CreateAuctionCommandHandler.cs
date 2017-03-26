@@ -18,14 +18,14 @@ namespace AuctionHouse.Application.Auctions
 			_timeProvider = timeProvider;
 		}
 
-		public async Task Handle(CommandEnvelope<CreateAuctionCommand> commandEnvelope)
+		public async Task Handle(ICommandEnvelope<CreateAuctionCommand> commandEnvelope)
 		{
-			var command = commandEnvelope.Message;
+			var command = commandEnvelope.Command;
 
 			var createdAuction = Auction.Create(command.Id, command.Title, command.Description, command.EndDate,
 				command.StartingPrice, command.BuyNowPrice, commandEnvelope.SenderUserName, _timeProvider);
 
-			await _auctionsRepository.Create(createdAuction, commandEnvelope.MessageId.ToString());
+			await _auctionsRepository.Create(createdAuction, commandEnvelope.CommandId.ToString());
 		}
 	}
 }

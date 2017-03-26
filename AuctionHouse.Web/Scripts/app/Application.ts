@@ -16,6 +16,8 @@ import {SimpleNotificationDialogComponent} from './UI/Shared/SimpleNotificationD
 import GenericModalService from './UI/Shared/GenericModalService';
 import Configuration from './Configuration';
 import FormatDateTimeFilterFactory from './UI/Shared/FormatDateTimeFilterFactory';
+import {ComposeUserMessageDialogComponent} from './UI/UserMessaging/ComposeUserMessageDialogComponent';
+import {UserReferenceComponent} from './UI/Shared/UserReferenceComponent';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
@@ -23,7 +25,9 @@ export class Application {
 		new CreateAuctionComponent(),
 		new DisplayAuctionComponent(),
 		new SignInDialogComponent(),
-		new SimpleNotificationDialogComponent()
+		new SimpleNotificationDialogComponent(),
+		new UserReferenceComponent(),
+		new ComposeUserMessageDialogComponent()
 	];
 
 	static bootstrap(): void {

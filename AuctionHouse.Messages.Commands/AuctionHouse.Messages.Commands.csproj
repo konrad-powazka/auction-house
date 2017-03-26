@@ -46,6 +46,7 @@
     <Compile Include="CommandsAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test\PopulateDatabaseWithTestDataCommand.cs" />
+    <Compile Include="UserMessaging\SendUserMessageCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">

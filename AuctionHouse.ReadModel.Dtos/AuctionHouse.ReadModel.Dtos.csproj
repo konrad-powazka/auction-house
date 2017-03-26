@@ -40,11 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Auctions\Details\AuctionDetailsReadModel.cs" />
-    <Compile Include="Auctions\List\AuctionListItemReadModel.cs" />
-    <Compile Include="Auctions\List\AuctionsListReadModel.cs" />
+    <Compile Include="Auctions\AuctionDetailsReadModel.cs" />
+    <Compile Include="Auctions\AuctionListItemReadModel.cs" />
+    <Compile Include="Auctions\AuctionsListReadModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadModelDtosAssemblyMarker.cs" />
+    <Compile Include="UserMessaging\UserInboxReadModel.cs" />
+    <Compile Include="UserMessaging\UserMessageReadModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
@@ -52,6 +54,7 @@
       <Name>AuctionHouse.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

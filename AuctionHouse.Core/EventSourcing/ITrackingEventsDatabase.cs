@@ -5,6 +5,6 @@ namespace AuctionHouse.Core.EventSourcing
 {
 	public interface ITrackingEventsDatabase : IEventsDatabase
 	{
-		IReadOnlyCollection<IMessageEnvelope<IEvent>> WrittenEventEnvelopes { get; }
+		IReadOnlyCollection<IEventEnvelope<IEvent>> WrittenEventEnvelopes { get; }
 	}
 }

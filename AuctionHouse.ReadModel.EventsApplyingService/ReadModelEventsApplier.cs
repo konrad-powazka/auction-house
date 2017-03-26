@@ -60,7 +60,7 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 			{
 				var eventEnvelope = _eventsQueue.Take(_processingStoppedCancellationTokenSource.Token);
 
-				if (appliedEventIds.Contains(eventEnvelope.MessageId))
+				if (appliedEventIds.Contains(eventEnvelope.EventId))
 				{
 					continue;
 				}
@@ -70,14 +70,14 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 
 				while (true)
 				{
-					if (appliedEventIds.Contains(eventEnvelope.MessageId))
+					if (appliedEventIds.Contains(eventEnvelope.EventId))
 					{
 						continue;
 					}
 
 					HandleEventEnvelope(eventEnvelope);
-					appliedEventIds.Add(eventEnvelope.MessageId);
-					appliedEventIdsInCurrentBatch.Add(eventEnvelope.MessageId);
+					appliedEventIds.Add(eventEnvelope.EventId);
+					appliedEventIdsInCurrentBatch.Add(eventEnvelope.EventId);
 
 					var millisecondsLeftForBatchConstruction = BatchConstructionTimeoutMilliseconds -
 					                                           batchConstructionStopwatch.ElapsedMilliseconds;

@@ -6,7 +6,7 @@ namespace AuctionHouse.Core.ReadModel
 {
 	public static class ReadModelDbContextExtensions
 	{
-		public static async Task<TReadModel> Get<TReadModel>(this IReadModelDbContext readModelDbContext, Guid id)
+		public static async Task<TReadModel> Get<TReadModel>(this IReadModelDbContext readModelDbContext, string id)
 			where TReadModel : class
 		{
 			var result = await readModelDbContext.TryGet<TReadModel>(id);

@@ -9,7 +9,7 @@ namespace AuctionHouse.Core.EventSourcing
 	public class TrackingEventsDatabase : ITrackingEventsDatabase
 	{
 		private readonly IEventsDatabase _eventsDatabase;
-		private readonly List<MessageEnvelope<IEvent>> _writtenEventEnvelopes = new List<MessageEnvelope<IEvent>>();
+		private readonly List<IEventEnvelope<IEvent>> _writtenEventEnvelopes = new List<IEventEnvelope<IEvent>>();
 
 		public TrackingEventsDatabase(IEventsDatabase eventsDatabase)
 		{
@@ -21,14 +21,14 @@ namespace AuctionHouse.Core.EventSourcing
 			_eventsDatabase = eventsDatabase;
 		}
 
-		public IReadOnlyCollection<IMessageEnvelope<IEvent>> WrittenEventEnvelopes => _writtenEventEnvelopes.ToList();
+		public IReadOnlyCollection<IEventEnvelope<IEvent>> WrittenEventEnvelopes => _writtenEventEnvelopes.ToList();
 
 		public Task<IEnumerable<PersistedEventEnvelope>> ReadStream(string streamName)
 		{
 			return _eventsDatabase.ReadStream(streamName);
 		}
 
-		public async Task AppendToStream(string streamName, IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend,
+		public async Task AppendToStream(string streamName, IEnumerable<IEventEnvelope<IEvent>> eventEnvelopesToAppend,
 			ExpectedStreamVersion expectedStreamVersion, int? specificExpectedStreamVersion)
 		{
 			eventEnvelopesToAppend = eventEnvelopesToAppend.ToList();

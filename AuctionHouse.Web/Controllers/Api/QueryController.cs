@@ -22,7 +22,8 @@ namespace AuctionHouse.Web.Controllers.Api
 		[HttpGet]
 		public async Task<TQueryResult> Handle([FromUri] TQuery query)
 		{
-			return await _handler.Handle(query);
+			var queryEnvelope = new QueryEnvelope<TQuery, TQueryResult>(query, User.Identity.Name);
+			return await _handler.Handle(queryEnvelope);
 		}
 	}
 }

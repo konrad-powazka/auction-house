@@ -4,6 +4,6 @@ namespace AuctionHouse.Core.Messaging
 {
 	public interface IEventPublisher
 	{
-		Task Publish(IMessageEnvelope<IEvent> eventEnvelope);
+		Task Publish(IEventEnvelope<IEvent> eventEnvelope);
 	}
 }

@@ -2,8 +2,8 @@
 
 namespace AuctionHouse.Core.Messaging
 {
-    public interface ICommandHandler<TCommand> where TCommand : ICommand
-    {
-        Task Handle(CommandEnvelope<TCommand> commandEnvelope);
-    }
+	public interface ICommandHandler<in TCommand> where TCommand : ICommand
+	{
+		Task Handle(ICommandEnvelope<TCommand> commandEnvelope);
+	}
 }

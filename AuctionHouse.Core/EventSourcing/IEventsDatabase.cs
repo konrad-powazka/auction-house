@@ -7,7 +7,7 @@ namespace AuctionHouse.Core.EventSourcing
 {
 	public interface IEventsDatabase
 	{
-		Task AppendToStream(string streamName, IEnumerable<MessageEnvelope<IEvent>> eventEnvelopesToAppend,
+		Task AppendToStream(string streamName, IEnumerable<IEventEnvelope<IEvent>> eventEnvelopesToAppend,
 			ExpectedStreamVersion expectedStreamVersion, int? specificExpectedStreamVersion = null);
 
 		Task<IEnumerable<PersistedEventEnvelope>> ReadStream(string streamName);

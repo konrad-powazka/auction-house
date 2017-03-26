@@ -1,0 +1,5 @@
+﻿<span class="fa fa-user"></span> 
+{{ $ctrl.userName }}
+<a href uib-tooltip="Send message to user" ng-if="!$ctrl.checkIfUserIsCurrentUser()"
+   ng-click="$ctrl.opendMessageCompositionDialog()"><span class="fa fa-envelope"></span></a>
+<span ng-if="$ctrl.checkIfUserIsCurrentUser()" class="side-note">(you)</span>

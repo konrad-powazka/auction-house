@@ -4,6 +4,13 @@
 
 
 export
+class SendUserMessageCommand
+{
+	public messageSubject: string;
+	public messageBody: string;
+	public recipientUserName: string;
+}
+export
 class PopulateDatabaseWithTestDataCommand
 {
 }

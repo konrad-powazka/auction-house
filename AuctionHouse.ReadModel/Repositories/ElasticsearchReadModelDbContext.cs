@@ -10,8 +10,8 @@ namespace AuctionHouse.ReadModel.Repositories
 {
 	public class ElasticsearchReadModelDbContext : IReadModelDbContext
 	{
-		private readonly Dictionary<Type, Dictionary<Guid, ReadModelChange>> _changes =
-			new Dictionary<Type, Dictionary<Guid, ReadModelChange>>();
+		private readonly Dictionary<Type, Dictionary<string, ReadModelChange>> _changes =
+			new Dictionary<Type, Dictionary<string, ReadModelChange>>();
 
 		private readonly IElasticClient _elasticClient;
 
@@ -20,9 +20,14 @@ namespace AuctionHouse.ReadModel.Repositories
 			_elasticClient = elasticClient;
 		}
 
-		public void CreateOrOverwrite<TReadModel>(TReadModel readModel, Guid id) where TReadModel : class
+		public void CreateOrOverwrite<TReadModel>(TReadModel readModel, string id) where TReadModel : class
 		{
-			var changesForReadModelType = _changes.GetOrAdd(typeof(TReadModel), () => new Dictionary<Guid, ReadModelChange>());
+			if (string.IsNullOrEmpty(id))
+			{
+				throw new ArgumentException("Value cannot be null or empty.", nameof(id));
+			}
+
+			var changesForReadModelType = _changes.GetOrAdd(typeof(TReadModel), () => new Dictionary<string, ReadModelChange>());
 			ReadModelChange readModelChange;
 
 			if (changesForReadModelType.TryGetValue(id, out readModelChange))
@@ -58,9 +63,14 @@ namespace AuctionHouse.ReadModel.Repositories
 			}
 		}
 
-		public async Task<TReadModel> TryGet<TReadModel>(Guid id) where TReadModel : class
+		public async Task<TReadModel> TryGet<TReadModel>(string id) where TReadModel : class
 		{
-			var changesForReadModelType = _changes.GetOrAdd(typeof(TReadModel), () => new Dictionary<Guid, ReadModelChange>());
+			if (string.IsNullOrEmpty(id))
+			{
+				throw new ArgumentException("Value cannot be null or empty.", nameof(id));
+			}
+
+			var changesForReadModelType = _changes.GetOrAdd(typeof(TReadModel), () => new Dictionary<string, ReadModelChange>());
 			ReadModelChange readModelChange;
 
 			if (changesForReadModelType.TryGetValue(id, out readModelChange))
@@ -83,7 +93,7 @@ namespace AuctionHouse.ReadModel.Repositories
 
 		private abstract class ReadModelChange
 		{
-			protected ReadModelChange(ChangeType type, Guid readModelId, object readModel)
+			protected ReadModelChange(ChangeType type, string readModelId, object readModel)
 			{
 				Type = type;
 				ReadModelId = readModelId;
@@ -91,14 +101,14 @@ namespace AuctionHouse.ReadModel.Repositories
 			}
 
 			public ChangeType Type { get; }
-			public Guid ReadModelId { get; }
+			public string ReadModelId { get; }
 			public object ReadModel { get; set; }
 			public abstract void IncludeInBulkDescriptor(BulkDescriptor bulkDescriptor);
 		}
 
 		private class ReadModelChange<TReadModel> : ReadModelChange where TReadModel : class
 		{
-			public ReadModelChange(ChangeType type, Guid readModelId, TReadModel readModel) : base(type, readModelId, readModel)
+			public ReadModelChange(ChangeType type, string readModelId, TReadModel readModel) : base(type, readModelId, readModel)
 			{
 			}
 

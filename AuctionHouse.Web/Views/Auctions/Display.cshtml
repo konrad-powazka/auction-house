@@ -9,7 +9,7 @@
 					Seller
 				</dt>
 				<dd>
-					<span class="fa fa-user"></span> {{ $ctrl.auction.createdByUserName }}
+					<user-reference user-name="$ctrl.auction.createdByUserName"></user-reference>
 				</dd>
 				<dt ng-if="$ctrl.auction.buyNowPrice">
 					Buy now price
@@ -39,7 +39,7 @@
 					Highest bidder
 				</dt>
 				<dd ng-if="$ctrl.auction.highestBidderUserName">
-					<span class="fa fa-user"></span> {{ $ctrl.auction.highestBidderUserName }}
+					<user-reference user-name="$ctrl.auction.highestBidderUserName"></user-reference>
 				</dd>
 				<dt>
 					End date

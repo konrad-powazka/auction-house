@@ -386,6 +386,9 @@
     <Content Include="Views\Auctions\Display.cshtml" />
     <Content Include="Views\Auctions\List.cshtml" />
     <Content Include="Views\Shared\SimpleNotificationDialog.cshtml" />
+    <Content Include="Views\UserMessaging\MessagesList.cshtml" />
+    <Content Include="Views\UserMessaging\ComposeMessageDialog.cshtml" />
+    <Content Include="Views\Shared\UserReference.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -485,13 +488,19 @@
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\ICommandUiHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\CommandUiHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\FormatDateTimeFilterFactory.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\UserReferenceComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SimpleNotificationDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\ApplicationCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\UserReferenceCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SimpleNotificationDialogCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\GenericModalService.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SecurityUiService.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\ComposeUserMessageDialogComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\ComposeUserMessageDialogCtrl.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-formly\angular-formly.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />

@@ -20,7 +20,7 @@ namespace AuctionHouse.Core.Messaging
 
 		public TimeSpan Delay { get; set; }
 
-		public Task Handle(CommandEnvelope<TCommand> commandEnvelope)
+		public Task Handle(ICommandEnvelope<TCommand> commandEnvelope)
 		{
 			Thread.Sleep(Delay);
 			return _decoratedCommandHandler.Handle(commandEnvelope);

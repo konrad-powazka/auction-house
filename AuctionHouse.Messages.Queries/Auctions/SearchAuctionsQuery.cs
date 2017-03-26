@@ -1,9 +1,10 @@
-﻿using AuctionHouse.Core.Messaging;
+﻿using AuctionHouse.Core.Paging;
+using AuctionHouse.ReadModel.Dtos.Auctions;
 using AuctionHouse.ReadModel.Dtos.Auctions.List;
 
 namespace AuctionHouse.Messages.Queries.Auctions
 {
-	public class SearchAuctionsQuery : IQuery<AuctionsListReadModel>
+	public class SearchAuctionsQuery : IPagedQuery<AuctionsListReadModel, AuctionListItemReadModel>
 	{
 		public string QueryString { get; set; }
 		public int PageSize { get; set; }

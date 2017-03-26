@@ -7,7 +7,7 @@ namespace AuctionHouse.Core.Domain
     public abstract class AggregateRoot : Entity
     {     
         private readonly Dictionary<Type, Action<IEvent>> _eventAppliers = new Dictionary<Type, Action<IEvent>>();
-        private bool _wereEventsReplayed = false, _wereAppliersRegistered;
+        private bool _wereEventsReplayed, _wereAppliersRegistered;
         private readonly List<IEvent> _changes = new List<IEvent>();
 
         public void ReplayEvents(IEnumerable<IEvent> eventsToReplay)

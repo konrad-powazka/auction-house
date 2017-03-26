@@ -6,6 +6,22 @@ import {SecurityUiService } from '../SecurityUiService';
 import BusyIndicator from '../BusyIndicator';
 import GenericModalService from '../GenericModalService';
 
+	export class SendUserMessageCommandUiHandler extends CommandUiHandler<Commands.SendUserMessageCommand> {
+		static $inject = ['sendUserMessageCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
+
+		constructor(
+			private sendUserMessageCommandHandler: ICommandHandler<Commands.SendUserMessageCommand>, 
+				busyIndicator: BusyIndicator, 
+				securityUiService: SecurityUiService,
+				qService: ng.IQService,
+				genericModalService: GenericModalService) {
+			super(busyIndicator, securityUiService, qService, genericModalService);
+		}
+
+		protected getCommandHandler(): ICommandHandler<Commands.SendUserMessageCommand> {
+			return this.sendUserMessageCommandHandler;
+		}
+	}
 	export class PopulateDatabaseWithTestDataCommandUiHandler extends CommandUiHandler<Commands.PopulateDatabaseWithTestDataCommand> {
 		static $inject = ['populateDatabaseWithTestDataCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 
@@ -73,6 +89,7 @@ import GenericModalService from '../GenericModalService';
 
 export class AngularCommandUiHandlersRegistry {
 	static commandUiHandlers: {[name: string]: ng.Injectable<Function>} = {
+							'sendUserMessageCommandUiHandler': SendUserMessageCommandUiHandler,
 							'populateDatabaseWithTestDataCommandUiHandler': PopulateDatabaseWithTestDataCommandUiHandler,
 							'createAuctionCommandUiHandler': CreateAuctionCommandUiHandler,
 							'finishAuctionCommandUiHandler': FinishAuctionCommandUiHandler,

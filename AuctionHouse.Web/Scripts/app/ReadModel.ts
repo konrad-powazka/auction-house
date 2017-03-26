@@ -4,6 +4,34 @@
 
 
 export
+class UserInboxReadModel
+{
+	public pageNumber: number;
+	public totalPagesCount: number;
+	public totalItemsCount: number;
+	public pageItems: UserMessageReadModel[];
+	public pageSize: number;
+}
+export
+class UserMessageReadModel
+{
+	public id: string;
+	public subject: string;
+	public body: string;
+	public recipientUserName: string;
+	public senderUserName: string;
+	public sentDateTime: string;
+}
+export
+class AuctionsListReadModel
+{
+	public pageNumber: number;
+	public totalPagesCount: number;
+	public totalItemsCount: number;
+	public pageItems: AuctionListItemReadModel[];
+	public pageSize: number;
+}
+export
 class AuctionListItemReadModel
 {
 	public id: string;
@@ -15,15 +43,6 @@ class AuctionListItemReadModel
 	public minimalPriceForNextBidder: number;
 	public wasFinished: boolean;
 	public numberOfBids: number;
-}
-export
-class AuctionsListReadModel
-{
-	public pageNumber: number;
-	public totalPagesCount: number;
-	public totalItemsCount: number;
-	public pageItems: AuctionListItemReadModel[];
-	public pageSize: number;
 }
 export
 class AuctionDetailsReadModel extends AuctionListItemReadModel

@@ -4,6 +4,16 @@
 
 
 export
+class UserMessageSentEvent
+{
+	public messageId: string;
+	public messageSubject: string;
+	public messageBody: string;
+	public recipientUserName: string;
+	public senderUserName: string;
+	public sentDateTime: string;
+}
+export
 class EventsAppliedToReadModelEvent
 {
 	public appliedEventIds: string[];

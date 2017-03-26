@@ -4,6 +4,6 @@ namespace AuctionHouse.Core.Messaging
 {
     public interface IEventHandler<in TEvent> where TEvent : IEvent
     {
-        Task Handle(IMessageEnvelope<TEvent> eventEnvelope);
+        Task Handle(IEventEnvelope<TEvent> eventEnvelope);
     }
 }

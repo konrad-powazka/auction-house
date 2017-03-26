@@ -67,7 +67,7 @@ export class CreateAuctionCtrl implements ng.IController {
 				templateOptions: {
 					label: 'Buy now price',
 					required: false,
-					type: 'number',
+					type: 'number'
 					
 				},
 				validators: {

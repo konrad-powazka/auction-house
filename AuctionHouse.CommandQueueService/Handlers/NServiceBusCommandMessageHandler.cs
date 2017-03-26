@@ -71,7 +71,7 @@ namespace AuctionHouse.CommandQueueService.Handlers
 
 			if (wasCommandHandledSuccessfully)
 			{
-				var publishedEventIds = _trackingEventsDatabase.WrittenEventEnvelopes.Select(e => e.MessageId).ToList();
+				var publishedEventIds = _trackingEventsDatabase.WrittenEventEnvelopes.Select(e => e.EventId).ToList();
 
 				commandHandlingFeedbackEvent = new CommandHandlingSucceededEvent
 				{

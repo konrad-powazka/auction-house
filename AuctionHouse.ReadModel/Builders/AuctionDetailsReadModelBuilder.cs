@@ -18,7 +18,7 @@ namespace AuctionHouse.ReadModel.Builders
 
 			if (StreamNameGenerator.TryExtractAuctionId(eventEnvelope.StreamName, out auctionId))
 			{
-				var readModel = await readModelDbContext.TryGet<AuctionDetailsReadModel>(auctionId);
+				var readModel = await readModelDbContext.TryGet<AuctionDetailsReadModel>(auctionId.ToString());
 
 				if (readModel != null)
 				{
@@ -27,7 +27,7 @@ namespace AuctionHouse.ReadModel.Builders
 			}
 
 			//TODO async
-			TypeSwitch.Do(eventEnvelope.Message,
+			TypeSwitch.Do(eventEnvelope.Event,
 				TypeSwitch.Case<AuctionCreatedEvent>(auctionCreatedEvent =>
 				{
 					var auctionDetails = new AuctionDetailsReadModel
@@ -45,21 +45,23 @@ namespace AuctionHouse.ReadModel.Builders
 						NumberOfBids = 0
 					};
 
-					readModelDbContext.CreateOrOverwrite(auctionDetails, auctionCreatedEvent.Id);
+					readModelDbContext.CreateOrOverwrite(auctionDetails, auctionCreatedEvent.Id.ToString());
 				}),
 				TypeSwitch.Case<BidMadeEvent>(bidMadeEvent =>
 				{
-					var auctionDetails = readModelDbContext.Get<AuctionDetailsReadModel>(bidMadeEvent.AuctionId).Result;
+					var auctionDetails = readModelDbContext.Get<AuctionDetailsReadModel>(bidMadeEvent.AuctionId.ToString()).Result;
 					auctionDetails.HighestBidderUserName = bidMadeEvent.HighestBidderUserName;
 					auctionDetails.MinimalPriceForNextBidder = bidMadeEvent.MinimalPriceForNextBidder;
 					auctionDetails.NumberOfBids++;
-					readModelDbContext.CreateOrOverwrite(auctionDetails, bidMadeEvent.AuctionId);
+					readModelDbContext.CreateOrOverwrite(auctionDetails, bidMadeEvent.AuctionId.ToString());
 				}),
 				TypeSwitch.Case<AuctionFinishedEvent>(auctionFinishedEvent =>
 				{
-					var auctionDetails = readModelDbContext.Get<AuctionDetailsReadModel>(auctionFinishedEvent.AuctionId).Result;
+					var auctionDetails =
+						readModelDbContext.Get<AuctionDetailsReadModel>(auctionFinishedEvent.AuctionId.ToString()).Result;
+
 					auctionDetails.WasFinished = true;
-					readModelDbContext.CreateOrOverwrite(auctionDetails, auctionFinishedEvent.AuctionId);
+					readModelDbContext.CreateOrOverwrite(auctionDetails, auctionFinishedEvent.AuctionId.ToString());
 				}));
 		}
 	}

@@ -7,5 +7,5 @@ export class SignInDialogComponent implements INamedComponentOptions {
     registerAs = 'signInDialog';
     bindings = {
         modalInstance: '<'
-    }
+    };
 }

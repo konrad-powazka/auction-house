@@ -5,6 +5,10 @@
 
 /// <reference path="../ReadModel.ts"/>
 export
+class GetUserInboxQuery
+{
+}
+export
 class GetAuctionDetailsQuery
 {
 	public id: string;

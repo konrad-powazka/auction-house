@@ -12,11 +12,11 @@ namespace AuctionHouse.Core.Messaging
 			_endpoint = endpoint;
 		}
 
-		public async Task Publish(IMessageEnvelope<IEvent> eventEnvelope)
+		public async Task Publish(IEventEnvelope<IEvent> eventEnvelope)
 		{
 			var publishOptions = new PublishOptions();
-			publishOptions.SetMessageId(eventEnvelope.MessageId.ToString());
-			await _endpoint.Publish(eventEnvelope.Message, publishOptions);
+			publishOptions.SetMessageId(eventEnvelope.EventId.ToString());
+			await _endpoint.Publish(eventEnvelope.Event, publishOptions);
 		}
 	}
 }

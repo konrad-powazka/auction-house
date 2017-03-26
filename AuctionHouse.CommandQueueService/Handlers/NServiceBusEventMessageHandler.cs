@@ -19,7 +19,7 @@ namespace AuctionHouse.CommandQueueService.Handlers
 		public async Task Handle(TEvent @event, IMessageHandlerContext context)
 		{
 			var eventId = Guid.Parse(context.MessageId);
-			var eventEnvelope = new MessageEnvelope<TEvent>(@event, eventId);
+			var eventEnvelope = new EventEnvelope<TEvent>(@event, eventId);
 			await _eventHandler.Handle(eventEnvelope);
 		}
 	}
