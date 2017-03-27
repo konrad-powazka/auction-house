@@ -3,6 +3,7 @@ using System.Net;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.ReadModel;
 using AuctionHouse.Persistence;
+using AuctionHouse.ReadModel.Dtos.UserMessaging;
 using AuctionHouse.ReadModel.Repositories;
 using Autofac;
 using EventStore.ClientAPI;
@@ -81,12 +82,19 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 			// last processed event and build new/corrupted read models from scratch would be costly
 			if (elasticClient.IndexExists(indexName).Exists)
 			{
-				elasticClient.DeleteByQueryAsync(new DeleteByQueryRequest(indexName, Types.All)).Wait();
+				elasticClient.DeleteIndex(indexName);
 			}
-			else
-			{
-				elasticClient.CreateIndexAsync(indexName).Wait();
-			}
+
+			elasticClient.CreateIndexAsync(indexName,
+				c =>
+					// TODO: Move mappings configuration elsewhere
+					c.Mappings(
+						m =>
+							m.Map<UserMessageReadModel>(t => t.AutoMap().Properties(p => p
+								.Keyword(k => k.Name(rm => rm.RecipientUserName))
+								.Keyword(k => k.Name(rm => rm.RecipientUserName))))))
+				.Wait();
+			
 
 			containerBuilder.RegisterInstance(elasticClient).As<IElasticClient>();
 		}

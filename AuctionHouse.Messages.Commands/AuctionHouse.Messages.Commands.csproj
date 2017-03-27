@@ -45,7 +45,6 @@
     <Compile Include="Auctions\MakeBidCommand.cs" />
     <Compile Include="CommandsAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Test\PopulateDatabaseWithTestDataCommand.cs" />
     <Compile Include="UserMessaging\SendUserMessageCommand.cs" />
   </ItemGroup>
   <ItemGroup>

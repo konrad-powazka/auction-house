@@ -58,7 +58,6 @@
     <Compile Include="Auctions\CreateAuctionCommandHandler.cs" />
     <Compile Include="ApplicationAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Test\PopulateDatabaseWithTestDataCommandHandler.cs" />
     <Compile Include="UserMessaging\SendUserMessageCommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>

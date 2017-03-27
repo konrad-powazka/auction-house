@@ -12,14 +12,19 @@ export class UserMessagesCtrl implements ng.IController {
 	staticResource = {
 		header: [
 			{
-				key: 'subject',
-				name: 'Subject',
-				style: { width: '30%' }
+				key: 'sender',
+				name: 'Sender',
+				style: { width: '15%' }
 			},
 			{
-				key: 'body',
+				key: 'message',
 				name: 'Message',
-				style: { width: '70%' }
+				style: { width: '60%' }
+			},
+			{
+				key: 'sentDateTime',
+				name: 'Sent',
+				style: { width: '25%' }
 			}
 		]
 	};

@@ -11,10 +11,6 @@ class SendUserMessageCommand
 	public recipientUserName: string;
 }
 export
-class PopulateDatabaseWithTestDataCommand
-{
-}
-export
 class CreateAuctionCommand
 {
 	public id: string;

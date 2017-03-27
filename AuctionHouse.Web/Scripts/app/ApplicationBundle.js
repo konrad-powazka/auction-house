@@ -344,17 +344,6 @@
 	    return SendUserMessageCommandHandler;
 	}(CommandHandler_1.CommandHandler));
 	exports.SendUserMessageCommandHandler = SendUserMessageCommandHandler;
-	var PopulateDatabaseWithTestDataCommandHandler = (function (_super) {
-	    __extends(PopulateDatabaseWithTestDataCommandHandler, _super);
-	    function PopulateDatabaseWithTestDataCommandHandler() {
-	        return _super.apply(this, arguments) || this;
-	    }
-	    PopulateDatabaseWithTestDataCommandHandler.prototype.getCommandName = function () {
-	        return 'PopulateDatabaseWithTestDataCommand';
-	    };
-	    return PopulateDatabaseWithTestDataCommandHandler;
-	}(CommandHandler_1.CommandHandler));
-	exports.PopulateDatabaseWithTestDataCommandHandler = PopulateDatabaseWithTestDataCommandHandler;
 	var CreateAuctionCommandHandler = (function (_super) {
 	    __extends(CreateAuctionCommandHandler, _super);
 	    function CreateAuctionCommandHandler() {
@@ -395,7 +384,6 @@
 	}());
 	AngularCommandHandlersRegistry.commandHandlers = {
 	    'sendUserMessageCommandHandler': SendUserMessageCommandHandler,
-	    'populateDatabaseWithTestDataCommandHandler': PopulateDatabaseWithTestDataCommandHandler,
 	    'createAuctionCommandHandler': CreateAuctionCommandHandler,
 	    'finishAuctionCommandHandler': FinishAuctionCommandHandler,
 	    'makeBidCommandHandler': MakeBidCommandHandler,
@@ -1091,20 +1079,6 @@
 	}(CommandUiHandler_1.CommandUiHandler));
 	SendUserMessageCommandUiHandler.$inject = ['sendUserMessageCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 	exports.SendUserMessageCommandUiHandler = SendUserMessageCommandUiHandler;
-	var PopulateDatabaseWithTestDataCommandUiHandler = (function (_super) {
-	    __extends(PopulateDatabaseWithTestDataCommandUiHandler, _super);
-	    function PopulateDatabaseWithTestDataCommandUiHandler(populateDatabaseWithTestDataCommandHandler, busyIndicator, securityUiService, qService, genericModalService) {
-	        var _this = _super.call(this, busyIndicator, securityUiService, qService, genericModalService) || this;
-	        _this.populateDatabaseWithTestDataCommandHandler = populateDatabaseWithTestDataCommandHandler;
-	        return _this;
-	    }
-	    PopulateDatabaseWithTestDataCommandUiHandler.prototype.getCommandHandler = function () {
-	        return this.populateDatabaseWithTestDataCommandHandler;
-	    };
-	    return PopulateDatabaseWithTestDataCommandUiHandler;
-	}(CommandUiHandler_1.CommandUiHandler));
-	PopulateDatabaseWithTestDataCommandUiHandler.$inject = ['populateDatabaseWithTestDataCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
-	exports.PopulateDatabaseWithTestDataCommandUiHandler = PopulateDatabaseWithTestDataCommandUiHandler;
 	var CreateAuctionCommandUiHandler = (function (_super) {
 	    __extends(CreateAuctionCommandUiHandler, _super);
 	    function CreateAuctionCommandUiHandler(createAuctionCommandHandler, busyIndicator, securityUiService, qService, genericModalService) {
@@ -1154,7 +1128,6 @@
 	}());
 	AngularCommandUiHandlersRegistry.commandUiHandlers = {
 	    'sendUserMessageCommandUiHandler': SendUserMessageCommandUiHandler,
-	    'populateDatabaseWithTestDataCommandUiHandler': PopulateDatabaseWithTestDataCommandUiHandler,
 	    'createAuctionCommandUiHandler': CreateAuctionCommandUiHandler,
 	    'finishAuctionCommandUiHandler': FinishAuctionCommandUiHandler,
 	    'makeBidCommandUiHandler': MakeBidCommandUiHandler,
@@ -1638,14 +1611,19 @@
 	        this.staticResource = {
 	            header: [
 	                {
-	                    key: 'subject',
-	                    name: 'Subject',
-	                    style: { width: '30%' }
+	                    key: 'sender',
+	                    name: 'Sender',
+	                    style: { width: '15%' }
 	                },
 	                {
-	                    key: 'body',
+	                    key: 'message',
 	                    name: 'Message',
-	                    style: { width: '70%' }
+	                    style: { width: '60%' }
+	                },
+	                {
+	                    key: 'sentDateTime',
+	                    name: 'Sent',
+	                    style: { width: '25%' }
 	                }
 	            ]
 	        };

@@ -139,3 +139,7 @@ textarea {
 .nav-tabs {
     margin-bottom: 0;
 }
+
+.text-excerpt {
+	color: gray;	
+}

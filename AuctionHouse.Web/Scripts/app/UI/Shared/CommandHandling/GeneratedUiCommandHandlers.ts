@@ -22,22 +22,6 @@ import GenericModalService from '../GenericModalService';
 			return this.sendUserMessageCommandHandler;
 		}
 	}
-	export class PopulateDatabaseWithTestDataCommandUiHandler extends CommandUiHandler<Commands.PopulateDatabaseWithTestDataCommand> {
-		static $inject = ['populateDatabaseWithTestDataCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
-
-		constructor(
-			private populateDatabaseWithTestDataCommandHandler: ICommandHandler<Commands.PopulateDatabaseWithTestDataCommand>, 
-				busyIndicator: BusyIndicator, 
-				securityUiService: SecurityUiService,
-				qService: ng.IQService,
-				genericModalService: GenericModalService) {
-			super(busyIndicator, securityUiService, qService, genericModalService);
-		}
-
-		protected getCommandHandler(): ICommandHandler<Commands.PopulateDatabaseWithTestDataCommand> {
-			return this.populateDatabaseWithTestDataCommandHandler;
-		}
-	}
 	export class CreateAuctionCommandUiHandler extends CommandUiHandler<Commands.CreateAuctionCommand> {
 		static $inject = ['createAuctionCommandHandler', 'busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 
@@ -90,7 +74,6 @@ import GenericModalService from '../GenericModalService';
 export class AngularCommandUiHandlersRegistry {
 	static commandUiHandlers: {[name: string]: ng.Injectable<Function>} = {
 							'sendUserMessageCommandUiHandler': SendUserMessageCommandUiHandler,
-							'populateDatabaseWithTestDataCommandUiHandler': PopulateDatabaseWithTestDataCommandUiHandler,
 							'createAuctionCommandUiHandler': CreateAuctionCommandUiHandler,
 							'finishAuctionCommandUiHandler': FinishAuctionCommandUiHandler,
 							'makeBidCommandUiHandler': MakeBidCommandUiHandler,

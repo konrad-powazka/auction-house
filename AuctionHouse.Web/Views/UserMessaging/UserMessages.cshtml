@@ -11,8 +11,14 @@
 				<thead tasty-thead></thead>
 				<tbody>
 				<tr ng-repeat="message in rows">
-					<td class="text-cell">{{ message.subject }}</td>
-					<td class="text-cell">{{ message.body }}</td>
+					<td class="text-cell">{{ message.senderUserName }}</td>
+					<td class="text-cell">
+						{{ message.subject }} <span class="text-excerpt">{{ message.body }}</span>
+					</td>
+					<td>{{ message.sentDateTime | formatDateTime }}</td>
+				</tr>
+				<tr ng-if="rows.length === 0">
+					<td colspan="{{ $ctrl.staticResource.header.length }}" class="side-note text-center">Your inbox is empty</td>
 				</tr>
 				</tbody>
 			</table>
@@ -23,7 +29,6 @@
 		<uib-tab-heading>
 			<span class="fa fa-arrow-circle-o-up fa-lg"></span> Sent
 		</uib-tab-heading>
-		<div>XXX</div>
 		<div tasty-table bind-resource-callback="$ctrl.getResource" bind-init="$ctrl.tastyInitCfg" bind-resource="$ctrl.staticResource">
 			<table class="table table-striped table-condensed">
 				<thead tasty-thead></thead>

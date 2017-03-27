@@ -9,17 +9,5 @@ namespace AuctionHouse.Web
 	{
         public string NServiceBusCommandHandlingDestination
             => ConfigurationManager.AppSettings["NServiceBusCommandHandlingDestination"];
-
-		public static bool PopulatingDatabaseWithTestDataOnStartupIsEnabled
-		{
-			get
-			{
-				{
-					var rawValue = ConfigurationManager.AppSettings["PopulatingDatabaseWithTestDataOnStartupIsEnabled"];
-					bool parsedValue;
-					return bool.TryParse(rawValue, out parsedValue) && parsedValue;
-				}
-			}
-		}
 	}
 }
