@@ -10,7 +10,8 @@ namespace AuctionHouse.Core
 		public static async Task<TPagedResult> RunPagedQuery
 			<TPagedQuery, TPagedResult, TPagedResultItem, TElasticsearchDocument>(
 			this IElasticClient elasticClient, TPagedQuery query,
-			Func<QueryContainerDescriptor<TElasticsearchDocument>, QueryContainer> applyQueryFiltersFunc)
+			Func<QueryContainerDescriptor<TElasticsearchDocument>, QueryContainer> applyQueryFiltersFunc,
+			Func<SortDescriptor<TElasticsearchDocument>, SortDescriptor<TElasticsearchDocument>> applySorting)
 			where TPagedResult : IPagedResult<TPagedResultItem>, new()
 			where TPagedQuery : IPagedQuery<TPagedResult, TPagedResultItem>
 			where TElasticsearchDocument : class, TPagedResultItem
@@ -23,6 +24,7 @@ namespace AuctionHouse.Core
 					elasticClient.SearchAsync<TElasticsearchDocument>(
 						s =>
 							s.Query(applyQueryFiltersFunc)
+							.Sort(sd => applySorting(sd))
 								.From(firstItemIndex)
 								.Take(query.PageSize));
 

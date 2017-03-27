@@ -34,12 +34,13 @@ namespace AuctionHouse.QueryHandling
 				await
 					_elasticClient
 						.RunPagedQuery<SearchAuctionsQuery, AuctionsListReadModel, AuctionListItemReadModel, AuctionDetailsReadModel>(
-							queryEnvelope.Query, q =>
-								q.MultiMatch(
-									mq =>
-										mq.Fields(f => f.Fields(a => a.Title, a => a.Description))
-											.Query(queryEnvelope.Query.QueryString)
-											.Fuzziness(Fuzziness.Auto)));
+							queryEnvelope.Query,
+							q => q.MultiMatch(
+								mq =>
+									mq.Fields(f => f.Fields(a => a.Title, a => a.Description))
+										.Query(queryEnvelope.Query.QueryString)
+										.Fuzziness(Fuzziness.Auto)),
+							sd => sd.Descending(a => a.EndDate));
 		}
 	}
 }

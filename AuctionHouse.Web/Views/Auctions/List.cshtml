@@ -1,5 +1,8 @@
-﻿<div tasty-table bind-resource-callback="$ctrl.getResource" bind-init="$ctrl.tastyInitCfg" bind-resource="$ctrl.staticResource">
-	<table class="table table-striped table-condensed" style="table-layout: fixed; width: 100%;">
+﻿<div class="page-header">
+	<h3>Auctions in progress</h3>
+</div>
+<div tasty-table bind-resource-callback="$ctrl.getResource" bind-init="$ctrl.tastyInitCfg" bind-resource="$ctrl.staticResource">
+	<table class="table table-striped table-condensed">
 		<thead tasty-thead></thead>
 		<tbody>
 		<tr ng-repeat="auction in rows">

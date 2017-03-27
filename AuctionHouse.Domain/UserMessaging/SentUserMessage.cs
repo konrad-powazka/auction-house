@@ -44,6 +44,7 @@ namespace AuctionHouse.Domain.UserMessaging
 
 		private void Apply(UserMessageSentEvent messageSentEvent)
 		{
+			Id = messageSentEvent.MessageId;
 		}
 	}
 }
