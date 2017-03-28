@@ -989,9 +989,19 @@
 	                });
 	            })
 	                .then(function (auction) {
+	                var previousAuction = _this.auction;
 	                _this.auctionLoadedCallback(auction);
 	                if (auction.highestBidderUserName === _this.securityUiService.currentUserName) {
-	                    _this.genericModalService.showSuccessNotification('Congratulations, you are now the highest bidder!');
+	                    if (auction.wasFinished) {
+	                        _this.genericModalService
+	                            .showSuccessNotification('Congratulations, you won the auction! Contact the seller in order to establish payment and delivery details.');
+	                    }
+	                    else if (auction.highestBidderUserName === previousAuction.highestBidderUserName) {
+	                        _this.genericModalService.showSuccessNotification('You are still the highest bidder.');
+	                    }
+	                    else {
+	                        _this.genericModalService.showSuccessNotification('Congratulations, you are now the highest bidder!');
+	                    }
 	                }
 	                else {
 	                    _this.genericModalService.showInformationNotification('Unfortunately your offer was not the highest.');
@@ -1245,14 +1255,29 @@
 	        this.staticResource = {
 	            header: [
 	                {
-	                    key: 'Title',
+	                    key: 'title',
 	                    name: 'Title',
-	                    style: { width: '30%' }
+	                    style: { width: '20%' }
 	                },
 	                {
-	                    key: 'Description',
+	                    key: 'currentPrice',
+	                    name: 'Current price',
+	                    style: { width: '120px', 'text-align': 'right' }
+	                },
+	                {
+	                    key: 'buyNowPrice',
+	                    name: 'Buy now price',
+	                    style: { width: '120px', 'text-align': 'right' }
+	                },
+	                {
+	                    key: 'numberOfBids',
+	                    name: 'Bids',
+	                    style: { width: '50px', 'text-align': 'right' }
+	                },
+	                {
+	                    key: 'description',
 	                    name: 'Description',
-	                    style: { width: '70%' }
+	                    style: { width: '' }
 	                }
 	            ]
 	        };

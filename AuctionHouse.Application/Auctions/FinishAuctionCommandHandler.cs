@@ -18,6 +18,12 @@ namespace AuctionHouse.Application.Auctions
 		public async Task Handle(ICommandEnvelope<FinishAuctionCommand> commandEnvelope)
 		{
 			var auction = await _auctionsRepository.Get(commandEnvelope.Command.Id);
+
+			if (auction.WasFinished)
+			{
+				return;
+			}
+
 			auction.Finish();
 			await _auctionsRepository.Save(auction, commandEnvelope.CommandId.ToString(), ExpectedAggregateRootVersion.Any);
 		}

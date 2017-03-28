@@ -35,6 +35,8 @@ namespace AuctionHouse.Domain.Auctions
 
 		public bool WasFinished { get; private set; }
 
+		public decimal? BuyNowPrice { get; private set; }
+
 		public static Auction Create(Guid id, string title, string description, DateTime endDate, decimal startingPrice,
 			decimal? buyNowPrice, string createdByUserName, ITimeProvider timeProvider)
 		{
@@ -101,15 +103,25 @@ namespace AuctionHouse.Domain.Auctions
 			var newBidIsHighest = !HighestBidPrice.HasValue || bidPrice > HighestBidPrice;
 			var newHighestBidPrice = newBidIsHighest ? bidPrice : HighestBidPrice.Value;
 			var newHighestBidderUserName = newBidIsHighest ? bidderUserName : HighestBidderUserName;
+			decimal newMinimalPriceForNextBidder;
 
-			var newMinimalPriceForNextBidderReferencePrice = newBidIsHighest
-				? (HighestBidPrice ?? StartingPrice)
-				: bidPrice;
+			if (bidderUserName == HighestBidderUserName)
+			{
+				newMinimalPriceForNextBidder = MinimalPriceForNextBidder;
+			}
+			else
+			{
+				var newMinimalPriceForNextBidderReferencePrice = newBidIsHighest
+					? (HighestBidPrice ?? StartingPrice)
+					: bidPrice;
+
+				newMinimalPriceForNextBidder = GetNewMinimalPriceForNextBidder(newMinimalPriceForNextBidderReferencePrice);
+			}
 
 			var bidMadeEvent = new BidMadeEvent
 			{
 				BidderUserName = bidderUserName,
-				MinimalPriceForNextBidder = GetNewMinimalPriceForNextBidder(newMinimalPriceForNextBidderReferencePrice),
+				MinimalPriceForNextBidder = newMinimalPriceForNextBidder,
 				HighestBidderUserName = newHighestBidderUserName,
 				HighestBidPrice = newHighestBidPrice,
 				AuctionId = Id,
@@ -117,6 +129,14 @@ namespace AuctionHouse.Domain.Auctions
 			};
 
 			ApplyChange(bidMadeEvent);
+
+			if (BuyNowPrice.HasValue && HighestBidPrice >= BuyNowPrice)
+			{
+				ApplyChange(new AuctionFinishedEvent
+				{
+					AuctionId = Id
+				});
+			}
 		}
 
 		private static decimal GetNewMinimalPriceForNextBidder(decimal referencePrice)
@@ -140,6 +160,7 @@ namespace AuctionHouse.Domain.Auctions
 			StartingPrice = auctionCreatedEvent.StartingPrice;
 			CreatedByUserName = auctionCreatedEvent.CreatedByUserName;
 			EndDateTime = auctionCreatedEvent.EndDateTime;
+			BuyNowPrice = auctionCreatedEvent.BuyNowPrice;
 		}
 
 		private void Apply(BidMadeEvent bidMadeEvent)

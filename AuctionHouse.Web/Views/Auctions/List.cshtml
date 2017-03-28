@@ -9,7 +9,16 @@
 			<td class="text-cell">
 				<a ui-sref="displayAuction({ auctionId: auction.id })">
 					{{ auction.title }}
-				</a> 
+				</a>
+			</td>
+			<td class="text-right">	
+				{{ auction.minimalPriceForNextBidder | currency }}
+			</td>
+			<td class="text-right">
+				{{ auction.buyNowPrice | currency }}
+			</td>
+			<td class="text-right">
+				<span ng-if="auction.numberOfBids > 0">{{ auction.numberOfBids }}</span>
 			</td>
 			<td class="text-cell">{{ auction.description }}</td>
 		</tr>

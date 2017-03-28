@@ -73,10 +73,18 @@ export class DisplayAuctionCtrl implements ng.IController {
 						});
 					})
 					.then(auction => {
+						var previousAuction = this.auction;
 						this.auctionLoadedCallback(auction);
 
 						if (auction.highestBidderUserName === this.securityUiService.currentUserName) {
-							this.genericModalService.showSuccessNotification('Congratulations, you are now the highest bidder!');
+							if (auction.wasFinished) {
+								this.genericModalService
+									.showSuccessNotification('Congratulations, you won the auction! Contact the seller in order to establish payment and delivery details.');
+							} else if (auction.highestBidderUserName === previousAuction.highestBidderUserName) {
+								this.genericModalService.showSuccessNotification('You are still the highest bidder.');
+							} else {
+								this.genericModalService.showSuccessNotification('Congratulations, you are now the highest bidder!');
+							}
 						} else {
 							this.genericModalService.showInformationNotification('Unfortunately your offer was not the highest.');
 						}

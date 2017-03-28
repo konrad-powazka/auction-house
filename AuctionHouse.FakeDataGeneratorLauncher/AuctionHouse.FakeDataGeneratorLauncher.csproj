@@ -87,6 +87,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FakeDataGenerator.cs" />
+    <Compile Include="GeneratedAuctionCharacteristic.cs" />
+    <Compile Include="GeneratedAuctionCharacteristicExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

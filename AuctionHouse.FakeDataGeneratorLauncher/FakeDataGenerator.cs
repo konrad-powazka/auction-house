@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Core.EventSourcing;
@@ -9,15 +10,14 @@ using AuctionHouse.Messages.Events.Auctions;
 using AuctionHouse.Messages.Events.UserMessaging;
 using AuctionHouse.Persistence.Shared;
 using Bogus;
-using JetBrains.Annotations;
 
 namespace AuctionHouse.FakeDataGeneratorLauncher
 {
 	public class FakeDataGenerator
 	{
 		private const string PredefinedUserName = "konrad.powazka";
-		private readonly ITimeProvider _timeProvider;
 		private readonly IEventsDatabase _eventsDatabase;
+		private readonly ITimeProvider _timeProvider;
 
 		public FakeDataGenerator(ITimeProvider timeProvider, IEventsDatabase eventsDatabase)
 		{
@@ -27,26 +27,23 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 
 		public async Task GenerateFakeData()
 		{
-			var hardcodedAuctionTemplates = GetHardcodedAuctionTemplates();
+			//var hardcodedAuctionTemplates = GetHardcodedAuctionTemplates();
 
 			var userNames =
 				Enumerable.Range(0, 17)
 					.Select(i => new Person().UserName)
 					.Concat(new[] {PredefinedUserName})
-					.Concat(hardcodedAuctionTemplates.Select(a => a.CreatedByUserName))
+					//.Concat(hardcodedAuctionTemplates.Select(a => a.CreatedByUserName))
 					.Distinct()
 					.ToList();
 
-			var generatedAuctionTemplates = userNames.SelectMany(GenerateAuctionTemplates);
-			var auctionTemplates = hardcodedAuctionTemplates.Concat(generatedAuctionTemplates).ToList();
+			var generatedAuctions = GenerateAuctions(userNames);
 
-			foreach (var auctionTemplate in auctionTemplates)
+			foreach (var generatedAuction in generatedAuctions)
 			{
-				var auctionCreatedEvent = MapAuctionTemplateToAuctionCreatedEvent(auctionTemplate);
-
 				await
-					_eventsDatabase.AppendToStream(StreamNameGenerator.GenerateAuctionStreamName(auctionCreatedEvent.Id),
-						WrapIntoEnvelopeCollection(auctionCreatedEvent), ExpectedStreamVersion.NotExisting);
+					_eventsDatabase.AppendToStream(StreamNameGenerator.GenerateAuctionStreamName(generatedAuction.Id),
+						WrapIntoEnvelopeCollection(generatedAuction.Events.AsEnumerable()), ExpectedStreamVersion.NotExisting);
 			}
 
 			var userMessageSentEvents = userNames.SelectMany(u => GenerateUserMessageSentEvents(u, userNames));
@@ -59,64 +56,207 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			}
 		}
 
-		private IEnumerable<AuctionTemplate> GenerateAuctionTemplates(string userName)
+		private IEnumerable<GeneratedAuction> GenerateAuctions(IReadOnlyCollection<string> allUserNames)
 		{
-			var auctionTemplateFaker = new Faker<AuctionTemplate>()
-					.RuleFor(a => a.Title, s =>
-					{
-						var title = s.Commerce.ProductName();
-						return title;
-					})
-					.RuleFor(a => a.Description, s =>
-					{
-						var numberOfParagraphs = s.Random.Int(3, 10);
-						return s.Lorem.Paragraphs(numberOfParagraphs);
-					})
-					.RuleFor(a => a.EndDate, s => s.Date.Between(_timeProvider.Now.AddDays(1), _timeProvider.Now.AddDays(21)))
-					.RuleFor(a => a.StartingPrice, s => s.Random.Bool() ? decimal.Round(s.Random.Decimal(1, 10000), 2) : 0)
-					.RuleFor(a => a.BuyNowPrice,
-						(s, a) => s.Random.Bool() ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?)null)
-					.RuleFor(a => a.CreatedByUserName, s => userName);
-
 			var randomizer = new Randomizer();
-			var numberOfAuctions = randomizer.Number(userName == PredefinedUserName ? 30 : 0, 50);
-			return auctionTemplateFaker.Generate(numberOfAuctions);
+
+			return
+				allUserNames.SelectMany(
+					currentUserName =>
+						Enum.GetValues(typeof(GeneratedAuctionCharacteristic))
+							.Cast<GeneratedAuctionCharacteristic>()
+							.SelectMany(
+								generatedAuctionCharacteristic =>
+									GenerateAuctionsHavingCharactersistic(generatedAuctionCharacteristic, currentUserName, allUserNames, randomizer)));
 		}
 
-		private AuctionCreatedEvent MapAuctionTemplateToAuctionCreatedEvent(AuctionTemplate auctionTemplate)
+		private IEnumerable<GeneratedAuction> GenerateAuctionsHavingCharactersistic(
+			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, string currentUserName,
+			IReadOnlyCollection<string> allUserNames, Randomizer randomizer)
 		{
-			return new AuctionCreatedEvent
+			var minNumberOfAuctions = currentUserName == PredefinedUserName ? 15 : 0;
+			var numberOfAuctions = randomizer.Int(minNumberOfAuctions, 40);
+
+			return
+				Enumerable.Range(0, numberOfAuctions)
+					.Select(i => GenerateAuction(currentUserName, generatedAuctionCharacteristic, allUserNames, randomizer));
+		}
+
+		private GeneratedAuction GenerateAuction(string currentUserName,
+			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, IReadOnlyCollection<string> allUserNames,
+			Randomizer randomizer)
+		{
+			var otherUserNames = allUserNames.Except(new[] {currentUserName}).ToList();
+			var isEndDateFuture = generatedAuctionCharacteristic.CheckIfAuctionIsInProgress() || randomizer.Bool();
+			var id = Guid.NewGuid();
+
+			var auctionCreatedEventFaker = new Faker<AuctionCreatedEvent>()
+				.RuleFor(a => a.Id, id)
+				.RuleFor(a => a.Title, s =>
+				{
+					var title = s.Commerce.ProductName();
+					return title;
+				})
+				.RuleFor(a => a.Description, s =>
+				{
+					var numberOfParagraphs = s.Random.Int(3, 10);
+					return s.Lorem.Paragraphs(numberOfParagraphs);
+				})
+				.RuleFor(a => a.BuyNowPrice,
+					(s, a) => s.Random.Int(1, 3) > 1 ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?) null)
+				.RuleFor(a => a.EndDateTime, s => isEndDateFuture
+					? s.Date.Between(_timeProvider.Now.AddMinutes(3), _timeProvider.Now.AddDays(21))
+					: s.Date.Between(_timeProvider.Now.AddDays(-1000), _timeProvider.Now.AddMinutes(-3)))
+				.RuleFor(a => a.StartingPrice, s => s.Random.Bool() ? decimal.Round(s.Random.Decimal(1, 10000), 2) : 0)
+				.RuleFor(a => a.BuyNowPrice,
+					(s, a) =>
+					{
+						var mustHaveBuyNowPrice = isEndDateFuture && generatedAuctionCharacteristic.CheckIfFinishesWithBuy();
+
+						return mustHaveBuyNowPrice || s.Random.Bool()
+							? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000))
+							: (decimal?) null;
+					})
+				.RuleFor(a => a.CreatedByUserName,
+					s => generatedAuctionCharacteristic.CheckIfUserIsSelling() ? currentUserName : s.PickRandom(otherUserNames))
+				.RuleFor(a => a.MinimalPriceForNextBidder, (s, e) => Math.Max(e.StartingPrice, 0.01m));
+
+			Debug.Assert(auctionCreatedEventFaker.Validate());
+
+			var auctionCreatedEvent = auctionCreatedEventFaker.Generate(1).Single();
+			var bidMadeEvents = GenerateBidMadeEvents(auctionCreatedEvent, generatedAuctionCharacteristic, currentUserName,
+				allUserNames, isEndDateFuture, randomizer);
+
+			return new GeneratedAuction
 			{
-				CreatedByUserName = auctionTemplate.CreatedByUserName,
-				Id = Guid.NewGuid(),
-				BuyNowPrice = auctionTemplate.BuyNowPrice,
-				Description = auctionTemplate.Description,
-				EndDateTime = auctionTemplate.EndDate,
-				MinimalPriceForNextBidder = Math.Max(auctionTemplate.StartingPrice, 0.01m),
-				StartingPrice = auctionTemplate.StartingPrice,
-				Title = auctionTemplate.Title
+				Id = id,
+				Events = new IEvent[] {auctionCreatedEvent}.Concat(bidMadeEvents).ToList()
 			};
 		}
 
-		private IEnumerable<EventEnvelope<TEvent>> WrapIntoEnvelopeCollection<TEvent>(TEvent @event) where TEvent : IEvent
+		private IEnumerable<BidMadeEvent> GenerateBidMadeEvents(AuctionCreatedEvent auctionCreatedEvent,
+			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, string currentUserName,
+			IReadOnlyCollection<string> allUserNames, bool isEndDateFuture, Randomizer randomizer)
 		{
-			return new [] {  new EventEnvelope<TEvent>(@event, Guid.NewGuid()) };
+			if (!generatedAuctionCharacteristic.CheckIfCanHaveBids())
+			{
+				return Enumerable.Empty<BidMadeEvent>();
+			}
+
+			var minNumberOfBids = GetMinimumNumberOfBids(generatedAuctionCharacteristic);
+			var numberOfBids = minNumberOfBids == 0 && randomizer.Bool() ? 0 : randomizer.Int(minNumberOfBids, 15);
+			var canCurrentUserBid = !generatedAuctionCharacteristic.CheckIfUserIsSelling();
+			var bidMadeEvents = new List<BidMadeEvent>();
+			var userNamesNotSelling = allUserNames.Except(new[] {auctionCreatedEvent.CreatedByUserName}).ToArray();
+			var userNamesNotSellingExceptCurrentUser = userNamesNotSelling.Except(new[] {currentUserName}).ToArray();
+			var minBidPrice = auctionCreatedEvent.MinimalPriceForNextBidder;
+
+			for (var bidNumber = 1; bidNumber <= numberOfBids; bidNumber++)
+			{
+				var isLastBid = bidNumber == numberOfBids;
+				var currentUserMadeBids = bidMadeEvents.Any(e => e.BidderUserName == currentUserName);
+
+				var mustInsertCurrentUserBidNow = (isLastBid &&
+				                                   generatedAuctionCharacteristic ==
+				                                   GeneratedAuctionCharacteristic.UserMadeBidsAndWon) ||
+				                                  (bidNumber == numberOfBids - 1 &&
+				                                   generatedAuctionCharacteristic ==
+				                                   GeneratedAuctionCharacteristic.UserMadeBidsAndNotWon && !currentUserMadeBids) ||
+				                                  (isLastBid &&
+				                                   generatedAuctionCharacteristic ==
+				                                   GeneratedAuctionCharacteristic.UserMadeBidsAndInProgress && !currentUserMadeBids);
+
+				var canInsertCurrentUserBidNow =
+					canCurrentUserBid &&
+					!(isLastBid && generatedAuctionCharacteristic == GeneratedAuctionCharacteristic.UserMadeBidsAndNotWon);
+
+				var bidderUserName = mustInsertCurrentUserBidNow
+					? currentUserName
+					: (canInsertCurrentUserBidNow
+						? randomizer.ArrayElement(userNamesNotSelling)
+						: randomizer.ArrayElement(userNamesNotSellingExceptCurrentUser));
+
+				var mustBuy = generatedAuctionCharacteristic.CheckIfFinishesWithBuy() && isLastBid;
+				var canBuy = !generatedAuctionCharacteristic.CheckIfFinishesWithBuy() || !isLastBid;
+				var numberOfBidsLeft = numberOfBids - bidNumber;
+				var maxBidPrice = auctionCreatedEvent.BuyNowPrice - numberOfBidsLeft*0.01M ?? 400000M;
+
+				if (mustBuy)
+				{
+					if (isEndDateFuture)
+					{
+						if (!auctionCreatedEvent.BuyNowPrice.HasValue)
+						{
+							throw new ArgumentOutOfRangeException(nameof(generatedAuctionCharacteristic));
+						}
+
+						minBidPrice = auctionCreatedEvent.BuyNowPrice.Value;
+						maxBidPrice = auctionCreatedEvent.BuyNowPrice.Value;
+					}
+					else
+					{
+						minBidPrice = minBidPrice + 0.01M;
+					}
+				}
+				else if (!canBuy && auctionCreatedEvent.BuyNowPrice.HasValue)
+				{
+					maxBidPrice = Math.Min(maxBidPrice, auctionCreatedEvent.BuyNowPrice.Value - 0.01M);
+				}
+
+				var bidPrice = Math.Round(randomizer.Decimal(minBidPrice, maxBidPrice), 2);
+
+				var minimalPriceForNextBidder = bidMadeEvents.Any()
+					? bidMadeEvents.Max(e => e.BidPrice) + 0.01M
+					: auctionCreatedEvent.StartingPrice;
+
+				var bidMadeEvent = new BidMadeEvent
+				{
+					AuctionId = auctionCreatedEvent.Id,
+					BidderUserName = bidderUserName,
+					BidPrice = bidPrice,
+					HighestBidderUserName = bidderUserName,
+					MinimalPriceForNextBidder = minimalPriceForNextBidder,
+					HighestBidPrice = bidPrice
+				};
+
+				bidMadeEvents.Add(bidMadeEvent);
+				minBidPrice = bidPrice + 0.01M;
+			}
+
+			return bidMadeEvents;
 		}
 
-		private IReadOnlyCollection<AuctionTemplate> GetHardcodedAuctionTemplates()
+		private int GetMinimumNumberOfBids(GeneratedAuctionCharacteristic generatedAuctionCharacteristic)
 		{
-			return new[]
+			switch (generatedAuctionCharacteristic)
 			{
-				new AuctionTemplate("The Dark Side of the Moon 1973 vinyl",
-					"A well-preserved original release of a timeless classic album from Pink Floyd.", _timeProvider.Now.AddMinutes(1),
-					20, 80, "vinyl_shop"),
-				new AuctionTemplate("Kyuss - Kyuss (Welcome to Sky Valley)",
-					"I would like to sell an original 1994 release of the self-titled third album by Kyuss.",
-					_timeProvider.Now.AddHours(2), 0, null, PredefinedUserName),
-				new AuctionTemplate("Fiat Multipla 1.9 Multijet Eleganza 5dr",
-					"The car may be ugly, but with only 100 000 kilometers of mileage it's a bargain!",
-					_timeProvider.Now.AddDays(3).AddMinutes(77), 800, 1500, "family_guy")
-			};
+				case GeneratedAuctionCharacteristic.UserMadeBidsAndWon:
+				case GeneratedAuctionCharacteristic.UserMadeBidsAndInProgress:
+				case GeneratedAuctionCharacteristic.UserSellingAndFinishedWithBids:
+					return 1;
+				case GeneratedAuctionCharacteristic.UserMadeBidsAndNotWon:
+					return 2;
+				case GeneratedAuctionCharacteristic.UserSellingAndInProgress:
+				case GeneratedAuctionCharacteristic.UserSellingAndFinishedWithoutBids:
+					return 0;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(generatedAuctionCharacteristic));
+			}
+		}
+
+		private IEventEnvelope<TEvent> WrapIntoEnvelope<TEvent>(TEvent @event) where TEvent : IEvent
+		{
+			return new EventEnvelope<TEvent>(@event, Guid.NewGuid());
+		}
+
+		private IEnumerable<IEventEnvelope<TEvent>> WrapIntoEnvelopeCollection<TEvent>(TEvent @event) where TEvent : IEvent
+		{
+			return new[] {WrapIntoEnvelope(@event)};
+		}
+
+		private IEnumerable<IEventEnvelope<IEvent>> WrapIntoEnvelopeCollection(IEnumerable<IEvent> events)
+		{
+			return events.Select<IEvent, IEventEnvelope<IEvent>>(WrapIntoEnvelope);
 		}
 
 		private IEnumerable<UserMessageSentEvent> GenerateUserMessageSentEvents(string userName,
@@ -142,40 +282,11 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			return userMessageSentEventFaker.Generate(numberOfMessages);
 		}
 
-		private class AuctionTemplate
+		private class GeneratedAuction
 		{
-			public AuctionTemplate()
-			{
-			}
+			public Guid Id { get; set; }
 
-			public AuctionTemplate(string title, string description, DateTime endDate, decimal startingPrice,
-				decimal? buyNowPrice, string createdByUserName)
-			{
-				Title = title;
-				Description = description;
-				EndDate = endDate;
-				StartingPrice = startingPrice;
-				BuyNowPrice = buyNowPrice;
-				CreatedByUserName = createdByUserName;
-			}
-
-			[UsedImplicitly]
-			public string Title { get; set; }
-
-			[UsedImplicitly]
-			public string Description { get; set; }
-
-			[UsedImplicitly]
-			public DateTime EndDate { get; set; }
-
-			[UsedImplicitly]
-			public decimal StartingPrice { get; set; }
-
-			[UsedImplicitly]
-			public decimal? BuyNowPrice { get; set; }
-
-			[UsedImplicitly]
-			public string CreatedByUserName { get; set; }
+			public IReadOnlyCollection<IEvent> Events { get; set; }
 		}
 	}
 }
