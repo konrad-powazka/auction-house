@@ -4,6 +4,7 @@ import { SearchAuctionsQuery } from '../../Messages/Queries';
 
 export class AuctionsListCtrl implements ng.IController {
 	queryString: string;
+	getAuctions: (pageSize: number, pageNumber: number) => ng.IPromise<AuctionsListReadModel>;
 
 	tastyInitCfg = {
 		'count': 25,
@@ -50,19 +51,13 @@ export class AuctionsListCtrl implements ng.IController {
 		]
 	};
 
-	static $inject = ['searchAuctionsQueryHandler'];
-
-	constructor(private searchAuctionsQueryHandler: IQueryHandler<SearchAuctionsQuery, AuctionsListReadModel>) {
-	}
+	static $inject = [];
 
 	getResource = (paramsString: string, paramsObject: any): ng.IPromise<any> => {
-		const query = {
-			queryString: this.queryString,
-			pageSize: paramsObject.count,
-			pageNumber: paramsObject.page
-		};
+		var pageSize = paramsObject.count;
+		var pageNumber = paramsObject.page;
 
-		return this.searchAuctionsQueryHandler.handle(query)
+		return this.getAuctions(pageSize, pageNumber)
 			.then(auctionsList => {
 				return {
 					rows: auctionsList.pageItems,

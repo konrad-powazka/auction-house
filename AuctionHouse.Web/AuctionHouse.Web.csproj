@@ -390,6 +390,7 @@
     <Content Include="Views\Shared\UserReference.cshtml" />
     <Content Include="Views\UserMessaging\UserMessages.cshtml" />
     <Content Include="Views\Auctions\UserList.cshtml" />
+    <Content Include="Views\Auctions\ActiveList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -473,6 +474,8 @@
     <TypeScriptCompile Include="Scripts\app\Routing.ts" />
     <TypeScriptCompile Include="Scripts\app\Security\SecurityService.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\AuctionRules.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Auctions\ActiveAuctionsListComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Auctions\ActiveAuctionsListCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\UserAuctionsListComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\AuctionsListComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\UserAuctionsListCtrl.ts" />

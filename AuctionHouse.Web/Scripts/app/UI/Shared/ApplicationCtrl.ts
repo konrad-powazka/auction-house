@@ -52,10 +52,6 @@ export class ApplicationCtrl implements ng.IController {
 		});
 	}
 
-	checkIfAuctionsSearchQueryStringIsValid(): boolean {
-		return _(this.auctionsSearchQueryString).isString() && !!this.auctionsSearchQueryString.trim();
-	}
-
 	searchAuctions(): void {
 		this.$state.go('auctionsSearch', { queryString: this.auctionsSearchQueryString });
 	}

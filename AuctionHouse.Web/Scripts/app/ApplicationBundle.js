@@ -66,6 +66,7 @@
 	var UserReferenceComponent_1 = __webpack_require__(31);
 	var UserMessagesComponent_1 = __webpack_require__(33);
 	var UserAuctionsListComponent_1 = __webpack_require__(35);
+	var ActiveAuctionsListComponent_1 = __webpack_require__(37);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -154,7 +155,8 @@
 	    new UserReferenceComponent_1.UserReferenceComponent(),
 	    new ComposeUserMessageDialogComponent_1.ComposeUserMessageDialogComponent(),
 	    new UserMessagesComponent_1.UserMessagesComponent(),
-	    new UserAuctionsListComponent_1.UserAuctionsListComponent()
+	    new UserAuctionsListComponent_1.UserAuctionsListComponent(),
+	    new ActiveAuctionsListComponent_1.ActiveAuctionsListComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -766,9 +768,6 @@
 	            }
 	        });
 	    }
-	    ApplicationCtrl.prototype.checkIfAuctionsSearchQueryStringIsValid = function () {
-	        return _(this.auctionsSearchQueryString).isString() && !!this.auctionsSearchQueryString.trim();
-	    };
 	    ApplicationCtrl.prototype.searchAuctions = function () {
 	        this.$state.go('auctionsSearch', { queryString: this.auctionsSearchQueryString });
 	    };
@@ -791,12 +790,12 @@
 	            {
 	                name: 'home',
 	                url: '/',
-	                component: 'auctionsList'
+	                component: 'activeAuctionsList'
 	            },
 	            {
 	                name: 'auctionsSearch',
 	                url: '/auction/search/{queryString}',
-	                component: 'auctionsList',
+	                component: 'activeAuctionsList',
 	                resolve: {
 	                    queryString: [
 	                        '$stateParams', function ($stateParams) {
@@ -1250,7 +1249,7 @@
 	        this.templateUrl = 'Template/Auctions/List';
 	        this.registerAs = 'auctionsList';
 	        this.bindings = {
-	            queryString: '<'
+	            getAuctions: '<'
 	        };
 	    }
 	    return AuctionsListComponent;
@@ -1264,9 +1263,8 @@
 
 	"use strict";
 	var AuctionsListCtrl = (function () {
-	    function AuctionsListCtrl(searchAuctionsQueryHandler) {
+	    function AuctionsListCtrl() {
 	        var _this = this;
-	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
 	        this.tastyInitCfg = {
 	            'count': 25,
 	            'page': 1
@@ -1311,12 +1309,9 @@
 	            ]
 	        };
 	        this.getResource = function (paramsString, paramsObject) {
-	            var query = {
-	                queryString: _this.queryString,
-	                pageSize: paramsObject.count,
-	                pageNumber: paramsObject.page
-	            };
-	            return _this.searchAuctionsQueryHandler.handle(query)
+	            var pageSize = paramsObject.count;
+	            var pageNumber = paramsObject.page;
+	            return _this.getAuctions(pageSize, pageNumber)
 	                .then(function (auctionsList) {
 	                return {
 	                    rows: auctionsList.pageItems,
@@ -1333,7 +1328,7 @@
 	    }
 	    return AuctionsListCtrl;
 	}());
-	AuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
+	AuctionsListCtrl.$inject = [];
 	exports.AuctionsListCtrl = AuctionsListCtrl;
 
 
@@ -1736,65 +1731,65 @@
 	    function UserAuctionsListCtrl(getAuctionsInvolvingUserQueryHandler) {
 	        var _this = this;
 	        this.getAuctionsInvolvingUserQueryHandler = getAuctionsInvolvingUserQueryHandler;
-	        this.tastyInitCfg = {
-	            'count': 10,
-	            'page': 1
-	        };
-	        this.staticResource = {
-	            header: [
-	                {
-	                    key: 'title',
-	                    name: 'Title',
-	                    style: { width: '20%' }
-	                },
-	                {
-	                    key: 'currentPrice',
-	                    name: 'Current price',
-	                    style: { width: '120px', 'text-align': 'right' }
-	                },
-	                {
-	                    key: 'buyNowPrice',
-	                    name: 'Buy now price',
-	                    style: { width: '120px', 'text-align': 'right' }
-	                },
-	                {
-	                    key: 'numberOfBids',
-	                    name: 'Bids',
-	                    style: { width: '50px', 'text-align': 'right' }
-	                },
-	                {
-	                    key: 'description',
-	                    name: 'Description',
-	                    style: { width: '' }
-	                }
-	            ]
-	        };
-	        this.getResource = function (paramsString, paramsObject) {
+	        this.userInvolvementIntoAuction = 'Selling';
+	        this.getAuctions = function (pageSize, pageNumber) {
 	            var query = {
-	                queryString: '',
-	                userInvolvementIntoAuction: null,
-	                pageSize: paramsObject.count,
-	                pageNumber: paramsObject.page
+	                queryString: _this.queryString,
+	                userInvolvementIntoAuction: _this.userInvolvementIntoAuction,
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
 	            };
-	            return _this.getAuctionsInvolvingUserQueryHandler.handle(query)
-	                .then(function (auctionsList) {
-	                return {
-	                    rows: auctionsList.pageItems,
-	                    pagination: {
-	                        count: auctionsList.pageSize,
-	                        page: auctionsList.pageNumber,
-	                        pages: auctionsList.totalPagesCount,
-	                        size: auctionsList.totalItemsCount
-	                    },
-	                    header: _this.staticResource.header
-	                };
-	            });
+	            return _this.getAuctionsInvolvingUserQueryHandler.handle(query);
 	        };
 	    }
 	    return UserAuctionsListCtrl;
 	}());
 	UserAuctionsListCtrl.$inject = ['getAuctionsInvolvingUserQueryHandler'];
 	exports.UserAuctionsListCtrl = UserAuctionsListCtrl;
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var ActiveAuctionsListCtrl_1 = __webpack_require__(38);
+	var ActiveAuctionsListComponent = (function () {
+	    function ActiveAuctionsListComponent() {
+	        this.controller = ActiveAuctionsListCtrl_1.ActiveAuctionsListCtrl;
+	        this.templateUrl = 'Template/Auctions/ActiveList';
+	        this.registerAs = 'activeAuctionsList';
+	        this.bindings = {
+	            queryString: '<'
+	        };
+	    }
+	    return ActiveAuctionsListComponent;
+	}());
+	exports.ActiveAuctionsListComponent = ActiveAuctionsListComponent;
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var ActiveAuctionsListCtrl = (function () {
+	    function ActiveAuctionsListCtrl(searchAuctionsQueryHandler) {
+	        var _this = this;
+	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
+	        this.getAuctions = function (pageSize, pageNumber) {
+	            var query = {
+	                queryString: _this.queryString,
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
+	            };
+	            return _this.searchAuctionsQueryHandler.handle(query);
+	        };
+	    }
+	    return ActiveAuctionsListCtrl;
+	}());
+	ActiveAuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
+	exports.ActiveAuctionsListCtrl = ActiveAuctionsListCtrl;
 
 
 /***/ }

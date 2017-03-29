@@ -4,12 +4,12 @@
 		{
 			name: 'home',
 			url: '/',
-			component: 'auctionsList'
+			component: 'activeAuctionsList'
 		},
 		{
 			name: 'auctionsSearch',
 			url: '/auction/search/{queryString}',
-			component: 'auctionsList',
+			component: 'activeAuctionsList',
 			resolve: {
 				queryString: [
 					'$stateParams', ($stateParams: angular.ui.IStateParamsService) => {

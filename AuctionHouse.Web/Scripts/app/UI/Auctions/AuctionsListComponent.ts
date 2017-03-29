@@ -6,6 +6,6 @@ export class AuctionsListComponent implements INamedComponentOptions {
     templateUrl = 'Template/Auctions/List';
     registerAs = 'auctionsList';
 	bindings = {
-		queryString: '<'
+		getAuctions: '<'
     }
 }
