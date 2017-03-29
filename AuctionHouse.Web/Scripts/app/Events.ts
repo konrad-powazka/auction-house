@@ -35,11 +35,13 @@ class AuctionCreatedEvent
 	public createdByUserName: string;
 	public endDateTime: string;
 	public buyNowPrice: number | null;
+	public currentPrice: number;
 }
 export
 class AuctionFinishedEvent
 {
 	public auctionId: string;
+	public finishedDateTime: string;
 }
 export
 class BidMadeEvent
@@ -50,6 +52,7 @@ class BidMadeEvent
 	public highestBidderUserName: string;
 	public highestBidPrice: number;
 	public minimalPriceForNextBidder: number;
+	public currentPrice: number;
 }
 export
 class CommandHandlingSucceededEvent extends CommandHandlingFeedbackEvent

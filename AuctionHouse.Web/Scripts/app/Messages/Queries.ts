@@ -16,6 +16,14 @@ class GetAuctionDetailsQuery
 	public id: string;
 }
 export
+class GetAuctionsInvolvingUserQuery
+{
+	public queryString: string;
+	public userInvolvementIntoAuction: any | null;
+	public pageSize: number;
+	public pageNumber: number;
+}
+export
 class SearchAuctionsQuery
 {
 	public queryString: string;

@@ -20,5 +20,7 @@ namespace AuctionHouse.Messages.Events.Auctions
 		public DateTime EndDateTime { get; set; }
 
 		public decimal? BuyNowPrice { get; set; }
+
+		public decimal CurrentPrice { get; set; }
 	}
 }

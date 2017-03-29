@@ -9,7 +9,6 @@ using AuctionHouse.Messages.Queries;
 using AuctionHouse.ReadModel.Dtos;
 using Reinforced.Typings;
 using Reinforced.Typings.Ast;
-using Reinforced.Typings.Attributes;
 using Reinforced.Typings.Fluent;
 using Reinforced.Typings.Generators;
 

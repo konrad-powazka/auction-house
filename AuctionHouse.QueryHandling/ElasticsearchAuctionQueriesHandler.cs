@@ -3,15 +3,14 @@ using AuctionHouse.Core;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Messages.Queries.Auctions;
 using AuctionHouse.ReadModel.Dtos.Auctions;
-using AuctionHouse.ReadModel.Dtos.Auctions.Details;
-using AuctionHouse.ReadModel.Dtos.Auctions.List;
 using Nest;
 
 namespace AuctionHouse.QueryHandling
 {
 	public class ElasticsearchAuctionQueriesHandler :
 		IQueryHandler<GetAuctionDetailsQuery, AuctionDetailsReadModel>,
-		IQueryHandler<SearchAuctionsQuery, AuctionsListReadModel>
+		IQueryHandler<SearchAuctionsQuery, AuctionsListReadModel>,
+		IQueryHandler<GetAuctionsInvolvingUserQuery, AuctionsListReadModel>
 	{
 		private readonly IElasticClient _elasticClient;
 
@@ -25,6 +24,24 @@ namespace AuctionHouse.QueryHandling
 		{
 			var response = await _elasticClient.GetAsync<AuctionDetailsReadModel>(queryEnvelope.Query.Id);
 			return response.Source;
+		}
+
+		public async Task<AuctionsListReadModel> Handle(
+			IQueryEnvelope<GetAuctionsInvolvingUserQuery, AuctionsListReadModel> queryEnvelope)
+		{
+			return
+				await
+					_elasticClient
+						.RunPagedQuery
+						<GetAuctionsInvolvingUserQuery, AuctionsListReadModel, AuctionListItemReadModel, AuctionDetailsReadModel>(
+							queryEnvelope.Query,
+							q => q.Term(tqd => tqd.Field(a => a.BiddersUserNames).Value(queryEnvelope.SenderUserName))
+							     &&
+							     q.MultiMatch(
+								     mq => mq.Fields(f => f.Fields(a => a.Title, a => a.Description))
+									     .Query(queryEnvelope.Query.QueryString)
+									     .Fuzziness(Fuzziness.Auto)),
+							sd => sd.Descending(a => a.EndDate));
 		}
 
 		public async Task<AuctionsListReadModel> Handle(

@@ -13,7 +13,7 @@
 				<tr ng-repeat="message in rows">
 					<td class="text-cell">{{ message.senderUserName }}</td>
 					<td class="text-cell">
-						{{ message.subject }} <span class="text-excerpt">{{ message.body }}</span>
+						{{ message.subject }} <span class="text-dimmed">{{ message.body }}</span>
 					</td>
 					<td>{{ message.sentDateTime | formatDateTime }}</td>
 				</tr>

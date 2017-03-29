@@ -21,6 +21,8 @@ namespace AuctionHouse.Domain.Auctions
 
 		public decimal StartingPrice { get; private set; }
 
+		public decimal CurrentPrice { get; set; }
+
 		public decimal MinimalPriceForNextBidder { get; private set; }
 
 		public decimal? HighestBidPrice { get; private set; }
@@ -71,6 +73,7 @@ namespace AuctionHouse.Domain.Auctions
 				Description = description,
 				StartingPrice = startingPrice,
 				MinimalPriceForNextBidder = Math.Max(startingPrice, 0.01m),
+				CurrentPrice = startingPrice,
 				CreatedByUserName = createdByUserName,
 				EndDateTime = endDate,
 				BuyNowPrice = buyNowPrice
@@ -104,18 +107,20 @@ namespace AuctionHouse.Domain.Auctions
 			var newHighestBidPrice = newBidIsHighest ? bidPrice : HighestBidPrice.Value;
 			var newHighestBidderUserName = newBidIsHighest ? bidderUserName : HighestBidderUserName;
 			decimal newMinimalPriceForNextBidder;
+			decimal newCurrentPrice;
 
 			if (bidderUserName == HighestBidderUserName)
 			{
 				newMinimalPriceForNextBidder = MinimalPriceForNextBidder;
+				newCurrentPrice = CurrentPrice;
 			}
 			else
 			{
-				var newMinimalPriceForNextBidderReferencePrice = newBidIsHighest
+				newCurrentPrice = newBidIsHighest
 					? (HighestBidPrice ?? StartingPrice)
 					: bidPrice;
 
-				newMinimalPriceForNextBidder = GetNewMinimalPriceForNextBidder(newMinimalPriceForNextBidderReferencePrice);
+				newMinimalPriceForNextBidder = GetNewMinimalPriceForNextBidder(newCurrentPrice);
 			}
 
 			var bidMadeEvent = new BidMadeEvent
@@ -125,7 +130,8 @@ namespace AuctionHouse.Domain.Auctions
 				HighestBidderUserName = newHighestBidderUserName,
 				HighestBidPrice = newHighestBidPrice,
 				AuctionId = Id,
-				BidPrice = bidPrice
+				BidPrice = bidPrice,
+				CurrentPrice = newCurrentPrice
 			};
 
 			ApplyChange(bidMadeEvent);
@@ -134,7 +140,8 @@ namespace AuctionHouse.Domain.Auctions
 			{
 				ApplyChange(new AuctionFinishedEvent
 				{
-					AuctionId = Id
+					AuctionId = Id,
+					FinishedDateTime = _timeProvider.Now
 				});
 			}
 		}
@@ -161,6 +168,7 @@ namespace AuctionHouse.Domain.Auctions
 			CreatedByUserName = auctionCreatedEvent.CreatedByUserName;
 			EndDateTime = auctionCreatedEvent.EndDateTime;
 			BuyNowPrice = auctionCreatedEvent.BuyNowPrice;
+			CurrentPrice = auctionCreatedEvent.CurrentPrice;
 		}
 
 		private void Apply(BidMadeEvent bidMadeEvent)
@@ -168,6 +176,7 @@ namespace AuctionHouse.Domain.Auctions
 			MinimalPriceForNextBidder = bidMadeEvent.MinimalPriceForNextBidder;
 			HighestBidPrice = bidMadeEvent.HighestBidPrice;
 			HighestBidderUserName = bidMadeEvent.HighestBidderUserName;
+			CurrentPrice = bidMadeEvent.CurrentPrice;
 		}
 
 		private void Apply(AuctionFinishedEvent auctionFinishedEvent)
@@ -184,7 +193,8 @@ namespace AuctionHouse.Domain.Auctions
 
 			ApplyChange(new AuctionFinishedEvent
 			{
-				AuctionId = Id
+				AuctionId = Id,
+				FinishedDateTime = EndDateTime
 			});
 		}
 	}

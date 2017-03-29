@@ -23,15 +23,6 @@ class UserMessageReadModel
 	public sentDateTime: string;
 }
 export
-class AuctionsListReadModel
-{
-	public pageNumber: number;
-	public totalPagesCount: number;
-	public totalItemsCount: number;
-	public pageItems: AuctionListItemReadModel[];
-	public pageSize: number;
-}
-export
 class AuctionListItemReadModel
 {
 	public id: string;
@@ -43,11 +34,23 @@ class AuctionListItemReadModel
 	public minimalPriceForNextBidder: number;
 	public wasFinished: boolean;
 	public numberOfBids: number;
+	public finishedDateTime: any | null;
+	public highestBidderUserName: string;
+	public currentPrice: number;
+}
+export
+class AuctionsListReadModel
+{
+	public pageNumber: number;
+	public totalPagesCount: number;
+	public totalItemsCount: number;
+	public pageItems: AuctionListItemReadModel[];
+	public pageSize: number;
 }
 export
 class AuctionDetailsReadModel extends AuctionListItemReadModel
 {
 	public startingPrice: number;
-	public highestBidderUserName: string;
 	public version: number;
+	public biddersUserNames: string[];
 }

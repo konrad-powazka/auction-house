@@ -3,6 +3,7 @@ using System.Net;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.ReadModel;
 using AuctionHouse.Persistence;
+using AuctionHouse.ReadModel.Dtos.Auctions;
 using AuctionHouse.ReadModel.Dtos.UserMessaging;
 using AuctionHouse.ReadModel.Repositories;
 using Autofac;
@@ -92,9 +93,12 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 						m =>
 							m.Map<UserMessageReadModel>(t => t.AutoMap().Properties(p => p
 								.Keyword(k => k.Name(rm => rm.RecipientUserName))
-								.Keyword(k => k.Name(rm => rm.RecipientUserName))))))
+								.Keyword(k => k.Name(rm => rm.RecipientUserName))))
+								.Map<AuctionDetailsReadModel>(
+									t => t.AutoMap().Properties(p => p
+										.Keyword(k => k.Name(rm => rm.BiddersUserNames))))))
+				//	t => t.AutoMap().Properties(p => p.Nested<string>(n => n.Name(rm => rm.BiddersUserNames))))))
 				.Wait();
-			
 
 			containerBuilder.RegisterInstance(elasticClient).As<IElasticClient>();
 		}

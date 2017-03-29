@@ -1,6 +1,6 @@
 ﻿using System;
 using AuctionHouse.Core.Messaging;
-using AuctionHouse.ReadModel.Dtos.Auctions.Details;
+using AuctionHouse.ReadModel.Dtos.Auctions;
 
 namespace AuctionHouse.Messages.Queries.Auctions
 {

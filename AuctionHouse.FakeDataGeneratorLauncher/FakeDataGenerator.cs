@@ -108,6 +108,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					? s.Date.Between(_timeProvider.Now.AddMinutes(3), _timeProvider.Now.AddDays(21))
 					: s.Date.Between(_timeProvider.Now.AddDays(-1000), _timeProvider.Now.AddMinutes(-3)))
 				.RuleFor(a => a.StartingPrice, s => s.Random.Bool() ? decimal.Round(s.Random.Decimal(1, 10000), 2) : 0)
+				.RuleFor(a => a.CurrentPrice, (s, a) => a.StartingPrice)
 				.RuleFor(a => a.BuyNowPrice,
 					(s, a) =>
 					{
@@ -205,9 +206,11 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 
 				var bidPrice = Math.Round(randomizer.Decimal(minBidPrice, maxBidPrice), 2);
 
-				var minimalPriceForNextBidder = bidMadeEvents.Any()
-					? bidMadeEvents.Max(e => e.BidPrice) + 0.01M
+				var currentPrice = bidMadeEvents.Any()
+					? bidMadeEvents.Max(e => e.BidPrice)
 					: auctionCreatedEvent.StartingPrice;
+
+				var minimalPriceForNextBidder = currentPrice + 0.01M;
 
 				var bidMadeEvent = new BidMadeEvent
 				{
@@ -216,7 +219,8 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					BidPrice = bidPrice,
 					HighestBidderUserName = bidderUserName,
 					MinimalPriceForNextBidder = minimalPriceForNextBidder,
-					HighestBidPrice = bidPrice
+					HighestBidPrice = bidPrice,
+					CurrentPrice = currentPrice
 				};
 
 				bidMadeEvents.Add(bidMadeEvent);

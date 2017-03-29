@@ -24,7 +24,7 @@ namespace AuctionHouse.Core
 					elasticClient.SearchAsync<TElasticsearchDocument>(
 						s =>
 							s.Query(applyQueryFiltersFunc)
-							.Sort(sd => applySorting(sd))
+								.Sort(applySorting)
 								.From(firstItemIndex)
 								.Take(query.PageSize));
 

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using AuctionHouse.Core.Paging;
-using AuctionHouse.ReadModel.Dtos.Auctions.List;
 
 namespace AuctionHouse.ReadModel.Dtos.Auctions
 {

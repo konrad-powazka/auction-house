@@ -13,6 +13,11 @@ export class GetAuctionDetailsQueryHandler extends QueryHandler<Queries.GetAucti
 		return 'GetAuctionDetailsQuery';
 	}
 }
+export class GetAuctionsInvolvingUserQueryHandler extends QueryHandler<Queries.GetAuctionsInvolvingUserQuery, ReadModel.AuctionsListReadModel> {
+	protected getQueryName(): string {
+		return 'GetAuctionsInvolvingUserQuery';
+	}
+}
 export class SearchAuctionsQueryHandler extends QueryHandler<Queries.SearchAuctionsQuery, ReadModel.AuctionsListReadModel> {
 	protected getQueryName(): string {
 		return 'SearchAuctionsQuery';
@@ -23,6 +28,7 @@ export class AngularQueryHandlersRegistry {
 	static queryHandlers: {[name: string]: ng.Injectable<Function>} = {
 							'getUserInboxQueryHandler': GetUserInboxQueryHandler,
 							'getAuctionDetailsQueryHandler': GetAuctionDetailsQueryHandler,
+							'getAuctionsInvolvingUserQueryHandler': GetAuctionsInvolvingUserQueryHandler,
 							'searchAuctionsQueryHandler': SearchAuctionsQueryHandler,
 					};
 	}

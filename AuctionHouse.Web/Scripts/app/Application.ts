@@ -19,6 +19,7 @@ import FormatDateTimeFilterFactory from './UI/Shared/FormatDateTimeFilterFactory
 import {ComposeUserMessageDialogComponent} from './UI/UserMessaging/ComposeUserMessageDialogComponent';
 import {UserReferenceComponent} from './UI/Shared/UserReferenceComponent';
 import {UserMessagesComponent} from './UI/UserMessaging/UserMessagesComponent';
+import {UserAuctionsListComponent} from './UI/Auctions/UserAuctionsListComponent';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
@@ -29,7 +30,8 @@ export class Application {
 		new SimpleNotificationDialogComponent(),
 		new UserReferenceComponent(),
 		new ComposeUserMessageDialogComponent(),
-		new UserMessagesComponent()
+		new UserMessagesComponent(),
+		new UserAuctionsListComponent()
 	];
 
 	static bootstrap(): void {

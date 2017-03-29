@@ -40,7 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auctions\UserInvolvementIntoAuction.cs" />
     <Compile Include="Auctions\GetAuctionDetailsQuery.cs" />
+    <Compile Include="Auctions\GetAuctionsInvolvingUserQuery.cs" />
     <Compile Include="Auctions\SearchAuctionsQuery.cs" />
     <Compile Include="QueriesAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

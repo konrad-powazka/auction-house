@@ -3,7 +3,7 @@
 
     static createFilterFunction() {
 	    return (value: any) => {
-		    return moment(value).format('Do MMMM YYYY, h:mm:ss A');
+		    return moment(value).format('Do MMMM YYYY, h:mm A');
 	    }
     }
 }

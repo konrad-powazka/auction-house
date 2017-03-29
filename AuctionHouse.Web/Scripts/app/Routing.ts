@@ -32,9 +32,15 @@
 			},
 			{
 				name: 'userMessages',
-				url: '/userMessages',
+				url: '/user-messages',
 				component: 'userMessages'
+			},
+			{
+				name: 'userAuctionsList',
+				url: '/my-auctions',
+				component: 'userAuctionsList'
 			}
+			
 		];
 
 		for (let state of states) {

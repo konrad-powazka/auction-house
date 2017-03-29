@@ -11,5 +11,6 @@ namespace AuctionHouse.Messages.Events.Auctions
         public string HighestBidderUserName { get; set; }
         public decimal HighestBidPrice { get; set; }
         public decimal MinimalPriceForNextBidder { get; set; }
+	    public decimal CurrentPrice { get; set; }
     }
 }

@@ -65,6 +65,7 @@
 	var ComposeUserMessageDialogComponent_1 = __webpack_require__(29);
 	var UserReferenceComponent_1 = __webpack_require__(31);
 	var UserMessagesComponent_1 = __webpack_require__(33);
+	var UserAuctionsListComponent_1 = __webpack_require__(35);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -152,7 +153,8 @@
 	    new SimpleNotificationDialogComponent_1.SimpleNotificationDialogComponent(),
 	    new UserReferenceComponent_1.UserReferenceComponent(),
 	    new ComposeUserMessageDialogComponent_1.ComposeUserMessageDialogComponent(),
-	    new UserMessagesComponent_1.UserMessagesComponent()
+	    new UserMessagesComponent_1.UserMessagesComponent(),
+	    new UserAuctionsListComponent_1.UserAuctionsListComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -818,8 +820,13 @@
 	            },
 	            {
 	                name: 'userMessages',
-	                url: '/userMessages',
+	                url: '/user-messages',
 	                component: 'userMessages'
+	            },
+	            {
+	                name: 'userAuctionsList',
+	                url: '/my-auctions',
+	                component: 'userAuctionsList'
 	            }
 	        ];
 	        for (var _i = 0, states_1 = states; _i < states_1.length; _i++) {
@@ -866,6 +873,17 @@
 	    return GetAuctionDetailsQueryHandler;
 	}(QueryHandler_1.QueryHandler));
 	exports.GetAuctionDetailsQueryHandler = GetAuctionDetailsQueryHandler;
+	var GetAuctionsInvolvingUserQueryHandler = (function (_super) {
+	    __extends(GetAuctionsInvolvingUserQueryHandler, _super);
+	    function GetAuctionsInvolvingUserQueryHandler() {
+	        return _super.apply(this, arguments) || this;
+	    }
+	    GetAuctionsInvolvingUserQueryHandler.prototype.getQueryName = function () {
+	        return 'GetAuctionsInvolvingUserQuery';
+	    };
+	    return GetAuctionsInvolvingUserQueryHandler;
+	}(QueryHandler_1.QueryHandler));
+	exports.GetAuctionsInvolvingUserQueryHandler = GetAuctionsInvolvingUserQueryHandler;
 	var SearchAuctionsQueryHandler = (function (_super) {
 	    __extends(SearchAuctionsQueryHandler, _super);
 	    function SearchAuctionsQueryHandler() {
@@ -885,6 +903,7 @@
 	AngularQueryHandlersRegistry.queryHandlers = {
 	    'getUserInboxQueryHandler': GetUserInboxQueryHandler,
 	    'getAuctionDetailsQueryHandler': GetAuctionDetailsQueryHandler,
+	    'getAuctionsInvolvingUserQueryHandler': GetAuctionsInvolvingUserQueryHandler,
 	    'searchAuctionsQueryHandler': SearchAuctionsQueryHandler,
 	};
 	exports.AngularQueryHandlersRegistry = AngularQueryHandlersRegistry;
@@ -1249,19 +1268,24 @@
 	        var _this = this;
 	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
 	        this.tastyInitCfg = {
-	            'count': 10,
+	            'count': 25,
 	            'page': 1
 	        };
 	        this.staticResource = {
 	            header: [
 	                {
-	                    key: 'title',
-	                    name: 'Title',
-	                    style: { width: '20%' }
+	                    key: 'titleAndDescription',
+	                    name: 'Auction',
+	                    style: { width: '' }
 	                },
 	                {
 	                    key: 'currentPrice',
 	                    name: 'Current price',
+	                    style: { width: '120px', 'text-align': 'right' }
+	                },
+	                {
+	                    key: 'soldFor',
+	                    name: 'Sold for',
 	                    style: { width: '120px', 'text-align': 'right' }
 	                },
 	                {
@@ -1275,9 +1299,14 @@
 	                    style: { width: '50px', 'text-align': 'right' }
 	                },
 	                {
-	                    key: 'description',
-	                    name: 'Description',
-	                    style: { width: '' }
+	                    key: 'seller',
+	                    name: 'Seller',
+	                    style: { width: '200px' }
+	                },
+	                {
+	                    key: 'winner',
+	                    name: 'Winner',
+	                    style: { width: '200px' }
 	                }
 	            ]
 	        };
@@ -1466,7 +1495,7 @@
 	    }
 	    FormatDateTimeFilterFactory.createFilterFunction = function () {
 	        return function (value) {
-	            return moment(value).format('Do MMMM YYYY, h:mm:ss A');
+	            return moment(value).format('Do MMMM YYYY, h:mm A');
 	        };
 	    };
 	    return FormatDateTimeFilterFactory;
@@ -1676,6 +1705,96 @@
 	}());
 	UserMessagesCtrl.$inject = ['getUserInboxQueryHandler'];
 	exports.UserMessagesCtrl = UserMessagesCtrl;
+
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserAuctionsListCtrl_1 = __webpack_require__(36);
+	var UserAuctionsListComponent = (function () {
+	    function UserAuctionsListComponent() {
+	        this.controller = UserAuctionsListCtrl_1.UserAuctionsListCtrl;
+	        this.templateUrl = 'Template/Auctions/UserList';
+	        this.registerAs = 'userAuctionsList';
+	        //bindings = {
+	        //	queryString: '<'
+	        //   }
+	    }
+	    return UserAuctionsListComponent;
+	}());
+	exports.UserAuctionsListComponent = UserAuctionsListComponent;
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var UserAuctionsListCtrl = (function () {
+	    function UserAuctionsListCtrl(getAuctionsInvolvingUserQueryHandler) {
+	        var _this = this;
+	        this.getAuctionsInvolvingUserQueryHandler = getAuctionsInvolvingUserQueryHandler;
+	        this.tastyInitCfg = {
+	            'count': 10,
+	            'page': 1
+	        };
+	        this.staticResource = {
+	            header: [
+	                {
+	                    key: 'title',
+	                    name: 'Title',
+	                    style: { width: '20%' }
+	                },
+	                {
+	                    key: 'currentPrice',
+	                    name: 'Current price',
+	                    style: { width: '120px', 'text-align': 'right' }
+	                },
+	                {
+	                    key: 'buyNowPrice',
+	                    name: 'Buy now price',
+	                    style: { width: '120px', 'text-align': 'right' }
+	                },
+	                {
+	                    key: 'numberOfBids',
+	                    name: 'Bids',
+	                    style: { width: '50px', 'text-align': 'right' }
+	                },
+	                {
+	                    key: 'description',
+	                    name: 'Description',
+	                    style: { width: '' }
+	                }
+	            ]
+	        };
+	        this.getResource = function (paramsString, paramsObject) {
+	            var query = {
+	                queryString: '',
+	                userInvolvementIntoAuction: null,
+	                pageSize: paramsObject.count,
+	                pageNumber: paramsObject.page
+	            };
+	            return _this.getAuctionsInvolvingUserQueryHandler.handle(query)
+	                .then(function (auctionsList) {
+	                return {
+	                    rows: auctionsList.pageItems,
+	                    pagination: {
+	                        count: auctionsList.pageSize,
+	                        page: auctionsList.pageNumber,
+	                        pages: auctionsList.totalPagesCount,
+	                        size: auctionsList.totalItemsCount
+	                    },
+	                    header: _this.staticResource.header
+	                };
+	            });
+	        };
+	    }
+	    return UserAuctionsListCtrl;
+	}());
+	UserAuctionsListCtrl.$inject = ['getAuctionsInvolvingUserQueryHandler'];
+	exports.UserAuctionsListCtrl = UserAuctionsListCtrl;
 
 
 /***/ }

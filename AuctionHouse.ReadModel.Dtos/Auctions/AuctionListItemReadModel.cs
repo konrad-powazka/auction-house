@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AuctionHouse.ReadModel.Dtos.Auctions.List
+namespace AuctionHouse.ReadModel.Dtos.Auctions
 {
     public class AuctionListItemReadModel
     {
@@ -13,5 +13,8 @@ namespace AuctionHouse.ReadModel.Dtos.Auctions.List
 		public decimal MinimalPriceForNextBidder { get; set; }
 		public bool WasFinished { get; set; }
 		public int NumberOfBids { get; set; }
-    }
+		public DateTime? FinishedDateTime { get; set; }
+		public string HighestBidderUserName { get; set; }
+		public decimal CurrentPrice { get; set; }
+	}
 }

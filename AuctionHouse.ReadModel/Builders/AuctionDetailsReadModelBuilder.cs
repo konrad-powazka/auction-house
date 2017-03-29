@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Core;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.ReadModel;
 using AuctionHouse.Messages.Events.Auctions;
 using AuctionHouse.Persistence.Shared;
-using AuctionHouse.ReadModel.Dtos.Auctions.Details;
+using AuctionHouse.ReadModel.Dtos.Auctions;
 
 namespace AuctionHouse.ReadModel.Builders
 {
@@ -41,6 +42,7 @@ namespace AuctionHouse.ReadModel.Builders
 						WasFinished = false,
 						StartingPrice = auctionCreatedEvent.StartingPrice,
 						MinimalPriceForNextBidder = auctionCreatedEvent.MinimalPriceForNextBidder,
+						CurrentPrice = auctionCreatedEvent.CurrentPrice,
 						HighestBidderUserName = null,
 						NumberOfBids = 0
 					};
@@ -53,6 +55,8 @@ namespace AuctionHouse.ReadModel.Builders
 					auctionDetails.HighestBidderUserName = bidMadeEvent.HighestBidderUserName;
 					auctionDetails.MinimalPriceForNextBidder = bidMadeEvent.MinimalPriceForNextBidder;
 					auctionDetails.NumberOfBids++;
+					auctionDetails.BiddersUserNames.Add(bidMadeEvent.BidderUserName);
+					auctionDetails.CurrentPrice = bidMadeEvent.CurrentPrice;
 					readModelDbContext.CreateOrOverwrite(auctionDetails, bidMadeEvent.AuctionId.ToString());
 				}),
 				TypeSwitch.Case<AuctionFinishedEvent>(auctionFinishedEvent =>
@@ -61,6 +65,7 @@ namespace AuctionHouse.ReadModel.Builders
 						readModelDbContext.Get<AuctionDetailsReadModel>(auctionFinishedEvent.AuctionId.ToString()).Result;
 
 					auctionDetails.WasFinished = true;
+					auctionDetails.FinishedDateTime = auctionFinishedEvent.FinishedDateTime;
 					readModelDbContext.CreateOrOverwrite(auctionDetails, auctionFinishedEvent.AuctionId.ToString());
 				}));
 		}

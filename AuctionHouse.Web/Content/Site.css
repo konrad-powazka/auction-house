@@ -140,6 +140,10 @@ textarea {
     margin-bottom: 0;
 }
 
-.text-excerpt {
+.text-dimmed {
 	color: gray;	
+}
+
+.clickable {
+	cursor: pointer;
 }
