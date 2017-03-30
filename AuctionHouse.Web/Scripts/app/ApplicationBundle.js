@@ -1249,7 +1249,8 @@
 	        this.templateUrl = 'Template/Auctions/List';
 	        this.registerAs = 'auctionsList';
 	        this.bindings = {
-	            getAuctions: '<'
+	            getAuctions: '<',
+	            displayedColumns: '<'
 	        };
 	    }
 	    return AuctionsListComponent;
@@ -1259,54 +1260,34 @@
 
 /***/ },
 /* 22 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var AuctionsListColumn_1 = __webpack_require__(39);
+	var HeaderDefinition = (function () {
+	    function HeaderDefinition(column, displayName, style) {
+	        this.column = column;
+	        this.displayName = displayName;
+	        this.style = style;
+	    }
+	    HeaderDefinition.prototype.toTastyTableHeader = function () {
+	        return {
+	            key: AuctionsListColumn_1.AuctionsListColumn[this.column],
+	            name: this.displayName,
+	            style: this.style
+	        };
+	    };
+	    return HeaderDefinition;
+	}());
 	var AuctionsListCtrl = (function () {
 	    function AuctionsListCtrl() {
 	        var _this = this;
+	        this.staticResource = {
+	            header: _(AuctionsListCtrl.allHeaders).map(function (header) { return header.toTastyTableHeader(); })
+	        };
 	        this.tastyInitCfg = {
 	            'count': 25,
 	            'page': 1
-	        };
-	        this.staticResource = {
-	            header: [
-	                {
-	                    key: 'titleAndDescription',
-	                    name: 'Auction',
-	                    style: { width: '' }
-	                },
-	                {
-	                    key: 'currentPrice',
-	                    name: 'Current price',
-	                    style: { width: '120px', 'text-align': 'right' }
-	                },
-	                {
-	                    key: 'soldFor',
-	                    name: 'Sold for',
-	                    style: { width: '120px', 'text-align': 'right' }
-	                },
-	                {
-	                    key: 'buyNowPrice',
-	                    name: 'Buy now price',
-	                    style: { width: '120px', 'text-align': 'right' }
-	                },
-	                {
-	                    key: 'numberOfBids',
-	                    name: 'Bids',
-	                    style: { width: '50px', 'text-align': 'right' }
-	                },
-	                {
-	                    key: 'seller',
-	                    name: 'Seller',
-	                    style: { width: '200px' }
-	                },
-	                {
-	                    key: 'winner',
-	                    name: 'Winner',
-	                    style: { width: '200px' }
-	                }
-	            ]
 	        };
 	        this.getResource = function (paramsString, paramsObject) {
 	            var pageSize = paramsObject.count;
@@ -1326,8 +1307,26 @@
 	            });
 	        };
 	    }
+	    AuctionsListCtrl.prototype.$onInit = function () {
+	        var _this = this;
+	        var displayedHeaders = _(AuctionsListCtrl.allHeaders).filter(function (header) { return _(_this.displayedColumns).contains(header.column); });
+	        this.staticResource.header = _(displayedHeaders).map(function (header) { return header.toTastyTableHeader(); });
+	    };
+	    AuctionsListCtrl.prototype.checkIfColumnIsDisplayed = function (columnName) {
+	        var column = AuctionsListColumn_1.AuctionsListColumn[columnName];
+	        return _(this.displayedColumns).contains(column);
+	    };
 	    return AuctionsListCtrl;
 	}());
+	AuctionsListCtrl.allHeaders = [
+	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, 'Auction'),
+	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, 'Current price', { width: '120px', 'text-align': 'right' }),
+	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.SoldFor, 'Sold for', { width: '120px', 'text-align': 'right' }),
+	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, 'Buy now price', { width: '120px', 'text-align': 'right' }),
+	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.NumberOfBids, 'Bids', { width: '50px', 'text-align': 'right' }),
+	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.Seller, 'Seller', { width: '200px' }),
+	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.Winner, 'Winner', { width: '200px' })
+	];
 	AuctionsListCtrl.$inject = [];
 	exports.AuctionsListCtrl = AuctionsListCtrl;
 
@@ -1770,13 +1769,15 @@
 
 /***/ },
 /* 38 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var AuctionsListColumn_1 = __webpack_require__(39);
 	var ActiveAuctionsListCtrl = (function () {
 	    function ActiveAuctionsListCtrl(searchAuctionsQueryHandler) {
 	        var _this = this;
 	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
+	        this.displayedColumns = [AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids, AuctionsListColumn_1.AuctionsListColumn.Seller];
 	        this.getAuctions = function (pageSize, pageNumber) {
 	            var query = {
 	                queryString: _this.queryString,
@@ -1790,6 +1791,23 @@
 	}());
 	ActiveAuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
 	exports.ActiveAuctionsListCtrl = ActiveAuctionsListCtrl;
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var AuctionsListColumn;
+	(function (AuctionsListColumn) {
+	    AuctionsListColumn[AuctionsListColumn["TitleAndDescription"] = 0] = "TitleAndDescription";
+	    AuctionsListColumn[AuctionsListColumn["CurrentPrice"] = 1] = "CurrentPrice";
+	    AuctionsListColumn[AuctionsListColumn["SoldFor"] = 2] = "SoldFor";
+	    AuctionsListColumn[AuctionsListColumn["BuyNowPrice"] = 3] = "BuyNowPrice";
+	    AuctionsListColumn[AuctionsListColumn["NumberOfBids"] = 4] = "NumberOfBids";
+	    AuctionsListColumn[AuctionsListColumn["Seller"] = 5] = "Seller";
+	    AuctionsListColumn[AuctionsListColumn["Winner"] = 6] = "Winner";
+	})(AuctionsListColumn = exports.AuctionsListColumn || (exports.AuctionsListColumn = {}));
 
 
 /***/ }

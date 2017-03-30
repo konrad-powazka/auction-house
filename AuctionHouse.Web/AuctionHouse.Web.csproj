@@ -473,11 +473,11 @@
     <TypeScriptCompile Include="Scripts\app\Configuration.ts" />
     <TypeScriptCompile Include="Scripts\app\Routing.ts" />
     <TypeScriptCompile Include="Scripts\app\Security\SecurityService.ts" />
-    <TypeScriptCompile Include="Scripts\app\UI\Auctions\AuctionRules.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\ActiveAuctionsListComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\ActiveAuctionsListCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\UserAuctionsListComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\AuctionsListComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Auctions\AuctionsListColumn.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\UserAuctionsListCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\AuctionsListCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\DisplayAuctionCtrl.ts" />

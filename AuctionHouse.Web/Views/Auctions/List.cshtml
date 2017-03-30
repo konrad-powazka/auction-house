@@ -3,25 +3,25 @@
 		<thead tasty-thead></thead>
 		<tbody>
 		<tr ng-repeat="auction in rows" class="clickable" ui-sref="displayAuction({ auctionId: auction.id })">
-			<td class="text-cell">
+			<td class="text-cell" ng-if="$ctrl.checkIfColumnIsDisplayed('TitleAndDescription')">
 				{{ auction.title }} <span class="text-dimmed">{{ auction.description }}</span>
 			</td>
-			<td class="text-right">
+			<td class="text-right" ng-if="$ctrl.checkIfColumnIsDisplayed('CurrentPrice')">
 				<span ng-if="auction.currentPrice">{{ auction.currentPrice | currency }}</span>
 			</td>
-			<td class="text-right">
+			<td class="text-right" ng-if="$ctrl.checkIfColumnIsDisplayed('SoldFor')">
 				<span ng-if="auction.currentPrice">{{ auction.currentPrice | currency }}</span>
 			</td>
-			<td class="text-right">
+			<td class="text-right" ng-if="$ctrl.checkIfColumnIsDisplayed('BuyNowPrice')">
 				{{ auction.buyNowPrice | currency }}
 			</td>
-			<td class="text-right">
+			<td class="text-right" ng-if="$ctrl.checkIfColumnIsDisplayed('NumberOfBids')">
 				<span ng-if="auction.numberOfBids > 0">{{ auction.numberOfBids }}</span>
 			</td>
-			<td class="text-cell">
+			<td class="text-cell" ng-if="$ctrl.checkIfColumnIsDisplayed('Seller')">
 				{{ auction.createdByUserName }}
 			</td>
-			<td class="text-cell">
+			<td class="text-cell" ng-if="$ctrl.checkIfColumnIsDisplayed('Winner')">
 				{{ auction.highestBidderUserName }}
 			</td>
 		</tr>

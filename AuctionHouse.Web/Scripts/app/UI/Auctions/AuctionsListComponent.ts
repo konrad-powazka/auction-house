@@ -3,9 +3,10 @@ import { INamedComponentOptions } from '../../Infrastructure/INamedComponentOpti
 
 export class AuctionsListComponent implements INamedComponentOptions {
 	controller = AuctionsListCtrl;
-    templateUrl = 'Template/Auctions/List';
-    registerAs = 'auctionsList';
+	templateUrl = 'Template/Auctions/List';
+	registerAs = 'auctionsList';
 	bindings = {
-		getAuctions: '<'
-    }
+		getAuctions: '<',
+		displayedColumns: '<'
+	}
 }
