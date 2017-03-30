@@ -7,6 +7,7 @@ export class AuctionsListComponent implements INamedComponentOptions {
 	registerAs = 'auctionsList';
 	bindings = {
 		getAuctions: '<',
-		displayedColumns: '<'
+		displayedColumns: '<',
+		onReloadFunctionChanged: '&'
 	}
 }

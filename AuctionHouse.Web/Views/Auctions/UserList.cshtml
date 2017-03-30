@@ -16,8 +16,9 @@
 	<div class="form-group">
 		<input ng-model="$ctrl.queryString" type="text" class="form-control" placeholder="Query string">
 	</div>
-	<button type="submit" class="btn btn-default" uib-tooltip="Search">
+	<button type="submit" class="btn btn-default" uib-tooltip="Search" ng-click="$ctrl.search()">
 		<span class="glyphicon glyphicon-search"></span>
 	</button>
 </form>
-<auctions-list get-auctions="$ctrl.getAuctions"></auctions-list>
+<auctions-list get-auctions="$ctrl.getAuctions" on-reload-function-changed="$ctrl.setReloadFunction(reloadFunction)" 
+			   displayed-columns="$ctrl.displayedColumns"></auctions-list>

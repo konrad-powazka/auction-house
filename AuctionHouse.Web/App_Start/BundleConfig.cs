@@ -24,7 +24,7 @@ namespace AuctionHouse.Web
                 "~/Scripts/datetimepicker-fixed.js",
                 "~/Scripts/spin.js",
                 "~/Scripts/angular-spinner.js",
-				"~/node_modules/ng-tasty/ng-tasty-tpls.js"));
+				"~/Scripts/ng-tasty-tpls-fixed.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap.css",

@@ -342,6 +342,7 @@
     <Content Include="Scripts\angular-formly-templates-bootstrap.min.js.map" />
     <Content Include="Scripts\angular-ui-router.min.js.map" />
     <Content Include="package.json" />
+    <Content Include="Scripts\ng-tasty-tpls-fixed.js" />
     <Content Include="webpack.config.js" />
     <Content Include="Scripts\angular.min.js.map" />
     <Content Include="Scripts\angular-messages.min.js.map" />

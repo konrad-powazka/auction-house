@@ -1250,7 +1250,8 @@
 	        this.registerAs = 'auctionsList';
 	        this.bindings = {
 	            getAuctions: '<',
-	            displayedColumns: '<'
+	            displayedColumns: '<',
+	            onReloadFunctionChanged: '&'
 	        };
 	    }
 	    return AuctionsListComponent;
@@ -1280,8 +1281,9 @@
 	    return HeaderDefinition;
 	}());
 	var AuctionsListCtrl = (function () {
-	    function AuctionsListCtrl() {
+	    function AuctionsListCtrl(scope) {
 	        var _this = this;
+	        this.reload = angular.noop;
 	        this.staticResource = {
 	            header: _(AuctionsListCtrl.allHeaders).map(function (header) { return header.toTastyTableHeader(); })
 	        };
@@ -1306,12 +1308,16 @@
 	                };
 	            });
 	        };
+	        scope.$watch(function () { return _this.reload; }, function () {
+	            _this.onReloadFunctionChanged({ reloadFunction: _this.reload });
+	            _this.reload();
+	        });
+	        scope.$watchCollection(function () { return _this.displayedColumns; }, function () {
+	            var displayedHeaders = _(AuctionsListCtrl.allHeaders)
+	                .filter(function (header) { return _(_this.displayedColumns).contains(header.column); });
+	            _this.staticResource.header = _(displayedHeaders).map(function (header) { return header.toTastyTableHeader(); });
+	        });
 	    }
-	    AuctionsListCtrl.prototype.$onInit = function () {
-	        var _this = this;
-	        var displayedHeaders = _(AuctionsListCtrl.allHeaders).filter(function (header) { return _(_this.displayedColumns).contains(header.column); });
-	        this.staticResource.header = _(displayedHeaders).map(function (header) { return header.toTastyTableHeader(); });
-	    };
 	    AuctionsListCtrl.prototype.checkIfColumnIsDisplayed = function (columnName) {
 	        var column = AuctionsListColumn_1.AuctionsListColumn[columnName];
 	        return _(this.displayedColumns).contains(column);
@@ -1327,7 +1333,7 @@
 	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.Seller, 'Seller', { width: '200px' }),
 	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.Winner, 'Winner', { width: '200px' })
 	];
-	AuctionsListCtrl.$inject = [];
+	AuctionsListCtrl.$inject = ['$scope'];
 	exports.AuctionsListCtrl = AuctionsListCtrl;
 
 
@@ -1723,15 +1729,18 @@
 
 /***/ },
 /* 36 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var AuctionsListColumn_1 = __webpack_require__(39);
 	var UserAuctionsListCtrl = (function () {
 	    function UserAuctionsListCtrl(getAuctionsInvolvingUserQueryHandler) {
 	        var _this = this;
 	        this.getAuctionsInvolvingUserQueryHandler = getAuctionsInvolvingUserQueryHandler;
 	        this.userInvolvementIntoAuction = 'Selling';
+	        this.displayedColumns = [AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, AuctionsListColumn_1.AuctionsListColumn.Winner];
 	        this.getAuctions = function (pageSize, pageNumber) {
+	            _this.refreshDisplayedColumns();
 	            var query = {
 	                queryString: _this.queryString,
 	                userInvolvementIntoAuction: _this.userInvolvementIntoAuction,
@@ -1741,6 +1750,23 @@
 	            return _this.getAuctionsInvolvingUserQueryHandler.handle(query);
 	        };
 	    }
+	    UserAuctionsListCtrl.prototype.setReloadFunction = function (reloadFn) {
+	        this.search = reloadFn;
+	    };
+	    UserAuctionsListCtrl.prototype.refreshDisplayedColumns = function () {
+	        var commonColumns = [AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice];
+	        // TODO: add ended date and final price columns
+	        var userInvolvementIntoAuctionToAdditionalColumnsMap = {
+	            'Selling': [AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
+	            'Sold': [AuctionsListColumn_1.AuctionsListColumn.SoldFor, AuctionsListColumn_1.AuctionsListColumn.Winner, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
+	            'FailedToSell': [],
+	            'Bidding': [AuctionsListColumn_1.AuctionsListColumn.Seller, AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
+	            'Bought': [AuctionsListColumn_1.AuctionsListColumn.SoldFor, AuctionsListColumn_1.AuctionsListColumn.Seller, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
+	            'FailedToBuy': [AuctionsListColumn_1.AuctionsListColumn.SoldFor, AuctionsListColumn_1.AuctionsListColumn.Seller, AuctionsListColumn_1.AuctionsListColumn.Winner, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids]
+	        };
+	        this.displayedColumns = commonColumns
+	            .concat(userInvolvementIntoAuctionToAdditionalColumnsMap[this.userInvolvementIntoAuction]);
+	    };
 	    return UserAuctionsListCtrl;
 	}());
 	UserAuctionsListCtrl.$inject = ['getAuctionsInvolvingUserQueryHandler'];

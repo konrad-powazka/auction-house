@@ -30,6 +30,8 @@ export class AuctionsListCtrl implements ng.IController {
 	queryString: string;
 	getAuctions: (pageSize: number, pageNumber: number) => ng.IPromise<AuctionsListReadModel>;
 	displayedColumns: AuctionsListColumn[];
+	onReloadFunctionChanged: (args: { reloadFunction: () => void }) => void;
+	reload: () => void = angular.noop;
 
 	staticResource = {
 		header: _(AuctionsListCtrl.allHeaders).map(header => header.toTastyTableHeader())
@@ -40,11 +42,21 @@ export class AuctionsListCtrl implements ng.IController {
 		'page': 1
 	};
 
-	static $inject = [];
+	static $inject = ['$scope'];
 
-	$onInit() {
-		const displayedHeaders = _(AuctionsListCtrl.allHeaders).filter(header => _(this.displayedColumns).contains(header.column));
-		this.staticResource.header = _(displayedHeaders).map(header => header.toTastyTableHeader());
+	constructor(scope: ng.IScope) {
+		scope.$watch(() => this.reload, () => {
+			this.onReloadFunctionChanged({ reloadFunction: this.reload });
+			this.reload();
+		});
+
+		scope.$watchCollection(() => this.displayedColumns, () => {
+			const displayedHeaders = _(AuctionsListCtrl.allHeaders)
+				.filter(header => _(this.displayedColumns).contains(header.column));
+
+			this.staticResource.header = _(displayedHeaders).map(header => header.toTastyTableHeader());
+
+		});
 	}
 
 	getResource = (paramsString: string, paramsObject: any): ng.IPromise<any> => {
