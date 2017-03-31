@@ -6,34 +6,35 @@ using System.Threading.Tasks;
 using AuctionHouse.Core.EventSourcing;
 using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Time;
+using AuctionHouse.Messages.Commands.Auctions;
 using AuctionHouse.Messages.Events.Auctions;
 using AuctionHouse.Messages.Events.UserMessaging;
 using AuctionHouse.Persistence.Shared;
 using Bogus;
+using Bogus.DataSets;
 
 namespace AuctionHouse.FakeDataGeneratorLauncher
 {
 	public class FakeDataGenerator
 	{
 		private const string PredefinedUserName = "konrad.powazka";
+		private readonly ICommandQueue _commandQueue;
 		private readonly IEventsDatabase _eventsDatabase;
 		private readonly ITimeProvider _timeProvider;
 
-		public FakeDataGenerator(ITimeProvider timeProvider, IEventsDatabase eventsDatabase)
+		public FakeDataGenerator(ITimeProvider timeProvider, IEventsDatabase eventsDatabase, ICommandQueue commandQueue)
 		{
 			_timeProvider = timeProvider;
 			_eventsDatabase = eventsDatabase;
+			_commandQueue = commandQueue;
 		}
 
 		public async Task GenerateFakeData()
 		{
-			//var hardcodedAuctionTemplates = GetHardcodedAuctionTemplates();
-
 			var userNames =
 				Enumerable.Range(0, 17)
 					.Select(i => new Person().UserName)
 					.Concat(new[] {PredefinedUserName})
-					//.Concat(hardcodedAuctionTemplates.Select(a => a.CreatedByUserName))
 					.Distinct()
 					.ToList();
 
@@ -44,6 +45,13 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 				await
 					_eventsDatabase.AppendToStream(StreamNameGenerator.GenerateAuctionStreamName(generatedAuction.Id),
 						WrapIntoEnvelopeCollection(generatedAuction.Events.AsEnumerable()), ExpectedStreamVersion.NotExisting);
+
+				var finishAuctionCommand = new FinishAuctionCommand
+				{
+					Id = generatedAuction.Id
+				};
+
+				await _commandQueue.QueueCommand(finishAuctionCommand, Guid.NewGuid(), "system", generatedAuction.EndDateTime);
 			}
 
 			var userMessageSentEvents = userNames.SelectMany(u => GenerateUserMessageSentEvents(u, userNames));
@@ -59,6 +67,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 		private IEnumerable<GeneratedAuction> GenerateAuctions(IReadOnlyCollection<string> allUserNames)
 		{
 			var randomizer = new Randomizer();
+			var dateRandomizer = new Date();
 
 			return
 				allUserNames.SelectMany(
@@ -67,27 +76,30 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 							.Cast<GeneratedAuctionCharacteristic>()
 							.SelectMany(
 								generatedAuctionCharacteristic =>
-									GenerateAuctionsHavingCharactersistic(generatedAuctionCharacteristic, currentUserName, allUserNames, randomizer)));
+									GenerateAuctionsHavingCharactersistic(generatedAuctionCharacteristic, currentUserName, allUserNames, randomizer,
+										dateRandomizer)));
 		}
 
 		private IEnumerable<GeneratedAuction> GenerateAuctionsHavingCharactersistic(
 			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, string currentUserName,
-			IReadOnlyCollection<string> allUserNames, Randomizer randomizer)
+			IReadOnlyCollection<string> allUserNames, Randomizer randomizer, Date dateRandomizer)
 		{
 			var minNumberOfAuctions = currentUserName == PredefinedUserName ? 15 : 0;
 			var numberOfAuctions = randomizer.Int(minNumberOfAuctions, 40);
 
 			return
 				Enumerable.Range(0, numberOfAuctions)
-					.Select(i => GenerateAuction(currentUserName, generatedAuctionCharacteristic, allUserNames, randomizer));
+					.Select(
+						i => GenerateAuction(currentUserName, generatedAuctionCharacteristic, allUserNames, randomizer, dateRandomizer));
 		}
 
 		private GeneratedAuction GenerateAuction(string currentUserName,
 			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, IReadOnlyCollection<string> allUserNames,
-			Randomizer randomizer)
+			Randomizer randomizer, Date dateRandomizer)
 		{
 			var otherUserNames = allUserNames.Except(new[] {currentUserName}).ToList();
-			var isEndDateFuture = generatedAuctionCharacteristic.CheckIfAuctionIsInProgress() || randomizer.Bool();
+			var hasBuyNowPrice = randomizer.Int(1, 3) > 1;
+			var isEndDateFuture = generatedAuctionCharacteristic.CheckIfAuctionIsInProgress() || hasBuyNowPrice;
 			var id = Guid.NewGuid();
 
 			var auctionCreatedEventFaker = new Faker<AuctionCreatedEvent>()
@@ -103,7 +115,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					return s.Lorem.Paragraphs(numberOfParagraphs);
 				})
 				.RuleFor(a => a.BuyNowPrice,
-					(s, a) => s.Random.Int(1, 3) > 1 ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?) null)
+					(s, a) => hasBuyNowPrice ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?) null)
 				.RuleFor(a => a.EndDateTime, s => isEndDateFuture
 					? s.Date.Between(_timeProvider.Now.AddMinutes(3), _timeProvider.Now.AddDays(21))
 					: s.Date.Between(_timeProvider.Now.AddDays(-1000), _timeProvider.Now.AddMinutes(-3)))
@@ -120,24 +132,43 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					})
 				.RuleFor(a => a.CreatedByUserName,
 					s => generatedAuctionCharacteristic.CheckIfUserIsSelling() ? currentUserName : s.PickRandom(otherUserNames))
-				.RuleFor(a => a.MinimalPriceForNextBidder, (s, e) => Math.Max(e.StartingPrice, 0.01m));
+				.RuleFor(a => a.MinimalPriceForNextBidder, (s, e) => Math.Max(e.StartingPrice, 0.01m))
+				.RuleFor(a => a.CreatedDateTime,
+					(s, a) => s.Date.Between(a.EndDateTime.AddDays(-21), a.EndDateTime.AddHours(-1)));
 
 			Debug.Assert(auctionCreatedEventFaker.Validate());
 
 			var auctionCreatedEvent = auctionCreatedEventFaker.Generate(1).Single();
+
 			var bidMadeEvents = GenerateBidMadeEvents(auctionCreatedEvent, generatedAuctionCharacteristic, currentUserName,
-				allUserNames, isEndDateFuture, randomizer);
+				allUserNames, isEndDateFuture, randomizer, dateRandomizer).ToList();
+
+			var allEvents = new IEvent[] {auctionCreatedEvent}.Concat(bidMadeEvents).ToList();
+
+			if (generatedAuctionCharacteristic.CheckIfFinishesWithBuy())
+			{
+				Debug.Assert(bidMadeEvents.Any());
+
+				var auctionFinishedEvent = new AuctionFinishedEvent
+				{
+					AuctionId = id,
+					FinishedDateTime = bidMadeEvents.Last().BidDateTime
+				};
+
+				allEvents.Add(auctionFinishedEvent);
+			}
 
 			return new GeneratedAuction
 			{
 				Id = id,
-				Events = new IEvent[] {auctionCreatedEvent}.Concat(bidMadeEvents).ToList()
+				EndDateTime = auctionCreatedEvent.EndDateTime,
+				Events = allEvents
 			};
 		}
 
 		private IEnumerable<BidMadeEvent> GenerateBidMadeEvents(AuctionCreatedEvent auctionCreatedEvent,
 			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, string currentUserName,
-			IReadOnlyCollection<string> allUserNames, bool isEndDateFuture, Randomizer randomizer)
+			IReadOnlyCollection<string> allUserNames, bool isEndDateFuture, Randomizer randomizer, Date dateRandomizer)
 		{
 			if (!generatedAuctionCharacteristic.CheckIfCanHaveBids())
 			{
@@ -151,6 +182,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			var userNamesNotSelling = allUserNames.Except(new[] {auctionCreatedEvent.CreatedByUserName}).ToArray();
 			var userNamesNotSellingExceptCurrentUser = userNamesNotSelling.Except(new[] {currentUserName}).ToArray();
 			var minBidPrice = auctionCreatedEvent.MinimalPriceForNextBidder;
+			var minBidDateTime = auctionCreatedEvent.CreatedDateTime;
 
 			for (var bidNumber = 1; bidNumber <= numberOfBids; bidNumber++)
 			{
@@ -220,11 +252,13 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					HighestBidderUserName = bidderUserName,
 					MinimalPriceForNextBidder = minimalPriceForNextBidder,
 					HighestBidPrice = bidPrice,
-					CurrentPrice = currentPrice
+					CurrentPrice = currentPrice,
+					BidDateTime = dateRandomizer.Between(minBidDateTime, auctionCreatedEvent.EndDateTime)
 				};
 
 				bidMadeEvents.Add(bidMadeEvent);
 				minBidPrice = bidPrice + 0.01M;
+				minBidDateTime = bidMadeEvent.BidDateTime;
 			}
 
 			return bidMadeEvents;
@@ -289,6 +323,8 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 		private class GeneratedAuction
 		{
 			public Guid Id { get; set; }
+
+			public DateTime EndDateTime { get; set; }
 
 			public IReadOnlyCollection<IEvent> Events { get; set; }
 		}

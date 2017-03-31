@@ -36,6 +36,7 @@ class AuctionCreatedEvent
 	public endDateTime: string;
 	public buyNowPrice: number | null;
 	public currentPrice: number;
+	public createdDateTime: string;
 }
 export
 class AuctionFinishedEvent
@@ -53,6 +54,7 @@ class BidMadeEvent
 	public highestBidPrice: number;
 	public minimalPriceForNextBidder: number;
 	public currentPrice: number;
+	public bidDateTime: string;
 }
 export
 class CommandHandlingSucceededEvent extends CommandHandlingFeedbackEvent

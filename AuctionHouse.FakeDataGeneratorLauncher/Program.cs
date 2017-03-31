@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using AuctionHouse.Core.Messaging;
 using AuctionHouse.Core.Time;
 using AuctionHouse.Persistence;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using Nito.AsyncEx;
+using NServiceBus;
+using ICommand = AuctionHouse.Core.Messaging.ICommand;
+using IEvent = AuctionHouse.Core.Messaging.IEvent;
+using IMessage = AuctionHouse.Core.Messaging.IMessage;
 
 namespace AuctionHouse.FakeDataGeneratorLauncher
 {
@@ -20,14 +25,29 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 		{
 			Console.Title = "AuctionHouse.FakeDataGeneratorLaunchers";
 
-			using (var eventStoreConnection = await CreateEventStoreConnection())
+			var timeProvider = new TimeProvider();
+			var endpointInstance = await StartNServiceBusEndpoint();
+
+			try
 			{
-				var fakeDataGenerator = new FakeDataGenerator(new TimeProvider(), new EventStoreEventsDatabase(eventStoreConnection));
-				await fakeDataGenerator.GenerateFakeData();
+				var commandQueue = new NServiceBusCommandQueue(endpointInstance, timeProvider,
+					new NServiceBusCommandQueueConfiguration());
+
+				using (var eventStoreConnection = await CreateEventStoreConnection())
+				{
+					var fakeDataGenerator = new FakeDataGenerator(timeProvider,
+						new EventStoreEventsDatabase(eventStoreConnection), commandQueue);
+
+					await fakeDataGenerator.GenerateFakeData();
+				}
+			}
+			finally
+			{
+				await endpointInstance.Stop();
 			}
 		}
 
-		private static async Task <IEventStoreConnection> CreateEventStoreConnection()
+		private static async Task<IEventStoreConnection> CreateEventStoreConnection()
 		{
 			const int defaultPort = 1113;
 			var settings = ConnectionSettings.Create();
@@ -36,6 +56,27 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			var connection = EventStoreConnection.Create(settings, endpoint);
 			await connection.ConnectAsync();
 			return connection;
+		}
+
+		private static async Task<IEndpointInstance> StartNServiceBusEndpoint()
+		{
+			var endpointConfiguration = new EndpointConfiguration("AuctionHouse.FakeDataGeneratorLaunchers");
+			endpointConfiguration.SendFailedMessagesTo("error");
+			endpointConfiguration.UseSerialization<JsonSerializer>();
+			endpointConfiguration.UsePersistence<InMemoryPersistence>();
+			endpointConfiguration.UseTransport<MsmqTransport>();
+
+			endpointConfiguration.Conventions()
+				.DefiningCommandsAs(t => typeof(ICommand).IsAssignableFrom(t))
+				.DefiningEventsAs(t => typeof(IEvent).IsAssignableFrom(t))
+				.DefiningMessagesAs(t => typeof(IMessage).IsAssignableFrom(t));
+
+			return await Endpoint.Start(endpointConfiguration);
+		}
+
+		private class NServiceBusCommandQueueConfiguration : INServiceBusCommandQueueConfiguration
+		{
+			public string NServiceBusCommandHandlingDestination => "AuctionHouse.CommandQueueService";
 		}
 	}
 }

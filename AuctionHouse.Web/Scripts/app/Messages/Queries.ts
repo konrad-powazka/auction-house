@@ -19,7 +19,7 @@ export
 class GetAuctionsInvolvingUserQuery
 {
 	public queryString: string;
-	public userInvolvementIntoAuction: any | null;
+	public userInvolvementIntoAuction: any;
 	public pageSize: number;
 	public pageNumber: number;
 }

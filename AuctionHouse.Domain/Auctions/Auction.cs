@@ -76,7 +76,8 @@ namespace AuctionHouse.Domain.Auctions
 				CurrentPrice = startingPrice,
 				CreatedByUserName = createdByUserName,
 				EndDateTime = endDate,
-				BuyNowPrice = buyNowPrice
+				BuyNowPrice = buyNowPrice,
+				CreatedDateTime = timeProvider.Now
 			};
 
 			auction.ApplyChange(auctionCreatedEvent);
@@ -131,7 +132,8 @@ namespace AuctionHouse.Domain.Auctions
 				HighestBidPrice = newHighestBidPrice,
 				AuctionId = Id,
 				BidPrice = bidPrice,
-				CurrentPrice = newCurrentPrice
+				CurrentPrice = newCurrentPrice,
+				BidDateTime = _timeProvider.Now
 			};
 
 			ApplyChange(bidMadeEvent);

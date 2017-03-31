@@ -57,16 +57,16 @@
 	var BusyIndicator_1 = __webpack_require__(17);
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
 	var AuctionsListComponent_1 = __webpack_require__(21);
-	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(23);
-	var SimpleNotificationDialogComponent_1 = __webpack_require__(24);
-	var GenericModalService_1 = __webpack_require__(26);
-	var Configuration_1 = __webpack_require__(27);
-	var FormatDateTimeFilterFactory_1 = __webpack_require__(28);
-	var ComposeUserMessageDialogComponent_1 = __webpack_require__(29);
-	var UserReferenceComponent_1 = __webpack_require__(31);
-	var UserMessagesComponent_1 = __webpack_require__(33);
-	var UserAuctionsListComponent_1 = __webpack_require__(35);
-	var ActiveAuctionsListComponent_1 = __webpack_require__(37);
+	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(24);
+	var SimpleNotificationDialogComponent_1 = __webpack_require__(25);
+	var GenericModalService_1 = __webpack_require__(27);
+	var Configuration_1 = __webpack_require__(28);
+	var FormatDateTimeFilterFactory_1 = __webpack_require__(29);
+	var ComposeUserMessageDialogComponent_1 = __webpack_require__(30);
+	var UserReferenceComponent_1 = __webpack_require__(32);
+	var UserMessagesComponent_1 = __webpack_require__(34);
+	var UserAuctionsListComponent_1 = __webpack_require__(36);
+	var ActiveAuctionsListComponent_1 = __webpack_require__(38);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -1264,7 +1264,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var AuctionsListColumn_1 = __webpack_require__(39);
+	var AuctionsListColumn_1 = __webpack_require__(23);
 	var HeaderDefinition = (function () {
 	    function HeaderDefinition(column, displayName, style) {
 	        this.column = column;
@@ -1342,6 +1342,23 @@
 /***/ function(module, exports) {
 
 	"use strict";
+	var AuctionsListColumn;
+	(function (AuctionsListColumn) {
+	    AuctionsListColumn[AuctionsListColumn["TitleAndDescription"] = 0] = "TitleAndDescription";
+	    AuctionsListColumn[AuctionsListColumn["CurrentPrice"] = 1] = "CurrentPrice";
+	    AuctionsListColumn[AuctionsListColumn["SoldFor"] = 2] = "SoldFor";
+	    AuctionsListColumn[AuctionsListColumn["BuyNowPrice"] = 3] = "BuyNowPrice";
+	    AuctionsListColumn[AuctionsListColumn["NumberOfBids"] = 4] = "NumberOfBids";
+	    AuctionsListColumn[AuctionsListColumn["Seller"] = 5] = "Seller";
+	    AuctionsListColumn[AuctionsListColumn["Winner"] = 6] = "Winner";
+	})(AuctionsListColumn = exports.AuctionsListColumn || (exports.AuctionsListColumn = {}));
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	"use strict";
 	var BusyIndicatingHttpInterceptor = (function () {
 	    function BusyIndicatingHttpInterceptor(busyIndicator, $q) {
 	        var _this = this;
@@ -1378,11 +1395,11 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var SimpleNotificationDialogCtrl_1 = __webpack_require__(25);
+	var SimpleNotificationDialogCtrl_1 = __webpack_require__(26);
 	var SimpleNotificationDialogComponent = (function () {
 	    function SimpleNotificationDialogComponent() {
 	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
@@ -1399,7 +1416,7 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1434,7 +1451,7 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1470,7 +1487,7 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1486,7 +1503,7 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1506,11 +1523,11 @@
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(30);
+	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(31);
 	var ComposeUserMessageDialogComponent = (function () {
 	    function ComposeUserMessageDialogComponent() {
 	        this.controller = ComposeUserMessageDialogCtrl_1.ComposeUserMessageDialogCtrl;
@@ -1527,7 +1544,7 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1584,11 +1601,11 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserReferenceCtrl_1 = __webpack_require__(32);
+	var UserReferenceCtrl_1 = __webpack_require__(33);
 	var UserReferenceComponent = (function () {
 	    function UserReferenceComponent() {
 	        this.controller = UserReferenceCtrl_1.UserReferenceCtrl;
@@ -1604,7 +1621,7 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1632,11 +1649,11 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserMessagesCtrl_1 = __webpack_require__(34);
+	var UserMessagesCtrl_1 = __webpack_require__(35);
 	var UserMessagesComponent = (function () {
 	    function UserMessagesComponent() {
 	        this.controller = UserMessagesCtrl_1.UserMessagesCtrl;
@@ -1649,7 +1666,7 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1708,11 +1725,11 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserAuctionsListCtrl_1 = __webpack_require__(36);
+	var UserAuctionsListCtrl_1 = __webpack_require__(37);
 	var UserAuctionsListComponent = (function () {
 	    function UserAuctionsListComponent() {
 	        this.controller = UserAuctionsListCtrl_1.UserAuctionsListCtrl;
@@ -1728,11 +1745,11 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var AuctionsListColumn_1 = __webpack_require__(39);
+	var AuctionsListColumn_1 = __webpack_require__(23);
 	var UserAuctionsListCtrl = (function () {
 	    function UserAuctionsListCtrl(getAuctionsInvolvingUserQueryHandler) {
 	        var _this = this;
@@ -1774,11 +1791,11 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ActiveAuctionsListCtrl_1 = __webpack_require__(38);
+	var ActiveAuctionsListCtrl_1 = __webpack_require__(39);
 	var ActiveAuctionsListComponent = (function () {
 	    function ActiveAuctionsListComponent() {
 	        this.controller = ActiveAuctionsListCtrl_1.ActiveAuctionsListCtrl;
@@ -1794,11 +1811,11 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var AuctionsListColumn_1 = __webpack_require__(39);
+	var AuctionsListColumn_1 = __webpack_require__(23);
 	var ActiveAuctionsListCtrl = (function () {
 	    function ActiveAuctionsListCtrl(searchAuctionsQueryHandler) {
 	        var _this = this;
@@ -1817,23 +1834,6 @@
 	}());
 	ActiveAuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
 	exports.ActiveAuctionsListCtrl = ActiveAuctionsListCtrl;
-
-
-/***/ },
-/* 39 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var AuctionsListColumn;
-	(function (AuctionsListColumn) {
-	    AuctionsListColumn[AuctionsListColumn["TitleAndDescription"] = 0] = "TitleAndDescription";
-	    AuctionsListColumn[AuctionsListColumn["CurrentPrice"] = 1] = "CurrentPrice";
-	    AuctionsListColumn[AuctionsListColumn["SoldFor"] = 2] = "SoldFor";
-	    AuctionsListColumn[AuctionsListColumn["BuyNowPrice"] = 3] = "BuyNowPrice";
-	    AuctionsListColumn[AuctionsListColumn["NumberOfBids"] = 4] = "NumberOfBids";
-	    AuctionsListColumn[AuctionsListColumn["Seller"] = 5] = "Seller";
-	    AuctionsListColumn[AuctionsListColumn["Winner"] = 6] = "Winner";
-	})(AuctionsListColumn = exports.AuctionsListColumn || (exports.AuctionsListColumn = {}));
 
 
 /***/ }

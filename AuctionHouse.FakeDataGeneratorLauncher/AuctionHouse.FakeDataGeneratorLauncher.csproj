@@ -75,6 +75,10 @@
       <HintPath>..\packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.6.0.0\lib\net452\NServiceBus.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
@@ -97,9 +101,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AuctionHouse.Core.Dependent\AuctionHouse.Core.Dependent.csproj">
+      <Project>{51A79491-5EF4-454B-8A12-807BF87B54C1}</Project>
+      <Name>AuctionHouse.Core.Dependent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Core\AuctionHouse.Core.csproj">
       <Project>{DBE324C7-9607-49F2-B49E-44CF130F4FA8}</Project>
       <Name>AuctionHouse.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuctionHouse.Messages.Commands\AuctionHouse.Messages.Commands.csproj">
+      <Project>{3FB528A3-F733-415D-8E46-49B846F8D27C}</Project>
+      <Name>AuctionHouse.Messages.Commands</Name>
     </ProjectReference>
     <ProjectReference Include="..\AuctionHouse.Messages.Events\AuctionHouse.Messages.Events.csproj">
       <Project>{BAE61B91-B3A9-4861-A15A-D58CB8EF1B28}</Project>
