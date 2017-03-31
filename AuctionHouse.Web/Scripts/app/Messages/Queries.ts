@@ -5,6 +5,12 @@
 
 /// <reference path="../ReadModel.ts"/>
 export
+class GetSentUserMessagesQuery
+{
+	public pageSize: number;
+	public pageNumber: number;
+}
+export
 class GetUserInboxQuery
 {
 	public pageSize: number;

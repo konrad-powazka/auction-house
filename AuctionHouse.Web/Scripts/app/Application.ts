@@ -21,6 +21,7 @@ import {UserReferenceComponent} from './UI/Shared/UserReferenceComponent';
 import {UserMessagesComponent} from './UI/UserMessaging/UserMessagesComponent';
 import {UserAuctionsListComponent} from './UI/Auctions/UserAuctionsListComponent';
 import {ActiveAuctionsListComponent} from './UI/Auctions/ActiveAuctionsListComponent';
+import {UserMessagesListComponent} from './UI/UserMessaging/UserMessagesListComponent';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
@@ -33,7 +34,8 @@ export class Application {
 		new ComposeUserMessageDialogComponent(),
 		new UserMessagesComponent(),
 		new UserAuctionsListComponent(),
-		new ActiveAuctionsListComponent()
+		new ActiveAuctionsListComponent(),
+		new UserMessagesListComponent()
 	];
 
 	static bootstrap(): void {

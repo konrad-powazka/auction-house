@@ -392,6 +392,7 @@
     <Content Include="Views\UserMessaging\UserMessages.cshtml" />
     <Content Include="Views\Auctions\UserList.cshtml" />
     <Content Include="Views\Auctions\ActiveList.cshtml" />
+    <Content Include="Views\UserMessaging\UserMessagesList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -485,8 +486,11 @@
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\DisplayAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Auctions\CreateAuctionCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\Lists\IPagedResult.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\Lists\ListCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\BusyIndicatingHttpInterceptor.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\BusyIndicator.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\Lists\ListHeaderDefinition.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\NotificationType.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\GeneratedUiCommandHandlers.ts">
       <DependentUpon>GeneratedUiCommandHandlers.tt</DependentUpon>
@@ -505,7 +509,10 @@
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\GenericModalService.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SecurityUiService.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesListComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesListColumn.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesListCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\ComposeUserMessageDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\ComposeUserMessageDialogCtrl.ts" />

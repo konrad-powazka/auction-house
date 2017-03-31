@@ -1,57 +1,36 @@
-﻿import { UserInboxReadModel } from '../../ReadModel';
+﻿import { UserInboxReadModel, UserSentMessagesReadModel } from '../../ReadModel';
 import {IQueryHandler} from '../../QueryHandling/IQueryHandler';
-import { GetUserInboxQuery } from '../../Messages/Queries';
-import {SecurityUiService} from '../Shared/SecurityUiService';
+import { GetUserInboxQuery, GetSentUserMessagesQuery } from '../../Messages/Queries';
+import { UserMessagesListColumn } from './UserMessagesListColumn';
 
 export class UserMessagesCtrl implements ng.IController {
-	tastyInitCfg = {
-		'count': 10,
-		'page': 1
-	};
+	inboxMessagesListDisplayedColumns: UserMessagesListColumn[] =
+	['SenderUserName', 'SubjectAndBody', 'SentDateTime'];
 
-	staticResource = {
-		header: [
-			{
-				key: 'sender',
-				name: 'Sender',
-				style: { width: '15%' }
-			},
-			{
-				key: 'message',
-				name: 'Message',
-				style: { width: '60%' }
-			},
-			{
-				key: 'sentDateTime',
-				name: 'Sent',
-				style: { width: '25%' }
-			}
-		]
-	};
+	sentMessagesListDisplayedColumns: UserMessagesListColumn[] =
+	['SubjectAndBody', 'SentDateTime', 'RecipientUserName'];
 
-	static $inject = ['getUserInboxQueryHandler'];
+	static $inject = ['getUserInboxQueryHandler', 'getSentUserMessagesQueryHandler'];
 
-	constructor(private getUserInboxQueryHandler: IQueryHandler<GetUserInboxQuery, UserInboxReadModel>, private securityUiService: SecurityUiService) {
+	constructor(private getUserInboxQueryHandler: IQueryHandler<GetUserInboxQuery, UserInboxReadModel>,
+		private getSentUserMessagesQueryHandler: IQueryHandler<GetSentUserMessagesQuery, UserSentMessagesReadModel>) {
 	}
 
-	getResource = (paramsString: string, paramsObject: any): ng.IPromise<any> => {
+	getUserInbox = (pageSize: number, pageNumber: number): ng.IPromise<UserInboxReadModel> => {
 		const query: GetUserInboxQuery = {
-			pageSize: paramsObject.count,
-			pageNumber: paramsObject.page
+			pageSize: pageSize,
+			pageNumber: pageNumber
 		};
 
-		return this.getUserInboxQueryHandler.handle(query)
-			.then(userInbox => {
-				return {
-					rows: userInbox.pageItems,
-					pagination: {
-						count: userInbox.pageSize,
-						page: userInbox.pageNumber,
-						pages: userInbox.totalPagesCount,
-						size: userInbox.totalItemsCount
-					},
-					header: this.staticResource.header
-				};
-			});
+		return this.getUserInboxQueryHandler.handle(query);
+	};
+
+	getSentUserMessages = (pageSize: number, pageNumber: number): ng.IPromise<UserInboxReadModel> => {
+		const query: GetSentUserMessagesQuery = {
+			pageSize: pageSize,
+			pageNumber: pageNumber
+		};
+
+		return this.getSentUserMessagesQueryHandler.handle(query);
 	};
 }

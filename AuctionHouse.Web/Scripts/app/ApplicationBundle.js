@@ -57,16 +57,17 @@
 	var BusyIndicator_1 = __webpack_require__(17);
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
 	var AuctionsListComponent_1 = __webpack_require__(21);
-	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(24);
-	var SimpleNotificationDialogComponent_1 = __webpack_require__(25);
-	var GenericModalService_1 = __webpack_require__(27);
-	var Configuration_1 = __webpack_require__(28);
-	var FormatDateTimeFilterFactory_1 = __webpack_require__(29);
-	var ComposeUserMessageDialogComponent_1 = __webpack_require__(30);
-	var UserReferenceComponent_1 = __webpack_require__(32);
-	var UserMessagesComponent_1 = __webpack_require__(34);
-	var UserAuctionsListComponent_1 = __webpack_require__(36);
-	var ActiveAuctionsListComponent_1 = __webpack_require__(38);
+	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(25);
+	var SimpleNotificationDialogComponent_1 = __webpack_require__(26);
+	var GenericModalService_1 = __webpack_require__(28);
+	var Configuration_1 = __webpack_require__(29);
+	var FormatDateTimeFilterFactory_1 = __webpack_require__(30);
+	var ComposeUserMessageDialogComponent_1 = __webpack_require__(31);
+	var UserReferenceComponent_1 = __webpack_require__(33);
+	var UserMessagesComponent_1 = __webpack_require__(35);
+	var UserAuctionsListComponent_1 = __webpack_require__(37);
+	var ActiveAuctionsListComponent_1 = __webpack_require__(39);
+	var UserMessagesListComponent_1 = __webpack_require__(41);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -156,7 +157,8 @@
 	    new ComposeUserMessageDialogComponent_1.ComposeUserMessageDialogComponent(),
 	    new UserMessagesComponent_1.UserMessagesComponent(),
 	    new UserAuctionsListComponent_1.UserAuctionsListComponent(),
-	    new ActiveAuctionsListComponent_1.ActiveAuctionsListComponent()
+	    new ActiveAuctionsListComponent_1.ActiveAuctionsListComponent(),
+	    new UserMessagesListComponent_1.UserMessagesListComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -850,6 +852,17 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var QueryHandler_1 = __webpack_require__(14);
+	var GetSentUserMessagesQueryHandler = (function (_super) {
+	    __extends(GetSentUserMessagesQueryHandler, _super);
+	    function GetSentUserMessagesQueryHandler() {
+	        return _super.apply(this, arguments) || this;
+	    }
+	    GetSentUserMessagesQueryHandler.prototype.getQueryName = function () {
+	        return 'GetSentUserMessagesQuery';
+	    };
+	    return GetSentUserMessagesQueryHandler;
+	}(QueryHandler_1.QueryHandler));
+	exports.GetSentUserMessagesQueryHandler = GetSentUserMessagesQueryHandler;
 	var GetUserInboxQueryHandler = (function (_super) {
 	    __extends(GetUserInboxQueryHandler, _super);
 	    function GetUserInboxQueryHandler() {
@@ -900,6 +913,7 @@
 	    return AngularQueryHandlersRegistry;
 	}());
 	AngularQueryHandlersRegistry.queryHandlers = {
+	    'getSentUserMessagesQueryHandler': GetSentUserMessagesQueryHandler,
 	    'getUserInboxQueryHandler': GetUserInboxQueryHandler,
 	    'getAuctionDetailsQueryHandler': GetAuctionDetailsQueryHandler,
 	    'getAuctionsInvolvingUserQueryHandler': GetAuctionsInvolvingUserQueryHandler,
@@ -1264,75 +1278,34 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var AuctionsListColumn_1 = __webpack_require__(23);
-	var HeaderDefinition = (function () {
-	    function HeaderDefinition(column, displayName, style) {
-	        this.column = column;
-	        this.displayName = displayName;
-	        this.style = style;
-	    }
-	    HeaderDefinition.prototype.toTastyTableHeader = function () {
-	        return {
-	            key: AuctionsListColumn_1.AuctionsListColumn[this.column],
-	            name: this.displayName,
-	            style: this.style
-	        };
-	    };
-	    return HeaderDefinition;
-	}());
-	var AuctionsListCtrl = (function () {
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var ListHeaderDefinition_1 = __webpack_require__(23);
+	var ListCtrl_1 = __webpack_require__(24);
+	var AuctionsListCtrl = (function (_super) {
+	    __extends(AuctionsListCtrl, _super);
 	    function AuctionsListCtrl(scope) {
-	        var _this = this;
-	        this.reload = angular.noop;
-	        this.staticResource = {
-	            header: _(AuctionsListCtrl.allHeaders).map(function (header) { return header.toTastyTableHeader(); })
-	        };
-	        this.tastyInitCfg = {
-	            'count': 25,
-	            'page': 1
-	        };
-	        this.getResource = function (paramsString, paramsObject) {
-	            var pageSize = paramsObject.count;
-	            var pageNumber = paramsObject.page;
-	            return _this.getAuctions(pageSize, pageNumber)
-	                .then(function (auctionsList) {
-	                return {
-	                    rows: auctionsList.pageItems,
-	                    pagination: {
-	                        count: auctionsList.pageSize,
-	                        page: auctionsList.pageNumber,
-	                        pages: auctionsList.totalPagesCount,
-	                        size: auctionsList.totalItemsCount
-	                    },
-	                    header: _this.staticResource.header
-	                };
-	            });
-	        };
-	        scope.$watch(function () { return _this.reload; }, function () {
-	            _this.onReloadFunctionChanged({ reloadFunction: _this.reload });
-	            _this.reload();
-	        });
-	        scope.$watchCollection(function () { return _this.displayedColumns; }, function () {
-	            var displayedHeaders = _(AuctionsListCtrl.allHeaders)
-	                .filter(function (header) { return _(_this.displayedColumns).contains(header.column); });
-	            _this.staticResource.header = _(displayedHeaders).map(function (header) { return header.toTastyTableHeader(); });
-	        });
+	        return _super.call(this, scope) || this;
 	    }
-	    AuctionsListCtrl.prototype.checkIfColumnIsDisplayed = function (columnName) {
-	        var column = AuctionsListColumn_1.AuctionsListColumn[columnName];
-	        return _(this.displayedColumns).contains(column);
+	    AuctionsListCtrl.prototype.getAllHeaderDefinitions = function () {
+	        return [
+	            new ListHeaderDefinition_1.default('TitleAndDescription', 'Auction'),
+	            new ListHeaderDefinition_1.default('CurrentPrice', 'Current price', { width: '120px', 'text-align': 'right' }),
+	            new ListHeaderDefinition_1.default('SoldFor', 'Sold for', { width: '120px', 'text-align': 'right' }),
+	            new ListHeaderDefinition_1.default('BuyNowPrice', 'Buy now price', { width: '120px', 'text-align': 'right' }),
+	            new ListHeaderDefinition_1.default('NumberOfBids', 'Bids', { width: '50px', 'text-align': 'right' }),
+	            new ListHeaderDefinition_1.default('Seller', 'Seller', { width: '200px' }),
+	            new ListHeaderDefinition_1.default('Winner', 'Winner', { width: '200px' })
+	        ];
+	    };
+	    AuctionsListCtrl.prototype.getResults = function (pageSize, pageNumber) {
+	        return this.getAuctions(pageSize, pageNumber);
 	    };
 	    return AuctionsListCtrl;
-	}());
-	AuctionsListCtrl.allHeaders = [
-	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, 'Auction'),
-	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, 'Current price', { width: '120px', 'text-align': 'right' }),
-	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.SoldFor, 'Sold for', { width: '120px', 'text-align': 'right' }),
-	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, 'Buy now price', { width: '120px', 'text-align': 'right' }),
-	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.NumberOfBids, 'Bids', { width: '50px', 'text-align': 'right' }),
-	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.Seller, 'Seller', { width: '200px' }),
-	    new HeaderDefinition(AuctionsListColumn_1.AuctionsListColumn.Winner, 'Winner', { width: '200px' })
-	];
+	}(ListCtrl_1.ListCtrl));
 	AuctionsListCtrl.$inject = ['$scope'];
 	exports.AuctionsListCtrl = AuctionsListCtrl;
 
@@ -1342,20 +1315,76 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	var AuctionsListColumn;
-	(function (AuctionsListColumn) {
-	    AuctionsListColumn[AuctionsListColumn["TitleAndDescription"] = 0] = "TitleAndDescription";
-	    AuctionsListColumn[AuctionsListColumn["CurrentPrice"] = 1] = "CurrentPrice";
-	    AuctionsListColumn[AuctionsListColumn["SoldFor"] = 2] = "SoldFor";
-	    AuctionsListColumn[AuctionsListColumn["BuyNowPrice"] = 3] = "BuyNowPrice";
-	    AuctionsListColumn[AuctionsListColumn["NumberOfBids"] = 4] = "NumberOfBids";
-	    AuctionsListColumn[AuctionsListColumn["Seller"] = 5] = "Seller";
-	    AuctionsListColumn[AuctionsListColumn["Winner"] = 6] = "Winner";
-	})(AuctionsListColumn = exports.AuctionsListColumn || (exports.AuctionsListColumn = {}));
+	var ListHeaderDefinition = (function () {
+	    function ListHeaderDefinition(column, displayName, style) {
+	        this.column = column;
+	        this.displayName = displayName;
+	        this.style = style;
+	    }
+	    return ListHeaderDefinition;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = ListHeaderDefinition;
 
 
 /***/ },
 /* 24 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var ListCtrl = (function () {
+	    function ListCtrl(scope) {
+	        var _this = this;
+	        this.reload = angular.noop;
+	        this.tastyInitCfg = {
+	            'count': 25,
+	            'page': 1
+	        };
+	        this.getResource = function (paramsString, paramsObject) {
+	            var pageSize = paramsObject.count;
+	            var pageNumber = paramsObject.page;
+	            return _this.getResults(pageSize, pageNumber)
+	                .then(function (pagedResults) {
+	                var displayedHeaders = _(_this.getAllHeaderDefinitions())
+	                    .filter(function (headerDefinition) { return _(_this.displayedColumns).contains(headerDefinition.column); });
+	                var tastyHeader = _(displayedHeaders).map(function (header) { return _this.mapHeaderDefinitionToTastyTableHeader(header); });
+	                return {
+	                    rows: pagedResults.pageItems,
+	                    pagination: {
+	                        count: pagedResults.pageSize,
+	                        page: pagedResults.pageNumber,
+	                        pages: pagedResults.totalPagesCount,
+	                        size: pagedResults.totalItemsCount
+	                    },
+	                    header: tastyHeader
+	                };
+	            });
+	        };
+	        scope.$watch(function () { return _this.reload; }, function () {
+	            if (_this.onReloadFunctionChanged) {
+	                _this.onReloadFunctionChanged({ reloadFunction: _this.reload });
+	            }
+	            _this.reload();
+	        });
+	    }
+	    ListCtrl.prototype.checkIfColumnIsDisplayed = function (column) {
+	        return _(this.displayedColumns).contains(column);
+	    };
+	    ListCtrl.prototype.mapHeaderDefinitionToTastyTableHeader = function (listHeaderDefinition) {
+	        return {
+	            key: listHeaderDefinition.column,
+	            name: listHeaderDefinition.displayName,
+	            style: listHeaderDefinition.style
+	        };
+	    };
+	    return ListCtrl;
+	}());
+	ListCtrl.$inject = ['$scope'];
+	exports.ListCtrl = ListCtrl;
+
+
+/***/ },
+/* 25 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1395,11 +1424,11 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var SimpleNotificationDialogCtrl_1 = __webpack_require__(26);
+	var SimpleNotificationDialogCtrl_1 = __webpack_require__(27);
 	var SimpleNotificationDialogComponent = (function () {
 	    function SimpleNotificationDialogComponent() {
 	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
@@ -1416,7 +1445,7 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1451,7 +1480,7 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1487,7 +1516,7 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1503,7 +1532,7 @@
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1523,11 +1552,11 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(31);
+	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(32);
 	var ComposeUserMessageDialogComponent = (function () {
 	    function ComposeUserMessageDialogComponent() {
 	        this.controller = ComposeUserMessageDialogCtrl_1.ComposeUserMessageDialogCtrl;
@@ -1544,7 +1573,7 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1601,11 +1630,11 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserReferenceCtrl_1 = __webpack_require__(33);
+	var UserReferenceCtrl_1 = __webpack_require__(34);
 	var UserReferenceComponent = (function () {
 	    function UserReferenceComponent() {
 	        this.controller = UserReferenceCtrl_1.UserReferenceCtrl;
@@ -1621,7 +1650,7 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1649,11 +1678,11 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserMessagesCtrl_1 = __webpack_require__(35);
+	var UserMessagesCtrl_1 = __webpack_require__(36);
 	var UserMessagesComponent = (function () {
 	    function UserMessagesComponent() {
 	        this.controller = UserMessagesCtrl_1.UserMessagesCtrl;
@@ -1666,70 +1695,44 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports) {
 
 	"use strict";
 	var UserMessagesCtrl = (function () {
-	    function UserMessagesCtrl(getUserInboxQueryHandler, securityUiService) {
+	    function UserMessagesCtrl(getUserInboxQueryHandler, getSentUserMessagesQueryHandler) {
 	        var _this = this;
 	        this.getUserInboxQueryHandler = getUserInboxQueryHandler;
-	        this.securityUiService = securityUiService;
-	        this.tastyInitCfg = {
-	            'count': 10,
-	            'page': 1
-	        };
-	        this.staticResource = {
-	            header: [
-	                {
-	                    key: 'sender',
-	                    name: 'Sender',
-	                    style: { width: '15%' }
-	                },
-	                {
-	                    key: 'message',
-	                    name: 'Message',
-	                    style: { width: '60%' }
-	                },
-	                {
-	                    key: 'sentDateTime',
-	                    name: 'Sent',
-	                    style: { width: '25%' }
-	                }
-	            ]
-	        };
-	        this.getResource = function (paramsString, paramsObject) {
+	        this.getSentUserMessagesQueryHandler = getSentUserMessagesQueryHandler;
+	        this.inboxMessagesListDisplayedColumns = ['SenderUserName', 'SubjectAndBody', 'SentDateTime'];
+	        this.sentMessagesListDisplayedColumns = ['SubjectAndBody', 'SentDateTime', 'RecipientUserName'];
+	        this.getUserInbox = function (pageSize, pageNumber) {
 	            var query = {
-	                pageSize: paramsObject.count,
-	                pageNumber: paramsObject.page
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
 	            };
-	            return _this.getUserInboxQueryHandler.handle(query)
-	                .then(function (userInbox) {
-	                return {
-	                    rows: userInbox.pageItems,
-	                    pagination: {
-	                        count: userInbox.pageSize,
-	                        page: userInbox.pageNumber,
-	                        pages: userInbox.totalPagesCount,
-	                        size: userInbox.totalItemsCount
-	                    },
-	                    header: _this.staticResource.header
-	                };
-	            });
+	            return _this.getUserInboxQueryHandler.handle(query);
+	        };
+	        this.getSentUserMessages = function (pageSize, pageNumber) {
+	            var query = {
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
+	            };
+	            return _this.getSentUserMessagesQueryHandler.handle(query);
 	        };
 	    }
 	    return UserMessagesCtrl;
 	}());
-	UserMessagesCtrl.$inject = ['getUserInboxQueryHandler'];
+	UserMessagesCtrl.$inject = ['getUserInboxQueryHandler', 'getSentUserMessagesQueryHandler'];
 	exports.UserMessagesCtrl = UserMessagesCtrl;
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserAuctionsListCtrl_1 = __webpack_require__(37);
+	var UserAuctionsListCtrl_1 = __webpack_require__(38);
 	var UserAuctionsListComponent = (function () {
 	    function UserAuctionsListComponent() {
 	        this.controller = UserAuctionsListCtrl_1.UserAuctionsListCtrl;
@@ -1745,17 +1748,15 @@
 
 
 /***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
+/* 38 */
+/***/ function(module, exports) {
 
 	"use strict";
-	var AuctionsListColumn_1 = __webpack_require__(23);
 	var UserAuctionsListCtrl = (function () {
 	    function UserAuctionsListCtrl(getAuctionsInvolvingUserQueryHandler) {
 	        var _this = this;
 	        this.getAuctionsInvolvingUserQueryHandler = getAuctionsInvolvingUserQueryHandler;
 	        this.userInvolvementIntoAuction = 'Selling';
-	        this.displayedColumns = [AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, AuctionsListColumn_1.AuctionsListColumn.Winner];
 	        this.getAuctions = function (pageSize, pageNumber) {
 	            _this.refreshDisplayedColumns();
 	            var query = {
@@ -1771,15 +1772,15 @@
 	        this.search = reloadFn;
 	    };
 	    UserAuctionsListCtrl.prototype.refreshDisplayedColumns = function () {
-	        var commonColumns = [AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice];
+	        var commonColumns = ['TitleAndDescription', 'BuyNowPrice'];
 	        // TODO: add ended date and final price columns
 	        var userInvolvementIntoAuctionToAdditionalColumnsMap = {
-	            'Selling': [AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
-	            'Sold': [AuctionsListColumn_1.AuctionsListColumn.SoldFor, AuctionsListColumn_1.AuctionsListColumn.Winner, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
+	            'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids'],
+	            'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids'],
 	            'FailedToSell': [],
-	            'Bidding': [AuctionsListColumn_1.AuctionsListColumn.Seller, AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
-	            'Bought': [AuctionsListColumn_1.AuctionsListColumn.SoldFor, AuctionsListColumn_1.AuctionsListColumn.Seller, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids],
-	            'FailedToBuy': [AuctionsListColumn_1.AuctionsListColumn.SoldFor, AuctionsListColumn_1.AuctionsListColumn.Seller, AuctionsListColumn_1.AuctionsListColumn.Winner, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids]
+	            'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids'],
+	            'Bought': ['SoldFor', 'Seller', 'NumberOfBids'],
+	            'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids']
 	        };
 	        this.displayedColumns = commonColumns
 	            .concat(userInvolvementIntoAuctionToAdditionalColumnsMap[this.userInvolvementIntoAuction]);
@@ -1791,11 +1792,11 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ActiveAuctionsListCtrl_1 = __webpack_require__(39);
+	var ActiveAuctionsListCtrl_1 = __webpack_require__(40);
 	var ActiveAuctionsListComponent = (function () {
 	    function ActiveAuctionsListComponent() {
 	        this.controller = ActiveAuctionsListCtrl_1.ActiveAuctionsListCtrl;
@@ -1811,16 +1812,15 @@
 
 
 /***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
+/* 40 */
+/***/ function(module, exports) {
 
 	"use strict";
-	var AuctionsListColumn_1 = __webpack_require__(23);
 	var ActiveAuctionsListCtrl = (function () {
 	    function ActiveAuctionsListCtrl(searchAuctionsQueryHandler) {
 	        var _this = this;
 	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
-	        this.displayedColumns = [AuctionsListColumn_1.AuctionsListColumn.TitleAndDescription, AuctionsListColumn_1.AuctionsListColumn.CurrentPrice, AuctionsListColumn_1.AuctionsListColumn.BuyNowPrice, AuctionsListColumn_1.AuctionsListColumn.NumberOfBids, AuctionsListColumn_1.AuctionsListColumn.Seller];
+	        this.displayedColumns = ['TitleAndDescription', 'CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'Seller'];
 	        this.getAuctions = function (pageSize, pageNumber) {
 	            var query = {
 	                queryString: _this.queryString,
@@ -1834,6 +1834,61 @@
 	}());
 	ActiveAuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
 	exports.ActiveAuctionsListCtrl = ActiveAuctionsListCtrl;
+
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserMessagesListCtrl_1 = __webpack_require__(42);
+	var UserMessagesListComponent = (function () {
+	    function UserMessagesListComponent() {
+	        this.controller = UserMessagesListCtrl_1.UserMessagesListCtrl;
+	        this.templateUrl = 'Template/UserMessaging/UserMessagesList';
+	        this.registerAs = 'userMessagesList';
+	        this.bindings = {
+	            getMessages: '<',
+	            displayedColumns: '<'
+	        };
+	    }
+	    return UserMessagesListComponent;
+	}());
+	exports.UserMessagesListComponent = UserMessagesListComponent;
+
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var ListCtrl_1 = __webpack_require__(24);
+	var ListHeaderDefinition_1 = __webpack_require__(23);
+	var UserMessagesListCtrl = (function (_super) {
+	    __extends(UserMessagesListCtrl, _super);
+	    function UserMessagesListCtrl(scope) {
+	        return _super.call(this, scope) || this;
+	    }
+	    UserMessagesListCtrl.prototype.getAllHeaderDefinitions = function () {
+	        return [
+	            new ListHeaderDefinition_1.default('SenderUserName', 'Sender', { width: '200px' }),
+	            new ListHeaderDefinition_1.default('RecipientUserName', 'Recipient', { width: '200px' }),
+	            new ListHeaderDefinition_1.default('SubjectAndBody', 'Message'),
+	            new ListHeaderDefinition_1.default('SentDateTime', 'Sent', { width: '250px' })
+	        ];
+	    };
+	    UserMessagesListCtrl.prototype.getResults = function (pageSize, pageNumber) {
+	        return this.getMessages(pageSize, pageNumber);
+	    };
+	    return UserMessagesListCtrl;
+	}(ListCtrl_1.ListCtrl));
+	UserMessagesListCtrl.$inject = ['$scope'];
+	exports.UserMessagesListCtrl = UserMessagesListCtrl;
 
 
 /***/ }

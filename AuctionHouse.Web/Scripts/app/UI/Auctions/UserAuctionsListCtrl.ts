@@ -7,7 +7,7 @@ export class UserAuctionsListCtrl implements ng.IController {
 	search: () => void;
 	queryString: string;
 	userInvolvementIntoAuction = 'Selling';
-	displayedColumns = [AuctionsListColumn.TitleAndDescription, AuctionsListColumn.Winner];
+	displayedColumns: AuctionsListColumn[];
 
 	static $inject = ['getAuctionsInvolvingUserQueryHandler'];
 
@@ -33,16 +33,16 @@ export class UserAuctionsListCtrl implements ng.IController {
 	}
 
 	private refreshDisplayedColumns() {
-		const commonColumns = [AuctionsListColumn.TitleAndDescription, AuctionsListColumn.BuyNowPrice];
+		const commonColumns: AuctionsListColumn[] = ['TitleAndDescription', 'BuyNowPrice'];
 
 		// TODO: add ended date and final price columns
 		const userInvolvementIntoAuctionToAdditionalColumnsMap: { [userInvolvementIntoAuction: string]: AuctionsListColumn[] } = {
-			'Selling': [AuctionsListColumn.CurrentPrice, AuctionsListColumn.BuyNowPrice, AuctionsListColumn.NumberOfBids],
-			'Sold': [AuctionsListColumn.SoldFor, AuctionsListColumn.Winner, AuctionsListColumn.BuyNowPrice, AuctionsListColumn.NumberOfBids],
+			'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids'],
+			'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids'],
 			'FailedToSell': [] as AuctionsListColumn[],
-			'Bidding': [AuctionsListColumn.Seller, AuctionsListColumn.CurrentPrice, AuctionsListColumn.NumberOfBids],
-			'Bought': [AuctionsListColumn.SoldFor, AuctionsListColumn.Seller, AuctionsListColumn.NumberOfBids],
-			'FailedToBuy': [AuctionsListColumn.SoldFor, AuctionsListColumn.Seller, AuctionsListColumn.Winner, AuctionsListColumn.NumberOfBids]
+			'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids'],
+			'Bought': ['SoldFor', 'Seller', 'NumberOfBids'],
+			'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids']
 		}
 
 		this.displayedColumns = commonColumns

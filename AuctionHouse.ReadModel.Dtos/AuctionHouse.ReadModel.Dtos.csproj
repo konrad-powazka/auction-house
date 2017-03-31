@@ -45,6 +45,7 @@
     <Compile Include="Auctions\AuctionsListReadModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadModelDtosAssemblyMarker.cs" />
+    <Compile Include="UserMessaging\UserSentMessagesReadModel.cs" />
     <Compile Include="UserMessaging\UserInboxReadModel.cs" />
     <Compile Include="UserMessaging\UserMessageReadModel.cs" />
   </ItemGroup>

@@ -47,6 +47,7 @@
     <Compile Include="QueriesAssemblyMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryTypeInfo.cs" />
+    <Compile Include="UserMessaging\GetSentUserMessagesQuery.cs" />
     <Compile Include="UserMessaging\GetUserInboxQuery.cs" />
   </ItemGroup>
   <ItemGroup>

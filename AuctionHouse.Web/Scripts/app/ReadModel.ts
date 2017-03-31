@@ -4,6 +4,15 @@
 
 
 export
+class UserSentMessagesReadModel
+{
+	public pageNumber: number;
+	public totalPagesCount: number;
+	public totalItemsCount: number;
+	public pageItems: UserMessageReadModel[];
+	public pageSize: number;
+}
+export
 class UserInboxReadModel
 {
 	public pageNumber: number;

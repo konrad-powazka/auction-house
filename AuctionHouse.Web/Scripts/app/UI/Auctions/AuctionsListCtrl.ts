@@ -1,85 +1,33 @@
-﻿import { AuctionsListReadModel } from '../../ReadModel';
+﻿import { AuctionsListReadModel, AuctionListItemReadModel } from '../../ReadModel';
 import {IQueryHandler} from '../../QueryHandling/IQueryHandler';
 import { SearchAuctionsQuery } from '../../Messages/Queries';
 import {AuctionsListColumn} from './AuctionsListColumn';
+import ListHeaderDefinition from '../Shared/Lists/ListHeaderDefinition';
+import {ListCtrl} from '../Shared/Lists/ListCtrl';
 
-class HeaderDefinition {
-	constructor(public column: AuctionsListColumn, public displayName: string, public style?: any) {
-	}
-
-	toTastyTableHeader() {
-		return {
-			key: AuctionsListColumn[this.column],
-			name: this.displayName,
-			style: this.style
-		}
-	}
-}
-
-export class AuctionsListCtrl implements ng.IController {
-	private static allHeaders = [
-		new HeaderDefinition(AuctionsListColumn.TitleAndDescription, 'Auction'),
-		new HeaderDefinition(AuctionsListColumn.CurrentPrice, 'Current price', { width: '120px', 'text-align': 'right' }),
-		new HeaderDefinition(AuctionsListColumn.SoldFor, 'Sold for', { width: '120px', 'text-align': 'right' }),
-		new HeaderDefinition(AuctionsListColumn.BuyNowPrice, 'Buy now price', { width: '120px', 'text-align': 'right' }),
-		new HeaderDefinition(AuctionsListColumn.NumberOfBids, 'Bids', { width: '50px', 'text-align': 'right' }),
-		new HeaderDefinition(AuctionsListColumn.Seller, 'Seller', { width: '200px' }),
-		new HeaderDefinition(AuctionsListColumn.Winner, 'Winner', { width: '200px' })
-	];
-
+export class AuctionsListCtrl extends ListCtrl<AuctionsListColumn, AuctionListItemReadModel> {
 	queryString: string;
 	getAuctions: (pageSize: number, pageNumber: number) => ng.IPromise<AuctionsListReadModel>;
-	displayedColumns: AuctionsListColumn[];
-	onReloadFunctionChanged: (args: { reloadFunction: () => void }) => void;
-	reload: () => void = angular.noop;
-
-	staticResource = {
-		header: _(AuctionsListCtrl.allHeaders).map(header => header.toTastyTableHeader())
-	};
-
-	tastyInitCfg = {
-		'count': 25,
-		'page': 1
-	};
 
 	static $inject = ['$scope'];
 
 	constructor(scope: ng.IScope) {
-		scope.$watch(() => this.reload, () => {
-			this.onReloadFunctionChanged({ reloadFunction: this.reload });
-			this.reload();
-		});
-
-		scope.$watchCollection(() => this.displayedColumns, () => {
-			const displayedHeaders = _(AuctionsListCtrl.allHeaders)
-				.filter(header => _(this.displayedColumns).contains(header.column));
-
-			this.staticResource.header = _(displayedHeaders).map(header => header.toTastyTableHeader());
-
-		});
+		super(scope);
 	}
 
-	getResource = (paramsString: string, paramsObject: any): ng.IPromise<any> => {
-		var pageSize = paramsObject.count;
-		var pageNumber = paramsObject.page;
+	protected getAllHeaderDefinitions() {
+		return [
+			new ListHeaderDefinition<AuctionsListColumn>('TitleAndDescription', 'Auction'),
+			new ListHeaderDefinition<AuctionsListColumn>('CurrentPrice', 'Current price', { width: '120px', 'text-align': 'right' }),
+			new ListHeaderDefinition<AuctionsListColumn>('SoldFor', 'Sold for', { width: '120px', 'text-align': 'right' }),
+			new ListHeaderDefinition<AuctionsListColumn>('BuyNowPrice', 'Buy now price', { width: '120px', 'text-align': 'right' }),
+			new ListHeaderDefinition<AuctionsListColumn>('NumberOfBids', 'Bids', { width: '50px', 'text-align': 'right' }),
+			new ListHeaderDefinition<AuctionsListColumn>('Seller', 'Seller', { width: '200px' }),
+			new ListHeaderDefinition<AuctionsListColumn>('Winner', 'Winner', { width: '200px' })
+		];
+	}
 
-		return this.getAuctions(pageSize, pageNumber)
-			.then(auctionsList => {
-				return {
-					rows: auctionsList.pageItems,
-					pagination: {
-						count: auctionsList.pageSize,
-						page: auctionsList.pageNumber,
-						pages: auctionsList.totalPagesCount,
-						size: auctionsList.totalItemsCount
-					},
-					header: this.staticResource.header
-				};
-			});
-	};
-
-	checkIfColumnIsDisplayed(columnName: string) {
-		const column = (AuctionsListColumn as any)[columnName] as AuctionsListColumn;
-		return _(this.displayedColumns).contains(column);
+	protected getResults(pageSize: number, pageNumber: number) {
+		return this.getAuctions(pageSize, pageNumber);
 	}
 }
