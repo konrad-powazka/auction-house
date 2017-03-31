@@ -37,12 +37,12 @@ export class UserAuctionsListCtrl implements ng.IController {
 
 		// TODO: add ended date and final price columns
 		const userInvolvementIntoAuctionToAdditionalColumnsMap: { [userInvolvementIntoAuction: string]: AuctionsListColumn[] } = {
-			'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids'],
-			'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids'],
-			'FailedToSell': [] as AuctionsListColumn[],
-			'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids'],
-			'Bought': ['SoldFor', 'Seller', 'NumberOfBids'],
-			'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids']
+			'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'EndsDateTime'],
+			'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids', 'EndedDateTime'],
+			'FailedToSell': ['EndedDateTime'],
+			'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids', 'EndsDateTime'],
+			'Bought': ['SoldFor', 'Seller', 'NumberOfBids', 'EndedDateTime'],
+			'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids', 'EndedDateTime']
 		}
 
 		this.displayedColumns = commonColumns

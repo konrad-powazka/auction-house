@@ -1,27 +1,28 @@
 ﻿import { INamedComponentOptions } from './Infrastructure/INamedComponentOptions';
 import { CreateAuctionComponent } from './UI/Auctions/CreateAuctionComponent';
 import { AngularCommandHandlersRegistry } from './CommandHandling/GeneratedCommandHandlers';
-import {SecurityService} from './Security/SecurityService';
-import {SecurityUiService} from './UI/Shared/SecurityUiService';
+import { SecurityService } from './Security/SecurityService';
+import { SecurityUiService } from './UI/Shared/SecurityUiService';
 import { SignInDialogComponent } from './UI/Shared/SignInDialogComponent';
-import {ApplicationCtrl} from './UI/Shared/ApplicationCtrl';
-import {Routing} from './Routing';
-import {AngularQueryHandlersRegistry} from './QueryHandling/GeneratedQueryHandlers';
-import {DisplayAuctionComponent} from './UI/Auctions/DisplayAuctionComponent';
+import { ApplicationCtrl } from './UI/Shared/ApplicationCtrl';
+import { Routing } from './Routing';
+import { AngularQueryHandlersRegistry } from './QueryHandling/GeneratedQueryHandlers';
+import { DisplayAuctionComponent } from './UI/Auctions/DisplayAuctionComponent';
 import BusyIndicator from './UI/Shared/BusyIndicator';
-import {AngularCommandUiHandlersRegistry} from './UI/Shared/CommandHandling/GeneratedUiCommandHandlers';
-import {AuctionsListComponent} from './UI/Auctions/AuctionsListComponent';
+import { AngularCommandUiHandlersRegistry } from './UI/Shared/CommandHandling/GeneratedUiCommandHandlers';
+import { AuctionsListComponent } from './UI/Auctions/AuctionsListComponent';
 import BusyIndicatingHttpInterceptor from './UI/Shared/BusyIndicatingHttpInterceptor';
-import {SimpleNotificationDialogComponent} from './UI/Shared/SimpleNotificationDialogComponent';
+import { SimpleNotificationDialogComponent } from './UI/Shared/SimpleNotificationDialogComponent';
 import GenericModalService from './UI/Shared/GenericModalService';
 import Configuration from './Configuration';
 import FormatDateTimeFilterFactory from './UI/Shared/FormatDateTimeFilterFactory';
-import {ComposeUserMessageDialogComponent} from './UI/UserMessaging/ComposeUserMessageDialogComponent';
-import {UserReferenceComponent} from './UI/Shared/UserReferenceComponent';
-import {UserMessagesComponent} from './UI/UserMessaging/UserMessagesComponent';
-import {UserAuctionsListComponent} from './UI/Auctions/UserAuctionsListComponent';
-import {ActiveAuctionsListComponent} from './UI/Auctions/ActiveAuctionsListComponent';
-import {UserMessagesListComponent} from './UI/UserMessaging/UserMessagesListComponent';
+import { ComposeUserMessageDialogComponent } from './UI/UserMessaging/ComposeUserMessageDialogComponent';
+import { UserReferenceComponent } from './UI/Shared/UserReferenceComponent';
+import { UserMessagesComponent } from './UI/UserMessaging/UserMessagesComponent';
+import { UserAuctionsListComponent } from './UI/Auctions/UserAuctionsListComponent';
+import { ActiveAuctionsListComponent } from './UI/Auctions/ActiveAuctionsListComponent';
+import { UserMessagesListComponent } from './UI/UserMessaging/UserMessagesListComponent';
+import { NewLinesToParagraphsComponent } from './UI/Shared/NewLinesToParagraphsComponent';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
@@ -35,15 +36,16 @@ export class Application {
 		new UserMessagesComponent(),
 		new UserAuctionsListComponent(),
 		new ActiveAuctionsListComponent(),
-		new UserMessagesListComponent()
+		new UserMessagesListComponent(),
+		new NewLinesToParagraphsComponent()
 	];
 
 	static bootstrap(): void {
 		const module = angular.module('auctionHouse',
-		[
-			'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
-			'ui.bootstrap.datetimepicker', 'angularSpinner', 'ngTasty'
-		]);
+			[
+				'ui.router', 'formly', 'formlyBootstrap', 'ngMessages', 'ngAnimate', 'ui.bootstrap',
+				'ui.bootstrap.datetimepicker', 'angularSpinner', 'ngTasty'
+			]);
 
 		this.registerConstants(module);
 
@@ -75,7 +77,8 @@ export class Application {
 		module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor);
 		module.service('genericModalService', GenericModalService);
 		module.service('configuration', Configuration);
-		module.filter('formatDateTime', FormatDateTimeFilterFactory.createFilterFunction);
+		module.filter('formatDateTime', FormatDateTimeFilterFactory.createStandardFilterFunction);
+		module.filter('formatToNowDateTime', FormatDateTimeFilterFactory.createToNowFilterFunction);
 	}
 
 	private static registerConstants(module: ng.IModule): void {
@@ -104,7 +107,7 @@ export class Application {
 		formlyConfig.setType({
 			name: 'dateTimePicker',
 			template:
-				'<div><datetimepicker ng-model="model[options.key]" show-spinners="true" date-format="M/d/yyyy" date-options="dateOptions"></datetimepicker></div>',
+			'<div><datetimepicker ng-model="model[options.key]" show-spinners="true" date-format="M/d/yyyy" date-options="dateOptions"></datetimepicker></div>',
 			wrapper: ['bootstrapLabel', 'bootstrapHasError'],
 			defaultOptions: {
 				templateOptions: {

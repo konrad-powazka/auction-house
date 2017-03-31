@@ -500,6 +500,8 @@
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\ICommandUiHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\CommandHandling\CommandUiHandler.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\FormatDateTimeFilterFactory.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\NewLinesToParagraphsComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\Shared\NewLinesToParagraphsCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\UserReferenceComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SimpleNotificationDialogComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogComponent.ts" />

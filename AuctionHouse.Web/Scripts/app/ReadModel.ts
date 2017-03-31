@@ -46,6 +46,7 @@ class AuctionListItemReadModel
 	public finishedDateTime: any | null;
 	public highestBidderUserName: string;
 	public currentPrice: number;
+	public createdDateTime: string;
 }
 export
 class AuctionsListReadModel

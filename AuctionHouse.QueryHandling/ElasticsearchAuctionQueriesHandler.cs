@@ -73,7 +73,13 @@ namespace AuctionHouse.QueryHandling
 
 								return filterFunctions.Aggregate(currentFilter, (current, filterFunction) => current && filterFunction(qcd, queryEnvelope));
 							},
-							sd => sd.Descending(a => a.EndDate));
+							sd =>
+							{
+								return queryEnvelope.Query.UserInvolvementIntoAuction == UserInvolvementIntoAuction.Selling ||
+								       queryEnvelope.Query.UserInvolvementIntoAuction == UserInvolvementIntoAuction.Bidding
+									? sd.Ascending(a => a.EndDate)
+									: sd.Descending(a => a.FinishedDateTime);
+							});
 		}
 
 		public async Task<AuctionsListReadModel> Handle(
@@ -89,7 +95,7 @@ namespace AuctionHouse.QueryHandling
 									mq.Fields(f => f.Fields(a => a.Title, a => a.Description))
 										.Query(queryEnvelope.Query.QueryString)
 										.Fuzziness(Fuzziness.Auto)) && q.Term(bqd => bqd.Field(a => a.WasFinished).Value(false)),
-							sd => sd.Descending(a => a.EndDate));
+							sd => sd.Ascending(a => a.EndDate));
 		}
 
 		private static Func<QueryContainerDescriptor<AuctionDetailsReadModel>,

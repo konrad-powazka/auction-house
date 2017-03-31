@@ -16,5 +16,6 @@ namespace AuctionHouse.ReadModel.Dtos.Auctions
 		public DateTime? FinishedDateTime { get; set; }
 		public string HighestBidderUserName { get; set; }
 		public decimal CurrentPrice { get; set; }
+		public DateTime CreatedDateTime { get; set; }
 	}
 }

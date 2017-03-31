@@ -44,7 +44,8 @@ namespace AuctionHouse.ReadModel.Builders
 						MinimalPriceForNextBidder = auctionCreatedEvent.MinimalPriceForNextBidder,
 						CurrentPrice = auctionCreatedEvent.CurrentPrice,
 						HighestBidderUserName = null,
-						NumberOfBids = 0
+						NumberOfBids = 0,
+						CreatedDateTime = auctionCreatedEvent.CreatedDateTime
 					};
 
 					readModelDbContext.CreateOrOverwrite(auctionDetails, auctionCreatedEvent.Id.ToString());

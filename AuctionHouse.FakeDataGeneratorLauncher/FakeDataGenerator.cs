@@ -112,7 +112,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 				.RuleFor(a => a.Description, s =>
 				{
 					var numberOfParagraphs = s.Random.Int(3, 10);
-					return s.Lorem.Paragraphs(numberOfParagraphs);
+					return s.Lorem.Paragraphs(numberOfParagraphs, "\n");
 				})
 				.RuleFor(a => a.BuyNowPrice,
 					(s, a) => hasBuyNowPrice ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?) null)
@@ -153,6 +153,15 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 				{
 					AuctionId = id,
 					FinishedDateTime = bidMadeEvents.Last().BidDateTime
+				};
+
+				allEvents.Add(auctionFinishedEvent);
+			} else if (!isEndDateFuture)
+			{
+				var auctionFinishedEvent = new AuctionFinishedEvent
+				{
+					AuctionId = id,
+					FinishedDateTime = auctionCreatedEvent.EndDateTime
 				};
 
 				allEvents.Add(auctionFinishedEvent);
@@ -307,7 +316,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 				.RuleFor(e => e.MessageBody, s =>
 				{
 					var numberOfParagraphs = s.Random.Int(1, 4);
-					return s.Lorem.Paragraphs(numberOfParagraphs);
+					return s.Lorem.Paragraphs(numberOfParagraphs, "\n");
 				})
 				.RuleFor(e => e.SentDateTime, s => s.Date.Between(_timeProvider.Now.AddDays(-500), _timeProvider.Now))
 				.RuleFor(e => e.MessageId, s => Guid.NewGuid())

@@ -16,10 +16,10 @@ export class UserMessagesListCtrl extends ListCtrl<UserMessagesListColumn, UserM
 
 	protected getAllHeaderDefinitions(): ListHeaderDefinition<UserMessagesListColumn>[] {
 		return [
-			new ListHeaderDefinition<UserMessagesListColumn>('SenderUserName', 'Sender', { width: '200px' }),
-			new ListHeaderDefinition<UserMessagesListColumn>('RecipientUserName', 'Recipient', { width: '200px' }),
+			new ListHeaderDefinition<UserMessagesListColumn>('SenderUserName', 'From', { width: '200px' }),
+			new ListHeaderDefinition<UserMessagesListColumn>('RecipientUserName', 'To', { width: '200px' }),
 			new ListHeaderDefinition<UserMessagesListColumn>('SubjectAndBody', 'Message'),
-			new ListHeaderDefinition<UserMessagesListColumn>('SentDateTime', 'Sent', { width: '250px' })
+			new ListHeaderDefinition<UserMessagesListColumn>('SentDateTime', 'Sent', { width: '180px' })
 		];
 	}
 

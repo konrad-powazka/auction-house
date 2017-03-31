@@ -68,6 +68,7 @@
 	var UserAuctionsListComponent_1 = __webpack_require__(37);
 	var ActiveAuctionsListComponent_1 = __webpack_require__(39);
 	var UserMessagesListComponent_1 = __webpack_require__(41);
+	var NewLinesToParagraphsComponent_1 = __webpack_require__(43);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -102,7 +103,8 @@
 	        module.service('busyIndicatingHttpInterceptor', BusyIndicatingHttpInterceptor_1.default);
 	        module.service('genericModalService', GenericModalService_1.default);
 	        module.service('configuration', Configuration_1.default);
-	        module.filter('formatDateTime', FormatDateTimeFilterFactory_1.default.createFilterFunction);
+	        module.filter('formatDateTime', FormatDateTimeFilterFactory_1.default.createStandardFilterFunction);
+	        module.filter('formatToNowDateTime', FormatDateTimeFilterFactory_1.default.createToNowFilterFunction);
 	    };
 	    Application.registerConstants = function (module) {
 	        module.constant('busyIndicator', new BusyIndicator_1.default());
@@ -158,7 +160,8 @@
 	    new UserMessagesComponent_1.UserMessagesComponent(),
 	    new UserAuctionsListComponent_1.UserAuctionsListComponent(),
 	    new ActiveAuctionsListComponent_1.ActiveAuctionsListComponent(),
-	    new UserMessagesListComponent_1.UserMessagesListComponent()
+	    new UserMessagesListComponent_1.UserMessagesListComponent(),
+	    new NewLinesToParagraphsComponent_1.NewLinesToParagraphsComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -1297,8 +1300,11 @@
 	            new ListHeaderDefinition_1.default('SoldFor', 'Sold for', { width: '120px', 'text-align': 'right' }),
 	            new ListHeaderDefinition_1.default('BuyNowPrice', 'Buy now price', { width: '120px', 'text-align': 'right' }),
 	            new ListHeaderDefinition_1.default('NumberOfBids', 'Bids', { width: '50px', 'text-align': 'right' }),
-	            new ListHeaderDefinition_1.default('Seller', 'Seller', { width: '200px' }),
-	            new ListHeaderDefinition_1.default('Winner', 'Winner', { width: '200px' })
+	            new ListHeaderDefinition_1.default('Seller', 'Seller', { width: '150px' }),
+	            new ListHeaderDefinition_1.default('Winner', 'Winner', { width: '150px' }),
+	            new ListHeaderDefinition_1.default('StartedDateTime', 'Started', { width: '180px' }),
+	            new ListHeaderDefinition_1.default('EndsDateTime', 'Ends in', { width: '130px' }),
+	            new ListHeaderDefinition_1.default('EndedDateTime', 'Ended', { width: '180px' }),
 	        ];
 	    };
 	    AuctionsListCtrl.prototype.getResults = function (pageSize, pageNumber) {
@@ -1539,9 +1545,20 @@
 	var FormatDateTimeFilterFactory = (function () {
 	    function FormatDateTimeFilterFactory() {
 	    }
-	    FormatDateTimeFilterFactory.createFilterFunction = function () {
+	    FormatDateTimeFilterFactory.createStandardFilterFunction = function () {
 	        return function (value) {
-	            return moment(value).format('Do MMMM YYYY, h:mm A');
+	            if (!value) {
+	                return null;
+	            }
+	            return moment(value).format('Do MMM YYYY, h:mm A');
+	        };
+	    };
+	    FormatDateTimeFilterFactory.createToNowFilterFunction = function () {
+	        return function (value) {
+	            if (!value) {
+	                return null;
+	            }
+	            return moment(value).toNow(true);
 	        };
 	    };
 	    return FormatDateTimeFilterFactory;
@@ -1775,12 +1792,12 @@
 	        var commonColumns = ['TitleAndDescription', 'BuyNowPrice'];
 	        // TODO: add ended date and final price columns
 	        var userInvolvementIntoAuctionToAdditionalColumnsMap = {
-	            'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids'],
-	            'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids'],
-	            'FailedToSell': [],
-	            'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids'],
-	            'Bought': ['SoldFor', 'Seller', 'NumberOfBids'],
-	            'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids']
+	            'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'EndsDateTime'],
+	            'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids', 'EndedDateTime'],
+	            'FailedToSell': ['EndedDateTime'],
+	            'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids', 'EndsDateTime'],
+	            'Bought': ['SoldFor', 'Seller', 'NumberOfBids', 'EndedDateTime'],
+	            'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids', 'EndedDateTime']
 	        };
 	        this.displayedColumns = commonColumns
 	            .concat(userInvolvementIntoAuctionToAdditionalColumnsMap[this.userInvolvementIntoAuction]);
@@ -1820,7 +1837,9 @@
 	    function ActiveAuctionsListCtrl(searchAuctionsQueryHandler) {
 	        var _this = this;
 	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
-	        this.displayedColumns = ['TitleAndDescription', 'CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'Seller'];
+	        this.displayedColumns = [
+	            'TitleAndDescription', 'CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'Seller', 'EndsDateTime'
+	        ];
 	        this.getAuctions = function (pageSize, pageNumber) {
 	            var query = {
 	                queryString: _this.queryString,
@@ -1876,10 +1895,10 @@
 	    }
 	    UserMessagesListCtrl.prototype.getAllHeaderDefinitions = function () {
 	        return [
-	            new ListHeaderDefinition_1.default('SenderUserName', 'Sender', { width: '200px' }),
-	            new ListHeaderDefinition_1.default('RecipientUserName', 'Recipient', { width: '200px' }),
+	            new ListHeaderDefinition_1.default('SenderUserName', 'From', { width: '200px' }),
+	            new ListHeaderDefinition_1.default('RecipientUserName', 'To', { width: '200px' }),
 	            new ListHeaderDefinition_1.default('SubjectAndBody', 'Message'),
-	            new ListHeaderDefinition_1.default('SentDateTime', 'Sent', { width: '250px' })
+	            new ListHeaderDefinition_1.default('SentDateTime', 'Sent', { width: '180px' })
 	        ];
 	    };
 	    UserMessagesListCtrl.prototype.getResults = function (pageSize, pageNumber) {
@@ -1889,6 +1908,52 @@
 	}(ListCtrl_1.ListCtrl));
 	UserMessagesListCtrl.$inject = ['$scope'];
 	exports.UserMessagesListCtrl = UserMessagesListCtrl;
+
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var NewLinesToParagraphsCtrl_1 = __webpack_require__(44);
+	var NewLinesToParagraphsComponent = (function () {
+	    function NewLinesToParagraphsComponent() {
+	        this.controller = NewLinesToParagraphsCtrl_1.NewLinesToParagraphsCtrl;
+	        this.registerAs = 'newLinesToParagraphs';
+	        this.bindings = {
+	            text: '<'
+	        };
+	    }
+	    return NewLinesToParagraphsComponent;
+	}());
+	exports.NewLinesToParagraphsComponent = NewLinesToParagraphsComponent;
+
+
+/***/ },
+/* 44 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var NewLinesToParagraphsCtrl = (function () {
+	    function NewLinesToParagraphsCtrl(element, scope) {
+	        var _this = this;
+	        scope.$watch(function () { return _this.text; }, function () {
+	            element.empty();
+	            if (!_(_this.text).isString()) {
+	                return;
+	            }
+	            var lines = _this.text.split(/\r\n|\r|\n/);
+	            var paragraphElements = _(lines).map(function (line) { return $('<p></p>').text(line); });
+	            for (var _i = 0, paragraphElements_1 = paragraphElements; _i < paragraphElements_1.length; _i++) {
+	                var paragraphElement = paragraphElements_1[_i];
+	                element.append(paragraphElement);
+	            }
+	        });
+	    }
+	    return NewLinesToParagraphsCtrl;
+	}());
+	NewLinesToParagraphsCtrl.$inject = ['$element', '$scope'];
+	exports.NewLinesToParagraphsCtrl = NewLinesToParagraphsCtrl;
 
 
 /***/ }

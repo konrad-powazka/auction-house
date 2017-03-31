@@ -5,4 +5,7 @@
 	'BuyNowPrice' |
 	'NumberOfBids' |
 	'Seller' |
-	'Winner'
+	'Winner' |
+	'StartedDateTime' |
+	'EndsDateTime' |
+	'EndedDateTime'

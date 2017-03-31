@@ -5,7 +5,10 @@ import { AuctionsListColumn } from './AuctionsListColumn';
 
 export class ActiveAuctionsListCtrl implements ng.IController {
 	queryString: string;
-	displayedColumns = ['TitleAndDescription', 'CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'Seller'];
+
+	displayedColumns = [
+		'TitleAndDescription', 'CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'Seller', 'EndsDateTime'
+	];
 
 	static $inject = ['searchAuctionsQueryHandler'];
 

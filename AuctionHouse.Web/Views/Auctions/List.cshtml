@@ -24,6 +24,18 @@
 			<td class="text-cell" ng-if="$ctrl.checkIfColumnIsDisplayed('Winner')">
 				{{ auction.highestBidderUserName }}
 			</td>
+			<td ng-if="$ctrl.checkIfColumnIsDisplayed('StartedDateTime')">
+				{{ auction.createdDateTime | formatDateTime }}
+			</td>
+			<td ng-if="$ctrl.checkIfColumnIsDisplayed('EndsDateTime')">
+				{{ auction.endDate | formatToNowDateTime }}
+			</td>
+			<td ng-if="$ctrl.checkIfColumnIsDisplayed('EndedDateTime')">
+				{{ auction.finishedDateTime | formatDateTime }}
+			</td>
+		</tr>
+		<tr ng-if="rows.length === 0">
+			<td colspan="{{ $ctrl.staticResource.header.length }}" class="side-note text-center">No auctions</td>
 		</tr>
 		</tbody>
 	</table>
