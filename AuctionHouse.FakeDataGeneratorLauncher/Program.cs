@@ -23,7 +23,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 
 		private static async Task MainAsync()
 		{
-			Console.Title = "AuctionHouse.FakeDataGeneratorLaunchers";
+			Console.Title = "AuctionHouse.FakeDataGeneratorLauncher";
 
 			var timeProvider = new TimeProvider();
 			var endpointInstance = await StartNServiceBusEndpoint();
@@ -40,6 +40,9 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 
 					await fakeDataGenerator.GenerateFakeData();
 				}
+
+				Console.WriteLine("Press any key to exit");
+				Console.ReadKey();
 			}
 			finally
 			{

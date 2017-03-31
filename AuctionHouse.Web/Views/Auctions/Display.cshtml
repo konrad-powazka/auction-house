@@ -1,8 +1,23 @@
 ﻿<div class="page-header">
-	<h3>{{ $ctrl.auction.title }}</h3>
+	<h3>{{ $ctrl.auction.title }} <span ng-if="$ctrl.auction.wasFinished" class="side-note text-dimmed small">(finished)</span></h3>
 </div>
 <div class="row">
 	<div class="col-md-5">
+		<div class="panel panel-default" ng-if="!$ctrl.auction.wasFinished">
+			<div class="panel-heading">Participate in auction</div>
+			<div class="panel-body">
+				<form class="form-inline bottom-margin" ng-if="$ctrl.auction.buyNowPrice">
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary" ng-click="$ctrl.makeBuyNowBid()">Buy now</button> for {{ $ctrl.auction.buyNowPrice | currency }}
+					</div>
+				</form>
+				<form class="form-inline">
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary" ng-click="$ctrl.makeUserEnteredBid()">Make a bid</button> for <input ng-model="$ctrl.bidPrice" type="number" class="form-control" step="0.01" placeholder="Enter your bid">
+					</div>
+				</form>
+			</div>
+		</div>
 		<div class="panel panel-default panel-body">
 			<dl class="dl-horizontal">
 				<dt>
@@ -11,17 +26,23 @@
 				<dd>
 					<user-reference user-name="$ctrl.auction.createdByUserName"></user-reference>
 				</dd>
+				<dt ng-if="$ctrl.auction.wasFinished">
+					Sold for
+				</dt>
+				<dd ng-if="$ctrl.auction.wasFinished">
+					{{ $ctrl.auction.currentPrice | currency }}
+				</dd>
 				<dt ng-if="$ctrl.auction.buyNowPrice">
 					Buy now price
 				</dt>
 				<dd ng-if="$ctrl.auction.buyNowPrice">
 					{{ $ctrl.auction.buyNowPrice | currency }}
 				</dd>
-				<dt>
+				<dt ng-if="!$ctrl.auction.wasFinished">
 					Current price
 				</dt>
-				<dd>
-					{{ $ctrl.auction.minimalPriceForNextBidder | currency }}
+				<dd ng-if="!$ctrl.auction.wasFinished">
+					{{ $ctrl.auction.currentPrice | currency }}
 				</dd>
 				<dt>
 					Starting price
@@ -41,23 +62,33 @@
 				<dd ng-if="$ctrl.auction.highestBidderUserName">
 					<user-reference user-name="$ctrl.auction.highestBidderUserName"></user-reference>
 				</dd>
+				<dt ng-if="!$ctrl.auction.wasFinished">
+					Ends
+				</dt>
+				<dd ng-if="!$ctrl.auction.wasFinished">
+					{{ $ctrl.auction.endDate | formatDateTime }} (in {{ $ctrl.auction.endDate | formatToNowDateTime }})
+				</dd>
+				<dt ng-if="$ctrl.auction.wasFinished">
+					Ended
+				</dt>
+				<dd ng-if="$ctrl.auction.wasFinished">
+					{{ $ctrl.auction.finishedDateTime | formatDateTime }}
+				</dd>
 				<dt>
-					End date
+					Started
 				</dt>
 				<dd>
-					{{ $ctrl.auction.endDate | formatDateTime }}
+					{{ $ctrl.auction.createdDateTime | formatDateTime }}
 				</dd>
 			</dl>
 		</div>
-		<div class="panel panel-default panel-body" ng-if="$ctrl.checkIfAuctionIsInProgress()">
-			<form ng-submit="$ctrl.makeBid()" name="$ctrl.makeBidForm" novalidate>
-				<formly-form model="$ctrl.makeBidModel" fields="$ctrl.makeBidFields" form="$ctrl.makeBidForm">
-					<button type="submit" class="btn btn-primary submit-button">Make bid</button>
-				</formly-form>
-			</form>
-		</div>
 	</div>
 	<div class="col-md-7">
-		<new-lines-to-paragraphs text="$ctrl.auction.description"></new-lines-to-paragraphs>
+		<div class="panel panel-default">
+			<div class="panel-heading">Item description</div>
+			<div class="panel-body">
+				<new-lines-to-paragraphs text="$ctrl.auction.description"></new-lines-to-paragraphs>
+			</div>
+		</div>
 	</div>
 </div>

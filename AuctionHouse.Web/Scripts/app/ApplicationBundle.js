@@ -57,19 +57,19 @@
 	var BusyIndicator_1 = __webpack_require__(17);
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
 	var AuctionsListComponent_1 = __webpack_require__(21);
-	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(23);
-	var SimpleNotificationDialogComponent_1 = __webpack_require__(24);
-	var GenericModalService_1 = __webpack_require__(26);
-	var Configuration_1 = __webpack_require__(27);
-	var FormatDateTimeFilterFactory_1 = __webpack_require__(28);
-	var ComposeUserMessageDialogComponent_1 = __webpack_require__(29);
-	var UserReferenceComponent_1 = __webpack_require__(31);
-	var UserMessagesComponent_1 = __webpack_require__(33);
-	var UserAuctionsListComponent_1 = __webpack_require__(35);
-	var ActiveAuctionsListComponent_1 = __webpack_require__(37);
-	var UserMessagesListComponent_1 = __webpack_require__(40);
-	var NewLinesToParagraphsComponent_1 = __webpack_require__(46);
-	var DisplayUserMessageDialogComponent_1 = __webpack_require__(47);
+	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(25);
+	var SimpleNotificationDialogComponent_1 = __webpack_require__(26);
+	var GenericModalService_1 = __webpack_require__(28);
+	var Configuration_1 = __webpack_require__(29);
+	var FormatDateTimeFilterFactory_1 = __webpack_require__(30);
+	var ComposeUserMessageDialogComponent_1 = __webpack_require__(31);
+	var UserReferenceComponent_1 = __webpack_require__(33);
+	var UserMessagesComponent_1 = __webpack_require__(35);
+	var UserAuctionsListComponent_1 = __webpack_require__(37);
+	var ActiveAuctionsListComponent_1 = __webpack_require__(39);
+	var UserMessagesListComponent_1 = __webpack_require__(41);
+	var NewLinesToParagraphsComponent_1 = __webpack_require__(43);
+	var DisplayUserMessageDialogComponent_1 = __webpack_require__(45);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -989,24 +989,27 @@
 	    }
 	    DisplayAuctionCtrl.prototype.auctionLoadedCallback = function (auction) {
 	        this.auction = auction;
-	        this.initMakeBidFields(auction);
-	        this.makeBidModel = { price: auction.minimalPriceForNextBidder };
+	        this.bidPrice = auction.minimalPriceForNextBidder;
 	    };
-	    DisplayAuctionCtrl.prototype.initMakeBidFields = function (auction) {
-	        this.makeBidFields = [
-	            {
-	                key: 'price',
-	                type: 'input',
-	                templateOptions: {
-	                    label: '',
-	                    required: true,
-	                    type: 'number',
-	                    min: this.auction.minimalPriceForNextBidder
-	                }
-	            }
-	        ];
+	    DisplayAuctionCtrl.prototype.makeUserEnteredBid = function () {
+	        if (!_(this.bidPrice).isNumber()) {
+	            this.genericModalService.showErrorNotification('Please enter a valid bid price.');
+	            return;
+	        }
+	        else if (this.bidPrice < this.auction.minimalPriceForNextBidder) {
+	            this.genericModalService
+	                .showErrorNotification("Minimal bid price is " + this.auction.minimalPriceForNextBidder + ".");
+	            return;
+	        }
+	        this.makeBid(this.bidPrice);
 	    };
-	    DisplayAuctionCtrl.prototype.makeBid = function () {
+	    DisplayAuctionCtrl.prototype.makeBuyNowBid = function () {
+	        if (!this.auction.buyNowPrice) {
+	            throw new Error();
+	        }
+	        this.makeBid(this.auction.buyNowPrice);
+	    };
+	    DisplayAuctionCtrl.prototype.makeBid = function (bidPrice) {
 	        var _this = this;
 	        this.securityUiService.ensureUserIsAuthenticated()
 	            .then(function () {
@@ -1017,7 +1020,7 @@
 	            var makeBidCommand = {
 	                auctionId: _this.auctionId,
 	                expectedAuctionVersion: _this.auction.version,
-	                price: _this.makeBidModel.price
+	                price: bidPrice
 	            };
 	            _this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator_1.default.generateGuid(), true)
 	                .then(function () {
@@ -1045,9 +1048,6 @@
 	                }
 	            });
 	        });
-	    };
-	    DisplayAuctionCtrl.prototype.checkIfAuctionIsInProgress = function () {
-	        return this.auction ? moment(this.auction.endDate).isAfter(new Date()) : null;
 	    };
 	    return DisplayAuctionCtrl;
 	}());
@@ -1288,8 +1288,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var ListHeaderDefinition_1 = __webpack_require__(43);
-	var ListCtrl_1 = __webpack_require__(42);
+	var ListHeaderDefinition_1 = __webpack_require__(23);
+	var ListCtrl_1 = __webpack_require__(24);
 	var AuctionsListCtrl = (function (_super) {
 	    __extends(AuctionsListCtrl, _super);
 	    function AuctionsListCtrl(scope) {
@@ -1320,6 +1320,79 @@
 
 /***/ },
 /* 23 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var ListHeaderDefinition = (function () {
+	    function ListHeaderDefinition(column, displayName, style) {
+	        this.column = column;
+	        this.displayName = displayName;
+	        this.style = style;
+	    }
+	    return ListHeaderDefinition;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = ListHeaderDefinition;
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var ListCtrl = (function () {
+	    function ListCtrl(scope) {
+	        var _this = this;
+	        this.reload = angular.noop;
+	        this.tastyInitCfg = {
+	            'count': 25,
+	            'page': 1
+	        };
+	        this.getResource = function (paramsString, paramsObject) {
+	            var pageSize = paramsObject.count;
+	            var pageNumber = paramsObject.page;
+	            return _this.getResults(pageSize, pageNumber)
+	                .then(function (pagedResults) {
+	                var displayedHeaders = _(_this.getAllHeaderDefinitions())
+	                    .filter(function (headerDefinition) { return _(_this.displayedColumns).contains(headerDefinition.column); });
+	                var tastyHeader = _(displayedHeaders).map(function (header) { return _this.mapHeaderDefinitionToTastyTableHeader(header); });
+	                return {
+	                    rows: pagedResults.pageItems,
+	                    pagination: {
+	                        count: pagedResults.pageSize,
+	                        page: pagedResults.pageNumber,
+	                        pages: pagedResults.totalPagesCount,
+	                        size: pagedResults.totalItemsCount
+	                    },
+	                    header: tastyHeader
+	                };
+	            });
+	        };
+	        scope.$watch(function () { return _this.reload; }, function () {
+	            if (_this.onReloadFunctionChanged) {
+	                _this.onReloadFunctionChanged({ reloadFunction: _this.reload });
+	            }
+	            _this.reload();
+	        });
+	    }
+	    ListCtrl.prototype.checkIfColumnIsDisplayed = function (column) {
+	        return _(this.displayedColumns).contains(column);
+	    };
+	    ListCtrl.prototype.mapHeaderDefinitionToTastyTableHeader = function (listHeaderDefinition) {
+	        return {
+	            key: listHeaderDefinition.column,
+	            name: listHeaderDefinition.displayName,
+	            style: listHeaderDefinition.style
+	        };
+	    };
+	    return ListCtrl;
+	}());
+	ListCtrl.$inject = ['$scope'];
+	exports.ListCtrl = ListCtrl;
+
+
+/***/ },
+/* 25 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1359,11 +1432,11 @@
 
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var SimpleNotificationDialogCtrl_1 = __webpack_require__(25);
+	var SimpleNotificationDialogCtrl_1 = __webpack_require__(27);
 	var SimpleNotificationDialogComponent = (function () {
 	    function SimpleNotificationDialogComponent() {
 	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
@@ -1380,7 +1453,7 @@
 
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1415,7 +1488,7 @@
 
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1451,7 +1524,7 @@
 
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1467,7 +1540,7 @@
 
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1498,11 +1571,11 @@
 
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(30);
+	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(32);
 	var ComposeUserMessageDialogComponent = (function () {
 	    function ComposeUserMessageDialogComponent() {
 	        this.controller = ComposeUserMessageDialogCtrl_1.ComposeUserMessageDialogCtrl;
@@ -1519,7 +1592,7 @@
 
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1578,11 +1651,11 @@
 
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserReferenceCtrl_1 = __webpack_require__(32);
+	var UserReferenceCtrl_1 = __webpack_require__(34);
 	var UserReferenceComponent = (function () {
 	    function UserReferenceComponent() {
 	        this.controller = UserReferenceCtrl_1.UserReferenceCtrl;
@@ -1598,7 +1671,7 @@
 
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1626,11 +1699,11 @@
 
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserMessagesCtrl_1 = __webpack_require__(34);
+	var UserMessagesCtrl_1 = __webpack_require__(36);
 	var UserMessagesComponent = (function () {
 	    function UserMessagesComponent() {
 	        this.controller = UserMessagesCtrl_1.UserMessagesCtrl;
@@ -1643,7 +1716,7 @@
 
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1676,11 +1749,11 @@
 
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserAuctionsListCtrl_1 = __webpack_require__(36);
+	var UserAuctionsListCtrl_1 = __webpack_require__(38);
 	var UserAuctionsListComponent = (function () {
 	    function UserAuctionsListComponent() {
 	        this.controller = UserAuctionsListCtrl_1.UserAuctionsListCtrl;
@@ -1696,7 +1769,7 @@
 
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1740,11 +1813,11 @@
 
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ActiveAuctionsListCtrl_1 = __webpack_require__(38);
+	var ActiveAuctionsListCtrl_1 = __webpack_require__(40);
 	var ActiveAuctionsListComponent = (function () {
 	    function ActiveAuctionsListComponent() {
 	        this.controller = ActiveAuctionsListCtrl_1.ActiveAuctionsListCtrl;
@@ -1760,7 +1833,7 @@
 
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1787,12 +1860,11 @@
 
 
 /***/ },
-/* 39 */,
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserMessagesListCtrl_1 = __webpack_require__(41);
+	var UserMessagesListCtrl_1 = __webpack_require__(42);
 	var UserMessagesListComponent = (function () {
 	    function UserMessagesListComponent() {
 	        this.controller = UserMessagesListCtrl_1.UserMessagesListCtrl;
@@ -1809,7 +1881,7 @@
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1818,8 +1890,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var ListCtrl_1 = __webpack_require__(42);
-	var ListHeaderDefinition_1 = __webpack_require__(43);
+	var ListCtrl_1 = __webpack_require__(24);
+	var ListHeaderDefinition_1 = __webpack_require__(23);
 	var UserMessagesListCtrl = (function (_super) {
 	    __extends(UserMessagesListCtrl, _super);
 	    function UserMessagesListCtrl(scope, modalService) {
@@ -1854,81 +1926,26 @@
 
 
 /***/ },
-/* 42 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var ListCtrl = (function () {
-	    function ListCtrl(scope) {
-	        var _this = this;
-	        this.reload = angular.noop;
-	        this.tastyInitCfg = {
-	            'count': 25,
-	            'page': 1
-	        };
-	        this.getResource = function (paramsString, paramsObject) {
-	            var pageSize = paramsObject.count;
-	            var pageNumber = paramsObject.page;
-	            return _this.getResults(pageSize, pageNumber)
-	                .then(function (pagedResults) {
-	                var displayedHeaders = _(_this.getAllHeaderDefinitions())
-	                    .filter(function (headerDefinition) { return _(_this.displayedColumns).contains(headerDefinition.column); });
-	                var tastyHeader = _(displayedHeaders).map(function (header) { return _this.mapHeaderDefinitionToTastyTableHeader(header); });
-	                return {
-	                    rows: pagedResults.pageItems,
-	                    pagination: {
-	                        count: pagedResults.pageSize,
-	                        page: pagedResults.pageNumber,
-	                        pages: pagedResults.totalPagesCount,
-	                        size: pagedResults.totalItemsCount
-	                    },
-	                    header: tastyHeader
-	                };
-	            });
-	        };
-	        scope.$watch(function () { return _this.reload; }, function () {
-	            if (_this.onReloadFunctionChanged) {
-	                _this.onReloadFunctionChanged({ reloadFunction: _this.reload });
-	            }
-	            _this.reload();
-	        });
-	    }
-	    ListCtrl.prototype.checkIfColumnIsDisplayed = function (column) {
-	        return _(this.displayedColumns).contains(column);
-	    };
-	    ListCtrl.prototype.mapHeaderDefinitionToTastyTableHeader = function (listHeaderDefinition) {
-	        return {
-	            key: listHeaderDefinition.column,
-	            name: listHeaderDefinition.displayName,
-	            style: listHeaderDefinition.style
-	        };
-	    };
-	    return ListCtrl;
-	}());
-	ListCtrl.$inject = ['$scope'];
-	exports.ListCtrl = ListCtrl;
-
-
-/***/ },
 /* 43 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ListHeaderDefinition = (function () {
-	    function ListHeaderDefinition(column, displayName, style) {
-	        this.column = column;
-	        this.displayName = displayName;
-	        this.style = style;
+	var NewLinesToParagraphsCtrl_1 = __webpack_require__(44);
+	var NewLinesToParagraphsComponent = (function () {
+	    function NewLinesToParagraphsComponent() {
+	        this.controller = NewLinesToParagraphsCtrl_1.NewLinesToParagraphsCtrl;
+	        this.registerAs = 'newLinesToParagraphs';
+	        this.bindings = {
+	            text: '<'
+	        };
 	    }
-	    return ListHeaderDefinition;
+	    return NewLinesToParagraphsComponent;
 	}());
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = ListHeaderDefinition;
+	exports.NewLinesToParagraphsComponent = NewLinesToParagraphsComponent;
 
 
 /***/ },
-/* 44 */,
-/* 45 */
+/* 44 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1955,30 +1972,11 @@
 
 
 /***/ },
-/* 46 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var NewLinesToParagraphsCtrl_1 = __webpack_require__(45);
-	var NewLinesToParagraphsComponent = (function () {
-	    function NewLinesToParagraphsComponent() {
-	        this.controller = NewLinesToParagraphsCtrl_1.NewLinesToParagraphsCtrl;
-	        this.registerAs = 'newLinesToParagraphs';
-	        this.bindings = {
-	            text: '<'
-	        };
-	    }
-	    return NewLinesToParagraphsComponent;
-	}());
-	exports.NewLinesToParagraphsComponent = NewLinesToParagraphsComponent;
-
-
-/***/ },
-/* 47 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var DisplayUserMessageDialogCtrl_1 = __webpack_require__(48);
+	var DisplayUserMessageDialogCtrl_1 = __webpack_require__(46);
 	var DisplayUserMessageDialogComponent = (function () {
 	    function DisplayUserMessageDialogComponent() {
 	        this.controller = DisplayUserMessageDialogCtrl_1.DisplayUserMessageDialogCtrl;
@@ -1995,7 +1993,7 @@
 
 
 /***/ },
-/* 48 */
+/* 46 */
 /***/ function(module, exports) {
 
 	"use strict";

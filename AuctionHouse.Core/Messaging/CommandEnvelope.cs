@@ -10,6 +10,7 @@ namespace AuctionHouse.Core.Messaging
 			{
 				throw new ArgumentNullException(nameof(command));
 			}
+
 			if (string.IsNullOrWhiteSpace(senderUserName))
 			{
 				throw new ArgumentException("Value cannot be null or whitespace.", nameof(senderUserName));

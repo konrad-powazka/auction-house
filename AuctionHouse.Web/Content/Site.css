@@ -155,3 +155,5 @@ textarea {
 .user-message-data > dd {
 	margin-left: 80px;
 }
+
+.bottom-margin { margin-bottom: 20px; }

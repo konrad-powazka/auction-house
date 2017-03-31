@@ -10,11 +10,7 @@ import GuidGenerator from '../../Infrastructure/GuidGenerator';
 export class DisplayAuctionCtrl implements ng.IController {
 	auctionId: string;
 	auction: AuctionDetailsReadModel;
-	makeBidFields: AngularFormly.IFieldArray;
-
-	makeBidModel: {
-		price: number;
-	};
+	bidPrice: number;
 
 	static $inject = ['getAuctionDetailsQueryHandler', 'securityUiService', 'makeBidCommandUiHandler', 'genericModalService'];
 
@@ -33,26 +29,31 @@ export class DisplayAuctionCtrl implements ng.IController {
 
 	private auctionLoadedCallback(auction: AuctionDetailsReadModel) {
 		this.auction = auction;
-		this.initMakeBidFields(auction);
-		this.makeBidModel = { price: auction.minimalPriceForNextBidder };
+		this.bidPrice = auction.minimalPriceForNextBidder;
 	}
 
-	private initMakeBidFields(auction: AuctionDetailsReadModel) {
-		this.makeBidFields = [
-			{
-				key: 'price',
-				type: 'input',
-				templateOptions: {
-					label: '',
-					required: true,
-					type: 'number',
-					min: this.auction.minimalPriceForNextBidder
-				}
-			}
-		];
+	makeUserEnteredBid() {
+		if (!_(this.bidPrice).isNumber()) {
+			this.genericModalService.showErrorNotification('Please enter a valid bid price.');
+			return;
+		} else if (this.bidPrice < this.auction.minimalPriceForNextBidder) {
+			this.genericModalService
+				.showErrorNotification(`Minimal bid price is ${this.auction.minimalPriceForNextBidder}.`);
+			return;
+		}
+
+		this.makeBid(this.bidPrice);
 	}
 
-	makeBid(): void {
+	makeBuyNowBid() {
+		if (!this.auction.buyNowPrice) {
+			throw new Error();
+		}
+
+		this.makeBid(this.auction.buyNowPrice as number);
+	}
+
+	private makeBid(bidPrice: number): void {
 		this.securityUiService.ensureUserIsAuthenticated()
 			.then(() => {
 				if (this.securityUiService.currentUserName === this.auction.createdByUserName) {
@@ -63,7 +64,7 @@ export class DisplayAuctionCtrl implements ng.IController {
 				const makeBidCommand: MakeBidCommand = {
 					auctionId: this.auctionId,
 					expectedAuctionVersion: this.auction.version,
-					price: this.makeBidModel.price
+					price: bidPrice
 				};
 
 				this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator.generateGuid(), true)
@@ -90,9 +91,5 @@ export class DisplayAuctionCtrl implements ng.IController {
 						}
 					});
 			});
-	}
-
-	checkIfAuctionIsInProgress() {
-		return this.auction ? moment(this.auction.endDate).isAfter(new Date()) : null;
 	}
 }
