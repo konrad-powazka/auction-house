@@ -7,6 +7,7 @@ import GenericModalService from '../Shared/GenericModalService';
 export class ComposeUserMessageDialogCtrl implements ng.IController {
 	resolve: {
 		recipientUserName: string;
+		messageSubject: string;
 	}
 
 	modalInstance: ModalServiceInstance;
@@ -27,6 +28,7 @@ export class ComposeUserMessageDialogCtrl implements ng.IController {
 		private sendUserMessageCommandUiHandler: ICommandUiHandler<SendUserMessageCommand>,
 		private genericModalService: GenericModalService) {
 		this.model.recipientUserName = this.resolve.recipientUserName;
+		this.model.messageSubject = this.resolve.messageSubject || '';
 
 		this.fields = [
 			{
@@ -43,7 +45,8 @@ export class ComposeUserMessageDialogCtrl implements ng.IController {
 				templateOptions: {
 					label: 'Message',
 					required: true,
-					maxlength: 10000
+					maxlength: 10000,
+					rows: 10
 				}
 			},
 		];

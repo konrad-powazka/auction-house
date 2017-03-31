@@ -147,3 +147,11 @@ textarea {
 .clickable {
 	cursor: pointer;
 }
+
+.user-message-data > dt {
+	width: 60px;
+}
+
+.user-message-data > dd {
+	margin-left: 80px;
+}

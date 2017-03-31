@@ -23,6 +23,7 @@ import { UserAuctionsListComponent } from './UI/Auctions/UserAuctionsListCompone
 import { ActiveAuctionsListComponent } from './UI/Auctions/ActiveAuctionsListComponent';
 import { UserMessagesListComponent } from './UI/UserMessaging/UserMessagesListComponent';
 import { NewLinesToParagraphsComponent } from './UI/Shared/NewLinesToParagraphsComponent';
+import {DisplayUserMessageDialogComponent} from './UI/UserMessaging/DisplayUserMessageDialogComponent';
 
 export class Application {
 	private static components: INamedComponentOptions[] = [
@@ -37,7 +38,8 @@ export class Application {
 		new UserAuctionsListComponent(),
 		new ActiveAuctionsListComponent(),
 		new UserMessagesListComponent(),
-		new NewLinesToParagraphsComponent()
+		new NewLinesToParagraphsComponent(),
+		new DisplayUserMessageDialogComponent()
 	];
 
 	static bootstrap(): void {

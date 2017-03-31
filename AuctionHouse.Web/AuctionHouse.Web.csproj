@@ -393,6 +393,7 @@
     <Content Include="Views\Auctions\UserList.cshtml" />
     <Content Include="Views\Auctions\ActiveList.cshtml" />
     <Content Include="Views\UserMessaging\UserMessagesList.cshtml" />
+    <Content Include="Views\UserMessaging\DisplayMessageDialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -511,6 +512,8 @@
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SignInDialogCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\GenericModalService.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\Shared\SecurityUiService.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\DisplayUserMessageDialogComponent.ts" />
+    <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\DisplayUserMessageDialogCtrl.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesListComponent.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesListColumn.ts" />
     <TypeScriptCompile Include="Scripts\app\UI\UserMessaging\UserMessagesComponent.ts" />

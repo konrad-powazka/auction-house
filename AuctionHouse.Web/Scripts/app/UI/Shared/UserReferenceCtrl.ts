@@ -11,7 +11,7 @@ export class UserReferenceCtrl implements ng.IController {
 
 	opendMessageCompositionDialog() {
 		this.modalService.open({
-			component: 'ComposeUserMessageDialog',
+			component: 'composeUserMessageDialog',
 			resolve: {
 				recipientUserName: () => this.userName
 			}

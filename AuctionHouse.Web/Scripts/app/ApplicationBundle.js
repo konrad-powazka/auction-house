@@ -57,18 +57,19 @@
 	var BusyIndicator_1 = __webpack_require__(17);
 	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
 	var AuctionsListComponent_1 = __webpack_require__(21);
-	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(25);
-	var SimpleNotificationDialogComponent_1 = __webpack_require__(26);
-	var GenericModalService_1 = __webpack_require__(28);
-	var Configuration_1 = __webpack_require__(29);
-	var FormatDateTimeFilterFactory_1 = __webpack_require__(30);
-	var ComposeUserMessageDialogComponent_1 = __webpack_require__(31);
-	var UserReferenceComponent_1 = __webpack_require__(33);
-	var UserMessagesComponent_1 = __webpack_require__(35);
-	var UserAuctionsListComponent_1 = __webpack_require__(37);
-	var ActiveAuctionsListComponent_1 = __webpack_require__(39);
-	var UserMessagesListComponent_1 = __webpack_require__(41);
-	var NewLinesToParagraphsComponent_1 = __webpack_require__(43);
+	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(23);
+	var SimpleNotificationDialogComponent_1 = __webpack_require__(24);
+	var GenericModalService_1 = __webpack_require__(26);
+	var Configuration_1 = __webpack_require__(27);
+	var FormatDateTimeFilterFactory_1 = __webpack_require__(28);
+	var ComposeUserMessageDialogComponent_1 = __webpack_require__(29);
+	var UserReferenceComponent_1 = __webpack_require__(31);
+	var UserMessagesComponent_1 = __webpack_require__(33);
+	var UserAuctionsListComponent_1 = __webpack_require__(35);
+	var ActiveAuctionsListComponent_1 = __webpack_require__(37);
+	var UserMessagesListComponent_1 = __webpack_require__(40);
+	var NewLinesToParagraphsComponent_1 = __webpack_require__(46);
+	var DisplayUserMessageDialogComponent_1 = __webpack_require__(47);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -161,7 +162,8 @@
 	    new UserAuctionsListComponent_1.UserAuctionsListComponent(),
 	    new ActiveAuctionsListComponent_1.ActiveAuctionsListComponent(),
 	    new UserMessagesListComponent_1.UserMessagesListComponent(),
-	    new NewLinesToParagraphsComponent_1.NewLinesToParagraphsComponent()
+	    new NewLinesToParagraphsComponent_1.NewLinesToParagraphsComponent(),
+	    new DisplayUserMessageDialogComponent_1.DisplayUserMessageDialogComponent()
 	];
 	exports.Application = Application;
 	Application.bootstrap();
@@ -1286,8 +1288,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var ListHeaderDefinition_1 = __webpack_require__(23);
-	var ListCtrl_1 = __webpack_require__(24);
+	var ListHeaderDefinition_1 = __webpack_require__(43);
+	var ListCtrl_1 = __webpack_require__(42);
 	var AuctionsListCtrl = (function (_super) {
 	    __extends(AuctionsListCtrl, _super);
 	    function AuctionsListCtrl(scope) {
@@ -1321,20 +1323,538 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	var ListHeaderDefinition = (function () {
-	    function ListHeaderDefinition(column, displayName, style) {
-	        this.column = column;
-	        this.displayName = displayName;
-	        this.style = style;
+	var BusyIndicatingHttpInterceptor = (function () {
+	    function BusyIndicatingHttpInterceptor(busyIndicator, $q) {
+	        var _this = this;
+	        this.busyIndicator = busyIndicator;
+	        this.$q = $q;
+	        this.numberOfRequestsInProgress = 0;
+	        this.request = function (config) {
+	            if (_this.numberOfRequestsInProgress === 0) {
+	                _this.leaveHttpBusyStateFn = _this.busyIndicator.enterBusyState();
+	            }
+	            _this.numberOfRequestsInProgress++;
+	            return config;
+	        };
+	        this.response = function (response) {
+	            _this.decrementNumberOfRequestsInProgress();
+	            return response;
+	        };
+	        this.responseError = function (rejection) {
+	            _this.decrementNumberOfRequestsInProgress();
+	            return _this.$q.reject(rejection);
+	        };
 	    }
-	    return ListHeaderDefinition;
+	    BusyIndicatingHttpInterceptor.prototype.decrementNumberOfRequestsInProgress = function () {
+	        this.numberOfRequestsInProgress--;
+	        if (this.numberOfRequestsInProgress === 0) {
+	            this.leaveHttpBusyStateFn();
+	        }
+	    };
+	    return BusyIndicatingHttpInterceptor;
 	}());
+	BusyIndicatingHttpInterceptor.$inject = ['busyIndicator', '$q'];
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = ListHeaderDefinition;
+	exports.default = BusyIndicatingHttpInterceptor;
 
 
 /***/ },
 /* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var SimpleNotificationDialogCtrl_1 = __webpack_require__(25);
+	var SimpleNotificationDialogComponent = (function () {
+	    function SimpleNotificationDialogComponent() {
+	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
+	        this.templateUrl = 'Template/Shared/SimpleNotificationDialog';
+	        this.registerAs = 'simpleNotificationDialog';
+	        this.bindings = {
+	            modalInstance: '<',
+	            resolve: '<'
+	        };
+	    }
+	    return SimpleNotificationDialogComponent;
+	}());
+	exports.SimpleNotificationDialogComponent = SimpleNotificationDialogComponent;
+
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var NotificationType_1 = __webpack_require__(20);
+	var SimpleNotificationDialogCtrl = (function () {
+	    function SimpleNotificationDialogCtrl() {
+	    }
+	    Object.defineProperty(SimpleNotificationDialogCtrl.prototype, "isInformationNotification", {
+	        get: function () {
+	            return this.resolve.notificationType === NotificationType_1.NotificationType.Information;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(SimpleNotificationDialogCtrl.prototype, "isSuccessNotification", {
+	        get: function () {
+	            return this.resolve.notificationType === NotificationType_1.NotificationType.Success;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(SimpleNotificationDialogCtrl.prototype, "isErrorNotification", {
+	        get: function () {
+	            return this.resolve.notificationType === NotificationType_1.NotificationType.Error;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    return SimpleNotificationDialogCtrl;
+	}());
+	exports.SimpleNotificationDialogCtrl = SimpleNotificationDialogCtrl;
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var NotificationType_1 = __webpack_require__(20);
+	var GenericModalService = (function () {
+	    function GenericModalService(modalService) {
+	        this.modalService = modalService;
+	    }
+	    GenericModalService.prototype.showInformationNotification = function (notificationMessage) {
+	        return this.showNotification(notificationMessage, NotificationType_1.NotificationType.Information);
+	    };
+	    GenericModalService.prototype.showSuccessNotification = function (notificationMessage) {
+	        return this.showNotification(notificationMessage, NotificationType_1.NotificationType.Success);
+	    };
+	    GenericModalService.prototype.showErrorNotification = function (notificationMessage) {
+	        return this.showNotification(notificationMessage, NotificationType_1.NotificationType.Error);
+	    };
+	    GenericModalService.prototype.showNotification = function (notificationMessage, notificationType) {
+	        var modalInstance = this.modalService.open({
+	            component: 'simpleNotificationDialog',
+	            resolve: {
+	                notificationMessage: function () { return notificationMessage; },
+	                notificationType: function () { return notificationType; }
+	            }
+	        });
+	        return modalInstance.result;
+	    };
+	    return GenericModalService;
+	}());
+	GenericModalService.$inject = ['$uibModal'];
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = GenericModalService;
+
+
+/***/ },
+/* 27 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var Configuration = (function () {
+	    function Configuration() {
+	        this.commandHandlingTimeoutMilliseconds = 10 * 1000;
+	        this.readModelChangeNotificationTimeoutMilliseconds = 10 * 1000;
+	    }
+	    return Configuration;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Configuration;
+
+
+/***/ },
+/* 28 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var FormatDateTimeFilterFactory = (function () {
+	    function FormatDateTimeFilterFactory() {
+	    }
+	    FormatDateTimeFilterFactory.createStandardFilterFunction = function () {
+	        return function (value) {
+	            if (!value) {
+	                return null;
+	            }
+	            return moment(value).format('Do MMM YYYY, h:mm A');
+	        };
+	    };
+	    FormatDateTimeFilterFactory.createToNowFilterFunction = function () {
+	        return function (value) {
+	            if (!value) {
+	                return null;
+	            }
+	            return moment(value).toNow(true);
+	        };
+	    };
+	    return FormatDateTimeFilterFactory;
+	}());
+	FormatDateTimeFilterFactory.$inject = [''];
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = FormatDateTimeFilterFactory;
+
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(30);
+	var ComposeUserMessageDialogComponent = (function () {
+	    function ComposeUserMessageDialogComponent() {
+	        this.controller = ComposeUserMessageDialogCtrl_1.ComposeUserMessageDialogCtrl;
+	        this.templateUrl = 'Template/UserMessaging/ComposeMessageDialog';
+	        this.registerAs = 'composeUserMessageDialog';
+	        this.bindings = {
+	            modalInstance: '<',
+	            resolve: '<'
+	        };
+	    }
+	    return ComposeUserMessageDialogComponent;
+	}());
+	exports.ComposeUserMessageDialogComponent = ComposeUserMessageDialogComponent;
+
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var GuidGenerator_1 = __webpack_require__(3);
+	var ComposeUserMessageDialogCtrl = (function () {
+	    function ComposeUserMessageDialogCtrl(sendUserMessageCommandUiHandler, genericModalService) {
+	        this.sendUserMessageCommandUiHandler = sendUserMessageCommandUiHandler;
+	        this.genericModalService = genericModalService;
+	        this.sendUserMessageCommandId = GuidGenerator_1.default.generateGuid();
+	        this.model = {
+	            recipientUserName: '',
+	            messageSubject: '',
+	            messageBody: ''
+	        };
+	        this.model.recipientUserName = this.resolve.recipientUserName;
+	        this.model.messageSubject = this.resolve.messageSubject || '';
+	        this.fields = [
+	            {
+	                key: 'messageSubject',
+	                type: 'input',
+	                templateOptions: {
+	                    label: 'Subject',
+	                    required: true
+	                }
+	            },
+	            {
+	                key: 'messageBody',
+	                type: 'textarea',
+	                templateOptions: {
+	                    label: 'Message',
+	                    required: true,
+	                    maxlength: 10000,
+	                    rows: 10
+	                }
+	            },
+	        ];
+	    }
+	    ComposeUserMessageDialogCtrl.prototype.sendMessage = function () {
+	        var _this = this;
+	        if (!this.form.$valid) {
+	            return;
+	        }
+	        this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, false)
+	            .then(function () {
+	            _this.modalInstance.close();
+	            _this.genericModalService.showSuccessNotification('Your message was sent successfully.');
+	        });
+	    };
+	    ComposeUserMessageDialogCtrl.prototype.cancel = function () {
+	        this.modalInstance.dismiss();
+	    };
+	    return ComposeUserMessageDialogCtrl;
+	}());
+	ComposeUserMessageDialogCtrl.$inject = ['sendUserMessageCommandUiHandler', 'genericModalService'];
+	exports.ComposeUserMessageDialogCtrl = ComposeUserMessageDialogCtrl;
+
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserReferenceCtrl_1 = __webpack_require__(32);
+	var UserReferenceComponent = (function () {
+	    function UserReferenceComponent() {
+	        this.controller = UserReferenceCtrl_1.UserReferenceCtrl;
+	        this.templateUrl = 'Template/Shared/UserReference';
+	        this.registerAs = 'userReference';
+	        this.bindings = {
+	            userName: '<'
+	        };
+	    }
+	    return UserReferenceComponent;
+	}());
+	exports.UserReferenceComponent = UserReferenceComponent;
+
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var UserReferenceCtrl = (function () {
+	    function UserReferenceCtrl(modalService, securityUiService) {
+	        this.modalService = modalService;
+	        this.securityUiService = securityUiService;
+	    }
+	    UserReferenceCtrl.prototype.opendMessageCompositionDialog = function () {
+	        var _this = this;
+	        this.modalService.open({
+	            component: 'composeUserMessageDialog',
+	            resolve: {
+	                recipientUserName: function () { return _this.userName; }
+	            }
+	        });
+	    };
+	    UserReferenceCtrl.prototype.checkIfUserIsCurrentUser = function () {
+	        return this.userName === this.securityUiService.currentUserName;
+	    };
+	    return UserReferenceCtrl;
+	}());
+	UserReferenceCtrl.$inject = ['$uibModal', 'securityUiService'];
+	exports.UserReferenceCtrl = UserReferenceCtrl;
+
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserMessagesCtrl_1 = __webpack_require__(34);
+	var UserMessagesComponent = (function () {
+	    function UserMessagesComponent() {
+	        this.controller = UserMessagesCtrl_1.UserMessagesCtrl;
+	        this.templateUrl = 'Template/UserMessaging/UserMessages';
+	        this.registerAs = 'userMessages';
+	    }
+	    return UserMessagesComponent;
+	}());
+	exports.UserMessagesComponent = UserMessagesComponent;
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var UserMessagesCtrl = (function () {
+	    function UserMessagesCtrl(getUserInboxQueryHandler, getSentUserMessagesQueryHandler) {
+	        var _this = this;
+	        this.getUserInboxQueryHandler = getUserInboxQueryHandler;
+	        this.getSentUserMessagesQueryHandler = getSentUserMessagesQueryHandler;
+	        this.inboxMessagesListDisplayedColumns = ['SenderUserName', 'SubjectAndBody', 'SentDateTime'];
+	        this.sentMessagesListDisplayedColumns = ['SubjectAndBody', 'SentDateTime', 'RecipientUserName'];
+	        this.getUserInbox = function (pageSize, pageNumber) {
+	            var query = {
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
+	            };
+	            return _this.getUserInboxQueryHandler.handle(query);
+	        };
+	        this.getSentUserMessages = function (pageSize, pageNumber) {
+	            var query = {
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
+	            };
+	            return _this.getSentUserMessagesQueryHandler.handle(query);
+	        };
+	    }
+	    return UserMessagesCtrl;
+	}());
+	UserMessagesCtrl.$inject = ['getUserInboxQueryHandler', 'getSentUserMessagesQueryHandler'];
+	exports.UserMessagesCtrl = UserMessagesCtrl;
+
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserAuctionsListCtrl_1 = __webpack_require__(36);
+	var UserAuctionsListComponent = (function () {
+	    function UserAuctionsListComponent() {
+	        this.controller = UserAuctionsListCtrl_1.UserAuctionsListCtrl;
+	        this.templateUrl = 'Template/Auctions/UserList';
+	        this.registerAs = 'userAuctionsList';
+	        //bindings = {
+	        //	queryString: '<'
+	        //   }
+	    }
+	    return UserAuctionsListComponent;
+	}());
+	exports.UserAuctionsListComponent = UserAuctionsListComponent;
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var UserAuctionsListCtrl = (function () {
+	    function UserAuctionsListCtrl(getAuctionsInvolvingUserQueryHandler) {
+	        var _this = this;
+	        this.getAuctionsInvolvingUserQueryHandler = getAuctionsInvolvingUserQueryHandler;
+	        this.userInvolvementIntoAuction = 'Selling';
+	        this.getAuctions = function (pageSize, pageNumber) {
+	            _this.refreshDisplayedColumns();
+	            var query = {
+	                queryString: _this.queryString,
+	                userInvolvementIntoAuction: _this.userInvolvementIntoAuction,
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
+	            };
+	            return _this.getAuctionsInvolvingUserQueryHandler.handle(query);
+	        };
+	    }
+	    UserAuctionsListCtrl.prototype.setReloadFunction = function (reloadFn) {
+	        this.search = reloadFn;
+	    };
+	    UserAuctionsListCtrl.prototype.refreshDisplayedColumns = function () {
+	        var commonColumns = ['TitleAndDescription', 'BuyNowPrice'];
+	        // TODO: add ended date and final price columns
+	        var userInvolvementIntoAuctionToAdditionalColumnsMap = {
+	            'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'EndsDateTime'],
+	            'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids', 'EndedDateTime'],
+	            'FailedToSell': ['EndedDateTime'],
+	            'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids', 'EndsDateTime'],
+	            'Bought': ['SoldFor', 'Seller', 'NumberOfBids', 'EndedDateTime'],
+	            'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids', 'EndedDateTime']
+	        };
+	        this.displayedColumns = commonColumns
+	            .concat(userInvolvementIntoAuctionToAdditionalColumnsMap[this.userInvolvementIntoAuction]);
+	    };
+	    return UserAuctionsListCtrl;
+	}());
+	UserAuctionsListCtrl.$inject = ['getAuctionsInvolvingUserQueryHandler'];
+	exports.UserAuctionsListCtrl = UserAuctionsListCtrl;
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var ActiveAuctionsListCtrl_1 = __webpack_require__(38);
+	var ActiveAuctionsListComponent = (function () {
+	    function ActiveAuctionsListComponent() {
+	        this.controller = ActiveAuctionsListCtrl_1.ActiveAuctionsListCtrl;
+	        this.templateUrl = 'Template/Auctions/ActiveList';
+	        this.registerAs = 'activeAuctionsList';
+	        this.bindings = {
+	            queryString: '<'
+	        };
+	    }
+	    return ActiveAuctionsListComponent;
+	}());
+	exports.ActiveAuctionsListComponent = ActiveAuctionsListComponent;
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var ActiveAuctionsListCtrl = (function () {
+	    function ActiveAuctionsListCtrl(searchAuctionsQueryHandler) {
+	        var _this = this;
+	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
+	        this.displayedColumns = [
+	            'TitleAndDescription', 'CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'Seller', 'EndsDateTime'
+	        ];
+	        this.getAuctions = function (pageSize, pageNumber) {
+	            var query = {
+	                queryString: _this.queryString,
+	                pageSize: pageSize,
+	                pageNumber: pageNumber
+	            };
+	            return _this.searchAuctionsQueryHandler.handle(query);
+	        };
+	    }
+	    return ActiveAuctionsListCtrl;
+	}());
+	ActiveAuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
+	exports.ActiveAuctionsListCtrl = ActiveAuctionsListCtrl;
+
+
+/***/ },
+/* 39 */,
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var UserMessagesListCtrl_1 = __webpack_require__(41);
+	var UserMessagesListComponent = (function () {
+	    function UserMessagesListComponent() {
+	        this.controller = UserMessagesListCtrl_1.UserMessagesListCtrl;
+	        this.templateUrl = 'Template/UserMessaging/UserMessagesList';
+	        this.registerAs = 'userMessagesList';
+	        this.bindings = {
+	            getMessages: '<',
+	            displayedColumns: '<'
+	        };
+	    }
+	    return UserMessagesListComponent;
+	}());
+	exports.UserMessagesListComponent = UserMessagesListComponent;
+
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var ListCtrl_1 = __webpack_require__(42);
+	var ListHeaderDefinition_1 = __webpack_require__(43);
+	var UserMessagesListCtrl = (function (_super) {
+	    __extends(UserMessagesListCtrl, _super);
+	    function UserMessagesListCtrl(scope, modalService) {
+	        var _this = _super.call(this, scope) || this;
+	        _this.scope = scope;
+	        _this.modalService = modalService;
+	        return _this;
+	    }
+	    UserMessagesListCtrl.prototype.getAllHeaderDefinitions = function () {
+	        return [
+	            new ListHeaderDefinition_1.default('SenderUserName', 'From', { width: '200px' }),
+	            new ListHeaderDefinition_1.default('RecipientUserName', 'To', { width: '200px' }),
+	            new ListHeaderDefinition_1.default('SubjectAndBody', 'Message'),
+	            new ListHeaderDefinition_1.default('SentDateTime', 'Sent', { width: '180px' })
+	        ];
+	    };
+	    UserMessagesListCtrl.prototype.getResults = function (pageSize, pageNumber) {
+	        return this.getMessages(pageSize, pageNumber);
+	    };
+	    UserMessagesListCtrl.prototype.displayUserMessage = function (userMessage) {
+	        this.modalService.open({
+	            component: 'displayUserMessageDialog',
+	            resolve: {
+	                userMessage: function () { return userMessage; }
+	            }
+	        });
+	    };
+	    return UserMessagesListCtrl;
+	}(ListCtrl_1.ListCtrl));
+	UserMessagesListCtrl.$inject = ['$scope', '$uibModal'];
+	exports.UserMessagesListCtrl = UserMessagesListCtrl;
+
+
+/***/ },
+/* 42 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1390,547 +1910,25 @@
 
 
 /***/ },
-/* 25 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var BusyIndicatingHttpInterceptor = (function () {
-	    function BusyIndicatingHttpInterceptor(busyIndicator, $q) {
-	        var _this = this;
-	        this.busyIndicator = busyIndicator;
-	        this.$q = $q;
-	        this.numberOfRequestsInProgress = 0;
-	        this.request = function (config) {
-	            if (_this.numberOfRequestsInProgress === 0) {
-	                _this.leaveHttpBusyStateFn = _this.busyIndicator.enterBusyState();
-	            }
-	            _this.numberOfRequestsInProgress++;
-	            return config;
-	        };
-	        this.response = function (response) {
-	            _this.decrementNumberOfRequestsInProgress();
-	            return response;
-	        };
-	        this.responseError = function (rejection) {
-	            _this.decrementNumberOfRequestsInProgress();
-	            return _this.$q.reject(rejection);
-	        };
-	    }
-	    BusyIndicatingHttpInterceptor.prototype.decrementNumberOfRequestsInProgress = function () {
-	        this.numberOfRequestsInProgress--;
-	        if (this.numberOfRequestsInProgress === 0) {
-	            this.leaveHttpBusyStateFn();
-	        }
-	    };
-	    return BusyIndicatingHttpInterceptor;
-	}());
-	BusyIndicatingHttpInterceptor.$inject = ['busyIndicator', '$q'];
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = BusyIndicatingHttpInterceptor;
-
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var SimpleNotificationDialogCtrl_1 = __webpack_require__(27);
-	var SimpleNotificationDialogComponent = (function () {
-	    function SimpleNotificationDialogComponent() {
-	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
-	        this.templateUrl = 'Template/Shared/SimpleNotificationDialog';
-	        this.registerAs = 'simpleNotificationDialog';
-	        this.bindings = {
-	            modalInstance: '<',
-	            resolve: '<'
-	        };
-	    }
-	    return SimpleNotificationDialogComponent;
-	}());
-	exports.SimpleNotificationDialogComponent = SimpleNotificationDialogComponent;
-
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var NotificationType_1 = __webpack_require__(20);
-	var SimpleNotificationDialogCtrl = (function () {
-	    function SimpleNotificationDialogCtrl() {
-	    }
-	    Object.defineProperty(SimpleNotificationDialogCtrl.prototype, "isInformationNotification", {
-	        get: function () {
-	            return this.resolve.notificationType === NotificationType_1.NotificationType.Information;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(SimpleNotificationDialogCtrl.prototype, "isSuccessNotification", {
-	        get: function () {
-	            return this.resolve.notificationType === NotificationType_1.NotificationType.Success;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(SimpleNotificationDialogCtrl.prototype, "isErrorNotification", {
-	        get: function () {
-	            return this.resolve.notificationType === NotificationType_1.NotificationType.Error;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    return SimpleNotificationDialogCtrl;
-	}());
-	exports.SimpleNotificationDialogCtrl = SimpleNotificationDialogCtrl;
-
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var NotificationType_1 = __webpack_require__(20);
-	var GenericModalService = (function () {
-	    function GenericModalService(modalService) {
-	        this.modalService = modalService;
-	    }
-	    GenericModalService.prototype.showInformationNotification = function (notificationMessage) {
-	        return this.showNotification(notificationMessage, NotificationType_1.NotificationType.Information);
-	    };
-	    GenericModalService.prototype.showSuccessNotification = function (notificationMessage) {
-	        return this.showNotification(notificationMessage, NotificationType_1.NotificationType.Success);
-	    };
-	    GenericModalService.prototype.showErrorNotification = function (notificationMessage) {
-	        return this.showNotification(notificationMessage, NotificationType_1.NotificationType.Error);
-	    };
-	    GenericModalService.prototype.showNotification = function (notificationMessage, notificationType) {
-	        var modalInstance = this.modalService.open({
-	            component: 'simpleNotificationDialog',
-	            resolve: {
-	                notificationMessage: function () { return notificationMessage; },
-	                notificationType: function () { return notificationType; }
-	            }
-	        });
-	        return modalInstance.result;
-	    };
-	    return GenericModalService;
-	}());
-	GenericModalService.$inject = ['$uibModal'];
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = GenericModalService;
-
-
-/***/ },
-/* 29 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var Configuration = (function () {
-	    function Configuration() {
-	        this.commandHandlingTimeoutMilliseconds = 10 * 1000;
-	        this.readModelChangeNotificationTimeoutMilliseconds = 10 * 1000;
-	    }
-	    return Configuration;
-	}());
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Configuration;
-
-
-/***/ },
-/* 30 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var FormatDateTimeFilterFactory = (function () {
-	    function FormatDateTimeFilterFactory() {
-	    }
-	    FormatDateTimeFilterFactory.createStandardFilterFunction = function () {
-	        return function (value) {
-	            if (!value) {
-	                return null;
-	            }
-	            return moment(value).format('Do MMM YYYY, h:mm A');
-	        };
-	    };
-	    FormatDateTimeFilterFactory.createToNowFilterFunction = function () {
-	        return function (value) {
-	            if (!value) {
-	                return null;
-	            }
-	            return moment(value).toNow(true);
-	        };
-	    };
-	    return FormatDateTimeFilterFactory;
-	}());
-	FormatDateTimeFilterFactory.$inject = [''];
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = FormatDateTimeFilterFactory;
-
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(32);
-	var ComposeUserMessageDialogComponent = (function () {
-	    function ComposeUserMessageDialogComponent() {
-	        this.controller = ComposeUserMessageDialogCtrl_1.ComposeUserMessageDialogCtrl;
-	        this.templateUrl = 'Template/UserMessaging/ComposeMessageDialog';
-	        this.registerAs = 'composeUserMessageDialog';
-	        this.bindings = {
-	            modalInstance: '<',
-	            resolve: '<'
-	        };
-	    }
-	    return ComposeUserMessageDialogComponent;
-	}());
-	exports.ComposeUserMessageDialogComponent = ComposeUserMessageDialogComponent;
-
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var GuidGenerator_1 = __webpack_require__(3);
-	var ComposeUserMessageDialogCtrl = (function () {
-	    function ComposeUserMessageDialogCtrl(sendUserMessageCommandUiHandler, genericModalService) {
-	        this.sendUserMessageCommandUiHandler = sendUserMessageCommandUiHandler;
-	        this.genericModalService = genericModalService;
-	        this.sendUserMessageCommandId = GuidGenerator_1.default.generateGuid();
-	        this.model = {
-	            recipientUserName: '',
-	            messageSubject: '',
-	            messageBody: ''
-	        };
-	        this.model.recipientUserName = this.resolve.recipientUserName;
-	        this.fields = [
-	            {
-	                key: 'messageSubject',
-	                type: 'input',
-	                templateOptions: {
-	                    label: 'Subject',
-	                    required: true
-	                }
-	            },
-	            {
-	                key: 'messageBody',
-	                type: 'textarea',
-	                templateOptions: {
-	                    label: 'Message',
-	                    required: true,
-	                    maxlength: 10000
-	                }
-	            },
-	        ];
-	    }
-	    ComposeUserMessageDialogCtrl.prototype.sendMessage = function () {
-	        var _this = this;
-	        if (!this.form.$valid) {
-	            return;
-	        }
-	        this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, false)
-	            .then(function () {
-	            _this.modalInstance.close();
-	            _this.genericModalService.showSuccessNotification('Your message was sent successfully.');
-	        });
-	    };
-	    ComposeUserMessageDialogCtrl.prototype.cancel = function () {
-	        this.modalInstance.dismiss();
-	    };
-	    return ComposeUserMessageDialogCtrl;
-	}());
-	ComposeUserMessageDialogCtrl.$inject = ['sendUserMessageCommandUiHandler', 'genericModalService'];
-	exports.ComposeUserMessageDialogCtrl = ComposeUserMessageDialogCtrl;
-
-
-/***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var UserReferenceCtrl_1 = __webpack_require__(34);
-	var UserReferenceComponent = (function () {
-	    function UserReferenceComponent() {
-	        this.controller = UserReferenceCtrl_1.UserReferenceCtrl;
-	        this.templateUrl = 'Template/Shared/UserReference';
-	        this.registerAs = 'userReference';
-	        this.bindings = {
-	            userName: '<'
-	        };
-	    }
-	    return UserReferenceComponent;
-	}());
-	exports.UserReferenceComponent = UserReferenceComponent;
-
-
-/***/ },
-/* 34 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var UserReferenceCtrl = (function () {
-	    function UserReferenceCtrl(modalService, securityUiService) {
-	        this.modalService = modalService;
-	        this.securityUiService = securityUiService;
-	    }
-	    UserReferenceCtrl.prototype.opendMessageCompositionDialog = function () {
-	        var _this = this;
-	        this.modalService.open({
-	            component: 'ComposeUserMessageDialog',
-	            resolve: {
-	                recipientUserName: function () { return _this.userName; }
-	            }
-	        });
-	    };
-	    UserReferenceCtrl.prototype.checkIfUserIsCurrentUser = function () {
-	        return this.userName === this.securityUiService.currentUserName;
-	    };
-	    return UserReferenceCtrl;
-	}());
-	UserReferenceCtrl.$inject = ['$uibModal', 'securityUiService'];
-	exports.UserReferenceCtrl = UserReferenceCtrl;
-
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var UserMessagesCtrl_1 = __webpack_require__(36);
-	var UserMessagesComponent = (function () {
-	    function UserMessagesComponent() {
-	        this.controller = UserMessagesCtrl_1.UserMessagesCtrl;
-	        this.templateUrl = 'Template/UserMessaging/UserMessages';
-	        this.registerAs = 'userMessages';
-	    }
-	    return UserMessagesComponent;
-	}());
-	exports.UserMessagesComponent = UserMessagesComponent;
-
-
-/***/ },
-/* 36 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var UserMessagesCtrl = (function () {
-	    function UserMessagesCtrl(getUserInboxQueryHandler, getSentUserMessagesQueryHandler) {
-	        var _this = this;
-	        this.getUserInboxQueryHandler = getUserInboxQueryHandler;
-	        this.getSentUserMessagesQueryHandler = getSentUserMessagesQueryHandler;
-	        this.inboxMessagesListDisplayedColumns = ['SenderUserName', 'SubjectAndBody', 'SentDateTime'];
-	        this.sentMessagesListDisplayedColumns = ['SubjectAndBody', 'SentDateTime', 'RecipientUserName'];
-	        this.getUserInbox = function (pageSize, pageNumber) {
-	            var query = {
-	                pageSize: pageSize,
-	                pageNumber: pageNumber
-	            };
-	            return _this.getUserInboxQueryHandler.handle(query);
-	        };
-	        this.getSentUserMessages = function (pageSize, pageNumber) {
-	            var query = {
-	                pageSize: pageSize,
-	                pageNumber: pageNumber
-	            };
-	            return _this.getSentUserMessagesQueryHandler.handle(query);
-	        };
-	    }
-	    return UserMessagesCtrl;
-	}());
-	UserMessagesCtrl.$inject = ['getUserInboxQueryHandler', 'getSentUserMessagesQueryHandler'];
-	exports.UserMessagesCtrl = UserMessagesCtrl;
-
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var UserAuctionsListCtrl_1 = __webpack_require__(38);
-	var UserAuctionsListComponent = (function () {
-	    function UserAuctionsListComponent() {
-	        this.controller = UserAuctionsListCtrl_1.UserAuctionsListCtrl;
-	        this.templateUrl = 'Template/Auctions/UserList';
-	        this.registerAs = 'userAuctionsList';
-	        //bindings = {
-	        //	queryString: '<'
-	        //   }
-	    }
-	    return UserAuctionsListComponent;
-	}());
-	exports.UserAuctionsListComponent = UserAuctionsListComponent;
-
-
-/***/ },
-/* 38 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var UserAuctionsListCtrl = (function () {
-	    function UserAuctionsListCtrl(getAuctionsInvolvingUserQueryHandler) {
-	        var _this = this;
-	        this.getAuctionsInvolvingUserQueryHandler = getAuctionsInvolvingUserQueryHandler;
-	        this.userInvolvementIntoAuction = 'Selling';
-	        this.getAuctions = function (pageSize, pageNumber) {
-	            _this.refreshDisplayedColumns();
-	            var query = {
-	                queryString: _this.queryString,
-	                userInvolvementIntoAuction: _this.userInvolvementIntoAuction,
-	                pageSize: pageSize,
-	                pageNumber: pageNumber
-	            };
-	            return _this.getAuctionsInvolvingUserQueryHandler.handle(query);
-	        };
-	    }
-	    UserAuctionsListCtrl.prototype.setReloadFunction = function (reloadFn) {
-	        this.search = reloadFn;
-	    };
-	    UserAuctionsListCtrl.prototype.refreshDisplayedColumns = function () {
-	        var commonColumns = ['TitleAndDescription', 'BuyNowPrice'];
-	        // TODO: add ended date and final price columns
-	        var userInvolvementIntoAuctionToAdditionalColumnsMap = {
-	            'Selling': ['CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'EndsDateTime'],
-	            'Sold': ['SoldFor', 'Winner', 'BuyNowPrice', 'NumberOfBids', 'EndedDateTime'],
-	            'FailedToSell': ['EndedDateTime'],
-	            'Bidding': ['Seller', 'CurrentPrice', 'NumberOfBids', 'EndsDateTime'],
-	            'Bought': ['SoldFor', 'Seller', 'NumberOfBids', 'EndedDateTime'],
-	            'FailedToBuy': ['SoldFor', 'Seller', 'Winner', 'NumberOfBids', 'EndedDateTime']
-	        };
-	        this.displayedColumns = commonColumns
-	            .concat(userInvolvementIntoAuctionToAdditionalColumnsMap[this.userInvolvementIntoAuction]);
-	    };
-	    return UserAuctionsListCtrl;
-	}());
-	UserAuctionsListCtrl.$inject = ['getAuctionsInvolvingUserQueryHandler'];
-	exports.UserAuctionsListCtrl = UserAuctionsListCtrl;
-
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var ActiveAuctionsListCtrl_1 = __webpack_require__(40);
-	var ActiveAuctionsListComponent = (function () {
-	    function ActiveAuctionsListComponent() {
-	        this.controller = ActiveAuctionsListCtrl_1.ActiveAuctionsListCtrl;
-	        this.templateUrl = 'Template/Auctions/ActiveList';
-	        this.registerAs = 'activeAuctionsList';
-	        this.bindings = {
-	            queryString: '<'
-	        };
-	    }
-	    return ActiveAuctionsListComponent;
-	}());
-	exports.ActiveAuctionsListComponent = ActiveAuctionsListComponent;
-
-
-/***/ },
-/* 40 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var ActiveAuctionsListCtrl = (function () {
-	    function ActiveAuctionsListCtrl(searchAuctionsQueryHandler) {
-	        var _this = this;
-	        this.searchAuctionsQueryHandler = searchAuctionsQueryHandler;
-	        this.displayedColumns = [
-	            'TitleAndDescription', 'CurrentPrice', 'BuyNowPrice', 'NumberOfBids', 'Seller', 'EndsDateTime'
-	        ];
-	        this.getAuctions = function (pageSize, pageNumber) {
-	            var query = {
-	                queryString: _this.queryString,
-	                pageSize: pageSize,
-	                pageNumber: pageNumber
-	            };
-	            return _this.searchAuctionsQueryHandler.handle(query);
-	        };
-	    }
-	    return ActiveAuctionsListCtrl;
-	}());
-	ActiveAuctionsListCtrl.$inject = ['searchAuctionsQueryHandler'];
-	exports.ActiveAuctionsListCtrl = ActiveAuctionsListCtrl;
-
-
-/***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var UserMessagesListCtrl_1 = __webpack_require__(42);
-	var UserMessagesListComponent = (function () {
-	    function UserMessagesListComponent() {
-	        this.controller = UserMessagesListCtrl_1.UserMessagesListCtrl;
-	        this.templateUrl = 'Template/UserMessaging/UserMessagesList';
-	        this.registerAs = 'userMessagesList';
-	        this.bindings = {
-	            getMessages: '<',
-	            displayedColumns: '<'
-	        };
-	    }
-	    return UserMessagesListComponent;
-	}());
-	exports.UserMessagesListComponent = UserMessagesListComponent;
-
-
-/***/ },
-/* 42 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var ListCtrl_1 = __webpack_require__(24);
-	var ListHeaderDefinition_1 = __webpack_require__(23);
-	var UserMessagesListCtrl = (function (_super) {
-	    __extends(UserMessagesListCtrl, _super);
-	    function UserMessagesListCtrl(scope) {
-	        return _super.call(this, scope) || this;
-	    }
-	    UserMessagesListCtrl.prototype.getAllHeaderDefinitions = function () {
-	        return [
-	            new ListHeaderDefinition_1.default('SenderUserName', 'From', { width: '200px' }),
-	            new ListHeaderDefinition_1.default('RecipientUserName', 'To', { width: '200px' }),
-	            new ListHeaderDefinition_1.default('SubjectAndBody', 'Message'),
-	            new ListHeaderDefinition_1.default('SentDateTime', 'Sent', { width: '180px' })
-	        ];
-	    };
-	    UserMessagesListCtrl.prototype.getResults = function (pageSize, pageNumber) {
-	        return this.getMessages(pageSize, pageNumber);
-	    };
-	    return UserMessagesListCtrl;
-	}(ListCtrl_1.ListCtrl));
-	UserMessagesListCtrl.$inject = ['$scope'];
-	exports.UserMessagesListCtrl = UserMessagesListCtrl;
-
-
-/***/ },
 /* 43 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	var NewLinesToParagraphsCtrl_1 = __webpack_require__(44);
-	var NewLinesToParagraphsComponent = (function () {
-	    function NewLinesToParagraphsComponent() {
-	        this.controller = NewLinesToParagraphsCtrl_1.NewLinesToParagraphsCtrl;
-	        this.registerAs = 'newLinesToParagraphs';
-	        this.bindings = {
-	            text: '<'
-	        };
+	var ListHeaderDefinition = (function () {
+	    function ListHeaderDefinition(column, displayName, style) {
+	        this.column = column;
+	        this.displayName = displayName;
+	        this.style = style;
 	    }
-	    return NewLinesToParagraphsComponent;
+	    return ListHeaderDefinition;
 	}());
-	exports.NewLinesToParagraphsComponent = NewLinesToParagraphsComponent;
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = ListHeaderDefinition;
 
 
 /***/ },
-/* 44 */
+/* 44 */,
+/* 45 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1954,6 +1952,89 @@
 	}());
 	NewLinesToParagraphsCtrl.$inject = ['$element', '$scope'];
 	exports.NewLinesToParagraphsCtrl = NewLinesToParagraphsCtrl;
+
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var NewLinesToParagraphsCtrl_1 = __webpack_require__(45);
+	var NewLinesToParagraphsComponent = (function () {
+	    function NewLinesToParagraphsComponent() {
+	        this.controller = NewLinesToParagraphsCtrl_1.NewLinesToParagraphsCtrl;
+	        this.registerAs = 'newLinesToParagraphs';
+	        this.bindings = {
+	            text: '<'
+	        };
+	    }
+	    return NewLinesToParagraphsComponent;
+	}());
+	exports.NewLinesToParagraphsComponent = NewLinesToParagraphsComponent;
+
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var DisplayUserMessageDialogCtrl_1 = __webpack_require__(48);
+	var DisplayUserMessageDialogComponent = (function () {
+	    function DisplayUserMessageDialogComponent() {
+	        this.controller = DisplayUserMessageDialogCtrl_1.DisplayUserMessageDialogCtrl;
+	        this.templateUrl = 'Template/UserMessaging/DisplayMessageDialog';
+	        this.registerAs = 'displayUserMessageDialog';
+	        this.bindings = {
+	            modalInstance: '<',
+	            resolve: '<'
+	        };
+	    }
+	    return DisplayUserMessageDialogComponent;
+	}());
+	exports.DisplayUserMessageDialogComponent = DisplayUserMessageDialogComponent;
+
+
+/***/ },
+/* 48 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var DisplayUserMessageDialogCtrl = (function () {
+	    function DisplayUserMessageDialogCtrl(modalService, securityUiService) {
+	        this.modalService = modalService;
+	        this.securityUiService = securityUiService;
+	    }
+	    Object.defineProperty(DisplayUserMessageDialogCtrl.prototype, "messageIsFromCurrentUser", {
+	        get: function () {
+	            return this.securityUiService.currentUserName === this.resolve.userMessage.senderUserName;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(DisplayUserMessageDialogCtrl.prototype, "messageIsToCurrentUser", {
+	        get: function () {
+	            return this.securityUiService.currentUserName === this.resolve.userMessage.recipientUserName;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    DisplayUserMessageDialogCtrl.prototype.reply = function () {
+	        var _this = this;
+	        this.modalService.open({
+	            component: 'composeUserMessageDialog',
+	            resolve: {
+	                recipientUserName: function () { return _this.resolve.userMessage.senderUserName; },
+	                messageSubject: function () { return "RE: " + _this.resolve.userMessage.subject; }
+	            }
+	        });
+	    };
+	    DisplayUserMessageDialogCtrl.prototype.close = function () {
+	        this.modalInstance.dismiss();
+	    };
+	    return DisplayUserMessageDialogCtrl;
+	}());
+	DisplayUserMessageDialogCtrl.$inject = ['$uibModal', 'securityUiService'];
+	exports.DisplayUserMessageDialogCtrl = DisplayUserMessageDialogCtrl;
 
 
 /***/ }

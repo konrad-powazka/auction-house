@@ -1,0 +1,42 @@
+﻿<div class="modal-header">
+	<span class="modal-title"><span class="fa fa-envelope"></span>Message</span>
+</div>
+
+<div class="modal-body">
+	<dl class="dl-horizontal user-message-data">
+		<dt ng-if="$ctrl.messageIsFromCurrentUser">
+			To
+		</dt>
+		<dd ng-if="$ctrl.messageIsFromCurrentUser">
+			<user-reference user-name="$ctrl.resolve.userMessage.recipientUserName"></user-reference>
+		</dd>
+		<dt ng-if="$ctrl.messageIsToCurrentUser">
+			From
+		</dt>
+		<dd ng-if="$ctrl.messageIsToCurrentUser">
+			<user-reference user-name="$ctrl.resolve.userMessage.senderUserName"></user-reference>
+		</dd>
+		<dt>
+			Sent
+		</dt>
+		<dd>
+			{{ $ctrl.resolve.userMessage.sentDateTime | formatDateTime }}
+		</dd>
+		<dt>
+			Subject
+		</dt>
+		<dd>
+			{{ $ctrl.resolve.userMessage.subject }}
+		</dd>
+	</dl>
+	<div class="well">
+		<new-lines-to-paragraphs text="$ctrl.resolve.userMessage.body"></new-lines-to-paragraphs>
+	</div>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-primary" ng-click="$ctrl.reply()"
+	         ng-if="$ctrl.messageIsToCurrentUser">
+		Reply
+	</button>
+	<button type="button" class="btn" ng-click="$ctrl.close()">Close</button>
+</div>
