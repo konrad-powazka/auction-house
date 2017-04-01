@@ -31,6 +31,8 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 
 		public async Task GenerateFakeData()
 		{
+			var utcNow = _timeProvider.UtcNow;
+
 			var userNames =
 				Enumerable.Range(0, 17)
 					.Select(i => new Person().UserName)
@@ -38,7 +40,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					.Distinct()
 					.ToList();
 
-			var generatedAuctions = GenerateAuctions(userNames);
+			var generatedAuctions = GenerateAuctions(userNames, utcNow);
 
 			foreach (var generatedAuction in generatedAuctions)
 			{
@@ -54,7 +56,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 				await _commandQueue.QueueCommand(finishAuctionCommand, Guid.NewGuid(), "system", generatedAuction.EndDateTime);
 			}
 
-			var userMessageSentEvents = userNames.SelectMany(u => GenerateUserMessageSentEvents(u, userNames));
+			var userMessageSentEvents = userNames.SelectMany(u => GenerateUserMessageSentEvents(u, userNames, utcNow));
 
 			foreach (var userMessageSentEvent in userMessageSentEvents)
 			{
@@ -64,7 +66,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			}
 		}
 
-		private IEnumerable<GeneratedAuction> GenerateAuctions(IReadOnlyCollection<string> allUserNames)
+		private IEnumerable<GeneratedAuction> GenerateAuctions(IReadOnlyCollection<string> allUserNames, DateTime utcNow)
 		{
 			var randomizer = new Randomizer();
 			var dateRandomizer = new Date();
@@ -77,12 +79,12 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 							.SelectMany(
 								generatedAuctionCharacteristic =>
 									GenerateAuctionsHavingCharactersistic(generatedAuctionCharacteristic, currentUserName, allUserNames, randomizer,
-										dateRandomizer)));
+										dateRandomizer, utcNow)));
 		}
 
 		private IEnumerable<GeneratedAuction> GenerateAuctionsHavingCharactersistic(
 			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, string currentUserName,
-			IReadOnlyCollection<string> allUserNames, Randomizer randomizer, Date dateRandomizer)
+			IReadOnlyCollection<string> allUserNames, Randomizer randomizer, Date dateRandomizer, DateTime utcNow)
 		{
 			var minNumberOfAuctions = currentUserName == PredefinedUserName ? 15 : 0;
 			var numberOfAuctions = randomizer.Int(minNumberOfAuctions, 40);
@@ -90,12 +92,12 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			return
 				Enumerable.Range(0, numberOfAuctions)
 					.Select(
-						i => GenerateAuction(currentUserName, generatedAuctionCharacteristic, allUserNames, randomizer, dateRandomizer));
+						i => GenerateAuction(currentUserName, generatedAuctionCharacteristic, allUserNames, randomizer, dateRandomizer, utcNow));
 		}
 
 		private GeneratedAuction GenerateAuction(string currentUserName,
 			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, IReadOnlyCollection<string> allUserNames,
-			Randomizer randomizer, Date dateRandomizer)
+			Randomizer randomizer, Date dateRandomizer, DateTime utcNow)
 		{
 			var otherUserNames = allUserNames.Except(new[] {currentUserName}).ToList();
 			var hasBuyNowPrice = randomizer.Int(1, 3) > 1;
@@ -117,8 +119,8 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 				.RuleFor(a => a.BuyNowPrice,
 					(s, a) => hasBuyNowPrice ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?) null)
 				.RuleFor(a => a.EndDateTime, s => isEndDateFuture
-					? s.Date.Between(_timeProvider.Now.AddMinutes(3), _timeProvider.Now.AddDays(21))
-					: s.Date.Between(_timeProvider.Now.AddDays(-1000), _timeProvider.Now.AddMinutes(-3)))
+					? s.Date.BetweenUtc(utcNow.AddMinutes(3), utcNow.AddDays(21))
+					: s.Date.BetweenUtc(utcNow.AddDays(-1000), utcNow.AddMinutes(-3)))
 				.RuleFor(a => a.StartingPrice, s => s.Random.Bool() ? decimal.Round(s.Random.Decimal(1, 10000), 2) : 0)
 				.RuleFor(a => a.CurrentPrice, (s, a) => a.StartingPrice)
 				.RuleFor(a => a.BuyNowPrice,
@@ -134,34 +136,28 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					s => generatedAuctionCharacteristic.CheckIfUserIsSelling() ? currentUserName : s.PickRandom(otherUserNames))
 				.RuleFor(a => a.MinimalPriceForNextBidder, (s, e) => Math.Max(e.StartingPrice, 0.01m))
 				.RuleFor(a => a.CreatedDateTime,
-					(s, a) => s.Date.Between(a.EndDateTime.AddDays(-21), a.EndDateTime.AddHours(-1)));
+					(s, a) => s.Date.BetweenUtc(utcNow.AddDays(-21), utcNow.AddHours(-1)));
 
 			Debug.Assert(auctionCreatedEventFaker.Validate());
-
 			var auctionCreatedEvent = auctionCreatedEventFaker.Generate(1).Single();
+			Debug.Assert(auctionCreatedEvent.CreatedDateTime < utcNow);
 
 			var bidMadeEvents = GenerateBidMadeEvents(auctionCreatedEvent, generatedAuctionCharacteristic, currentUserName,
-				allUserNames, isEndDateFuture, randomizer, dateRandomizer).ToList();
+				allUserNames, isEndDateFuture, randomizer, dateRandomizer, utcNow).ToList();
 
 			var allEvents = new IEvent[] {auctionCreatedEvent}.Concat(bidMadeEvents).ToList();
 
-			if (generatedAuctionCharacteristic.CheckIfFinishesWithBuy())
+			var auctionFinishedDateTime = TryGetFinishedDateTime(auctionCreatedEvent, generatedAuctionCharacteristic,
+				isEndDateFuture, bidMadeEvents);
+
+			if (auctionFinishedDateTime.HasValue)
 			{
-				Debug.Assert(bidMadeEvents.Any());
+				Debug.Assert(auctionFinishedDateTime.Value <= utcNow);
 
 				var auctionFinishedEvent = new AuctionFinishedEvent
 				{
 					AuctionId = id,
-					FinishedDateTime = bidMadeEvents.Last().BidDateTime
-				};
-
-				allEvents.Add(auctionFinishedEvent);
-			} else if (!isEndDateFuture)
-			{
-				var auctionFinishedEvent = new AuctionFinishedEvent
-				{
-					AuctionId = id,
-					FinishedDateTime = auctionCreatedEvent.EndDateTime
+					FinishedDateTime = auctionFinishedDateTime.Value
 				};
 
 				allEvents.Add(auctionFinishedEvent);
@@ -175,9 +171,37 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			};
 		}
 
+		private DateTime? TryGetFinishedDateTime(AuctionCreatedEvent auctionCreatedEvent,
+			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, bool isEndDateFuture,
+			IReadOnlyCollection<BidMadeEvent> bidMadeEvents)
+		{
+			if (!generatedAuctionCharacteristic.CheckIfFinishesWithBuy() && isEndDateFuture)
+			{
+				return null;
+			}
+
+			if (bidMadeEvents.Any())
+			{
+				var winningBid = bidMadeEvents.Last();
+
+				if (auctionCreatedEvent.BuyNowPrice.HasValue && winningBid.BidPrice >= auctionCreatedEvent.BuyNowPrice.Value)
+				{
+					return winningBid.BidDateTime;
+				}
+			}
+
+			if (isEndDateFuture)
+			{
+				throw new ArgumentException("Impossible data for given auction characteristic.",
+					nameof(generatedAuctionCharacteristic));
+			}
+
+			return auctionCreatedEvent.EndDateTime;
+		}
+
 		private IEnumerable<BidMadeEvent> GenerateBidMadeEvents(AuctionCreatedEvent auctionCreatedEvent,
 			GeneratedAuctionCharacteristic generatedAuctionCharacteristic, string currentUserName,
-			IReadOnlyCollection<string> allUserNames, bool isEndDateFuture, Randomizer randomizer, Date dateRandomizer)
+			IReadOnlyCollection<string> allUserNames, bool isEndDateFuture, Randomizer randomizer, Date dateRandomizer, DateTime utcNow)
 		{
 			if (!generatedAuctionCharacteristic.CheckIfCanHaveBids())
 			{
@@ -262,9 +286,10 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					MinimalPriceForNextBidder = minimalPriceForNextBidder,
 					HighestBidPrice = bidPrice,
 					CurrentPrice = currentPrice,
-					BidDateTime = dateRandomizer.Between(minBidDateTime, auctionCreatedEvent.EndDateTime)
+					BidDateTime = dateRandomizer.BetweenUtc(minBidDateTime, utcNow)
 				};
 
+				Debug.Assert(bidMadeEvent.BidDateTime <= utcNow);
 				bidMadeEvents.Add(bidMadeEvent);
 				minBidPrice = bidPrice + 0.01M;
 				minBidDateTime = bidMadeEvent.BidDateTime;
@@ -307,7 +332,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 		}
 
 		private IEnumerable<UserMessageSentEvent> GenerateUserMessageSentEvents(string userName,
-			IEnumerable<string> allUserNames)
+			IEnumerable<string> allUserNames, DateTime utcNow)
 		{
 			var otherUserNames = allUserNames.Except(new[] {userName}).ToList();
 
@@ -318,7 +343,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					var numberOfParagraphs = s.Random.Int(1, 4);
 					return s.Lorem.Paragraphs(numberOfParagraphs, "\n");
 				})
-				.RuleFor(e => e.SentDateTime, s => s.Date.Between(_timeProvider.Now.AddDays(-500), _timeProvider.Now))
+				.RuleFor(e => e.SentDateTime, s => s.Date.BetweenUtc(utcNow.AddDays(-500), utcNow))
 				.RuleFor(e => e.MessageId, s => Guid.NewGuid())
 				.RuleFor(e => e.SenderUserName, s => userName)
 				.RuleFor(e => e.RecipientUserName, s => s.PickRandom(otherUserNames));

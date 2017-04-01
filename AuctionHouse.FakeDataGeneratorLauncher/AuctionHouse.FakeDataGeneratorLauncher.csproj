@@ -90,6 +90,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BogusExtensions.cs" />
     <Compile Include="FakeDataGenerator.cs" />
     <Compile Include="GeneratedAuctionCharacteristic.cs" />
     <Compile Include="GeneratedAuctionCharacteristicExtensions.cs" />

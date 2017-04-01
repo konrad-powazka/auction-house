@@ -4,6 +4,6 @@ namespace AuctionHouse.Core.Time
 {
 	public interface ITimeProvider
 	{
-		DateTime Now { get; }
+		DateTime UtcNow { get; }
 	}
 }

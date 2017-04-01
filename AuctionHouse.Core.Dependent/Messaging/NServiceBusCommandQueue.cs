@@ -40,7 +40,7 @@ namespace AuctionHouse.Core.Messaging
 
 			if (delayedUntil.HasValue)
 			{
-				var deliveryDelay = delayedUntil.Value - _timeProvider.Now;
+				var deliveryDelay = delayedUntil.Value - _timeProvider.UtcNow;
 
 				if (deliveryDelay > TimeSpan.Zero)
 				{

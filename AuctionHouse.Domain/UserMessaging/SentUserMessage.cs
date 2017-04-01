@@ -29,7 +29,7 @@ namespace AuctionHouse.Domain.UserMessaging
 				MessageBody = body,
 				SenderUserName = senderUserName,
 				RecipientUserName = recipientUserName,
-				SentDateTime = timeProvider.Now
+				SentDateTime = timeProvider.UtcNow
 			};
 
 			sentUserMessage.ApplyChange(userMessageSentEvent);

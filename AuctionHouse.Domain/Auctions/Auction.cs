@@ -33,7 +33,7 @@ namespace AuctionHouse.Domain.Auctions
 
 		public DateTime EndDateTime { get; private set; }
 
-		public bool IsInProgress => !WasFinished && _timeProvider.Now < EndDateTime;
+		public bool IsInProgress => !WasFinished && _timeProvider.UtcNow < EndDateTime;
 
 		public bool WasFinished { get; private set; }
 
@@ -49,7 +49,7 @@ namespace AuctionHouse.Domain.Auctions
 				throw new ArgumentException("Value cannot be null or whitespace.", nameof(title));
 			}
 
-			if (endDate <= timeProvider.Now)
+			if (endDate <= timeProvider.UtcNow)
 			{
 				throw new ArgumentOutOfRangeException(nameof(endDate));
 			}
@@ -77,7 +77,7 @@ namespace AuctionHouse.Domain.Auctions
 				CreatedByUserName = createdByUserName,
 				EndDateTime = endDate,
 				BuyNowPrice = buyNowPrice,
-				CreatedDateTime = timeProvider.Now
+				CreatedDateTime = timeProvider.UtcNow
 			};
 
 			auction.ApplyChange(auctionCreatedEvent);
@@ -121,6 +121,11 @@ namespace AuctionHouse.Domain.Auctions
 					? (HighestBidPrice ?? StartingPrice)
 					: bidPrice;
 
+				if (BuyNowPrice.HasValue)
+				{
+					newCurrentPrice = Math.Min(newCurrentPrice, BuyNowPrice.Value);
+				}
+
 				newMinimalPriceForNextBidder = GetNewMinimalPriceForNextBidder(newCurrentPrice);
 			}
 
@@ -133,7 +138,7 @@ namespace AuctionHouse.Domain.Auctions
 				AuctionId = Id,
 				BidPrice = bidPrice,
 				CurrentPrice = newCurrentPrice,
-				BidDateTime = _timeProvider.Now
+				BidDateTime = _timeProvider.UtcNow
 			};
 
 			ApplyChange(bidMadeEvent);
@@ -143,7 +148,7 @@ namespace AuctionHouse.Domain.Auctions
 				ApplyChange(new AuctionFinishedEvent
 				{
 					AuctionId = Id,
-					FinishedDateTime = _timeProvider.Now
+					FinishedDateTime = _timeProvider.UtcNow
 				});
 			}
 		}
