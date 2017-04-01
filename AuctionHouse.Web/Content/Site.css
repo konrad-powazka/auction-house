@@ -1,5 +1,5 @@
 ﻿body {
-    padding-top: 60px;
+    padding-top: 50px;
     padding-bottom: 20px;
 }
 
@@ -44,11 +44,11 @@ textarea {
 }
 
 .color-error {
-  color: #a94442;
+  color: #e51c23;
 }
 
 .color-success {
-   color: #3c763d
+   color: #4caf50;
 }
 
 .error-messages {
@@ -63,7 +63,7 @@ textarea {
 .error-message {
   position: absolute;
   width: 100%;
-  color: #a94442;
+  color: #e51c23;
 }
 
 .error-messages.ng-enter.ng-enter-active,
@@ -130,10 +130,9 @@ textarea {
 }
 
 .tab-content {
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-	border-bottom: 1px solid #ddd;
-    padding: 10px;
+    border: 1px solid #ddd;
+    padding: 20px;
+	padding-bottom: 0;
 }
 
 .nav-tabs {
@@ -141,7 +140,7 @@ textarea {
 }
 
 .text-dimmed {
-	color: gray;	
+	color: rgb(170, 170, 170);	
 }
 
 .clickable {
@@ -156,4 +155,16 @@ textarea {
 	margin-left: 80px;
 }
 
-.bottom-margin { margin-bottom: 20px; }
+.bottom-margin {
+	 margin-bottom: 20px;
+}
+
+.uib-datepicker table button, .nav-tabs > li > a {
+	-webkit-box-shadow: none;
+	-ms-box-shadow: none;
+	box-shadow: none;
+}
+
+.navbar-inverse .navbar-brand {
+	color: white;
+}

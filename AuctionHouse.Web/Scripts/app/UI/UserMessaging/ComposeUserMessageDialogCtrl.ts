@@ -46,7 +46,7 @@ export class ComposeUserMessageDialogCtrl implements ng.IController {
 					label: 'Message',
 					required: true,
 					maxlength: 10000,
-					rows: 10
+					rows: 8
 				}
 			},
 		];

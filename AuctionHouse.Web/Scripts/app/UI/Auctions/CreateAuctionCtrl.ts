@@ -44,7 +44,8 @@ export class CreateAuctionCtrl implements ng.IController {
                     label: 'Description',
                     required: true,
                     minlength: 10,
-                    maxlength: 10000
+					maxlength: 10000,
+					rows: 8
                 }
 			},
 			{

@@ -28,6 +28,7 @@ namespace AuctionHouse.Web
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap.css",
+				"~/Content/bootstrap-paper-theme.css",
 				"~/Content/font-awesome.css",
 				"~/node_modules/angular-ui-bootstrap-datetimepicker/datetimepicker.css",
                 "~/Content/Site.css"));

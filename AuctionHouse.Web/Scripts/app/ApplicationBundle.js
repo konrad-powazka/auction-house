@@ -225,7 +225,8 @@
 	                    label: 'Description',
 	                    required: true,
 	                    minlength: 10,
-	                    maxlength: 10000
+	                    maxlength: 10000,
+	                    rows: 8
 	                }
 	            },
 	            {
@@ -1625,7 +1626,7 @@
 	                    label: 'Message',
 	                    required: true,
 	                    maxlength: 10000,
-	                    rows: 10
+	                    rows: 8
 	                }
 	            },
 	        ];
