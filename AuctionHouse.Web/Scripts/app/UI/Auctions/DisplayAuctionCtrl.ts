@@ -6,6 +6,8 @@ import {MakeBidCommand} from '../../Messages/Commands';
 import {ICommandHandler } from '../../CommandHandling/ICommandHandler';
 import GenericModalService from '../Shared/GenericModalService';
 import GuidGenerator from '../../Infrastructure/GuidGenerator';
+import {CommandHandlingAsynchronityLevel} from '../../CommandHandling/CommandHandlingAsynchronityLevel';
+import {ICommandUiHandler } from '../Shared/CommandHandling/ICommandUiHandler';
 
 export class DisplayAuctionCtrl implements ng.IController {
 	auctionId: string;
@@ -17,7 +19,7 @@ export class DisplayAuctionCtrl implements ng.IController {
 	constructor(
 		private getAuctionDetailsQueryHandler: IQueryHandler<GetAuctionDetailsQuery, AuctionDetailsReadModel>,
 		public securityUiService: SecurityUiService,
-		private makeBidCommandUiHandler: ICommandHandler<MakeBidCommand>,
+		private makeBidCommandUiHandler: ICommandUiHandler<MakeBidCommand>,
 		private genericModalService: GenericModalService) {
 		getAuctionDetailsQueryHandler.handle({
 				id: this.auctionId
@@ -67,7 +69,7 @@ export class DisplayAuctionCtrl implements ng.IController {
 					price: bidPrice
 				};
 
-				this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator.generateGuid(), true)
+				this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator.generateGuid(), CommandHandlingAsynchronityLevel.WaitUnitReadModelIsUpdated)
 					.then(() => {
 						return this.getAuctionDetailsQueryHandler.handle({
 							id: this.auctionId

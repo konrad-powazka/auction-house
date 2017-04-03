@@ -6,6 +6,7 @@ import { NotifyOnEventsAppliedToReadModelResponse } from '../Infrastructure/Noti
 import { CommandHandlingSucceededEvent, CommandHandlingFailedEvent } from '../Events';
 import GuidGenerator from '../Infrastructure/GuidGenerator';
 import Configuration from '../Configuration';
+import {CommandHandlingAsynchronityLevel} from './CommandHandlingAsynchronityLevel';
 
 export abstract class CommandHandler<TCommand> implements ICommandHandler<TCommand> {
     private static wasSignalrRInitialized = false;
@@ -47,12 +48,12 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
         }
     }
 
-	handle(command: TCommand, commandId: string, shouldWaitForEventsApplicationToReadModel: boolean): ng.IPromise<void> {
+	handle(command: TCommand, commandId: string, asynchronityLevel: CommandHandlingAsynchronityLevel): ng.IPromise<void> {
         const deferred = this.qService.defer<void>();
 
         this.connectSignalR()
             .then(() => {
-                this.sendCommandAndWaitForHandling(command, commandId, shouldWaitForEventsApplicationToReadModel, deferred);
+                this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);
             })
             .catch(() => deferred.reject(CommandHandlingErrorType.FailedToConnectToFeedbackHub));
 
@@ -61,7 +62,7 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
 
     private sendCommandAndWaitForHandling(command: TCommand,
         commandId: string,
-        shouldWaitForEventsApplicationToReadModel: boolean,
+        asynchronityLevel: CommandHandlingAsynchronityLevel,
         deferred: ng.IDeferred<void>): void {
 	    var commandProcessingFinishedAndSucceeded = false;
 
@@ -69,7 +70,7 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
             if (commandHandlingSucceededEvent.commandId === commandId) {
 	            commandProcessingFinishedAndSucceeded = true;
 
-                if (!shouldWaitForEventsApplicationToReadModel) {
+                if (asynchronityLevel === CommandHandlingAsynchronityLevel.WaitUntilCommandIsProcessed) {
                     deferred.resolve();
                 } else {
                     this

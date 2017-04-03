@@ -449,6 +449,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\app\CommandHandling\CommandHandlingAsynchronityLevel.ts" />
     <TypeScriptCompile Include="Scripts\app\CommandHandling\CommandHandlingErrorType.ts" />
     <TypeScriptCompile Include="Scripts\app\CommandHandling\GeneratedCommandHandlers.ts">
       <AutoGen>True</AutoGen>

@@ -46,30 +46,30 @@
 
 	"use strict";
 	var CreateAuctionComponent_1 = __webpack_require__(1);
-	var GeneratedCommandHandlers_1 = __webpack_require__(4);
-	var SecurityService_1 = __webpack_require__(7);
-	var SecurityUiService_1 = __webpack_require__(8);
-	var SignInDialogComponent_1 = __webpack_require__(9);
-	var ApplicationCtrl_1 = __webpack_require__(11);
-	var Routing_1 = __webpack_require__(12);
-	var GeneratedQueryHandlers_1 = __webpack_require__(13);
-	var DisplayAuctionComponent_1 = __webpack_require__(15);
-	var BusyIndicator_1 = __webpack_require__(17);
-	var GeneratedUiCommandHandlers_1 = __webpack_require__(18);
-	var AuctionsListComponent_1 = __webpack_require__(21);
-	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(25);
-	var SimpleNotificationDialogComponent_1 = __webpack_require__(26);
-	var GenericModalService_1 = __webpack_require__(28);
-	var Configuration_1 = __webpack_require__(29);
-	var FormatDateTimeFilterFactory_1 = __webpack_require__(30);
-	var ComposeUserMessageDialogComponent_1 = __webpack_require__(31);
-	var UserReferenceComponent_1 = __webpack_require__(33);
-	var UserMessagesComponent_1 = __webpack_require__(35);
-	var UserAuctionsListComponent_1 = __webpack_require__(37);
-	var ActiveAuctionsListComponent_1 = __webpack_require__(39);
-	var UserMessagesListComponent_1 = __webpack_require__(41);
-	var NewLinesToParagraphsComponent_1 = __webpack_require__(43);
-	var DisplayUserMessageDialogComponent_1 = __webpack_require__(45);
+	var GeneratedCommandHandlers_1 = __webpack_require__(5);
+	var SecurityService_1 = __webpack_require__(8);
+	var SecurityUiService_1 = __webpack_require__(9);
+	var SignInDialogComponent_1 = __webpack_require__(10);
+	var ApplicationCtrl_1 = __webpack_require__(12);
+	var Routing_1 = __webpack_require__(13);
+	var GeneratedQueryHandlers_1 = __webpack_require__(14);
+	var DisplayAuctionComponent_1 = __webpack_require__(16);
+	var BusyIndicator_1 = __webpack_require__(18);
+	var GeneratedUiCommandHandlers_1 = __webpack_require__(19);
+	var AuctionsListComponent_1 = __webpack_require__(22);
+	var BusyIndicatingHttpInterceptor_1 = __webpack_require__(26);
+	var SimpleNotificationDialogComponent_1 = __webpack_require__(27);
+	var GenericModalService_1 = __webpack_require__(29);
+	var Configuration_1 = __webpack_require__(30);
+	var FormatDateTimeFilterFactory_1 = __webpack_require__(31);
+	var ComposeUserMessageDialogComponent_1 = __webpack_require__(32);
+	var UserReferenceComponent_1 = __webpack_require__(34);
+	var UserMessagesComponent_1 = __webpack_require__(36);
+	var UserAuctionsListComponent_1 = __webpack_require__(38);
+	var ActiveAuctionsListComponent_1 = __webpack_require__(40);
+	var UserMessagesListComponent_1 = __webpack_require__(42);
+	var NewLinesToParagraphsComponent_1 = __webpack_require__(44);
+	var DisplayUserMessageDialogComponent_1 = __webpack_require__(46);
 	var Application = (function () {
 	    function Application() {
 	    }
@@ -192,6 +192,7 @@
 
 	"use strict";
 	var GuidGenerator_1 = __webpack_require__(3);
+	var CommandHandlingAsynchronityLevel_1 = __webpack_require__(4);
 	var CreateAuctionCtrl = (function () {
 	    function CreateAuctionCtrl(createAuctionCommandUiHandler, getAuctionDetailsQueryHandler, stateService) {
 	        var _this = this;
@@ -290,7 +291,7 @@
 	            return;
 	        }
 	        this.createAuctionCommandUiHandler
-	            .handle(this.model, this.createAuctionCommandId, true)
+	            .handle(this.model, this.createAuctionCommandId, CommandHandlingAsynchronityLevel_1.CommandHandlingAsynchronityLevel.WaitUnitReadModelIsUpdated)
 	            .then(function () {
 	            _this.stateService.go('displayAuction', { auctionId: _this.model.id });
 	        });
@@ -336,6 +337,19 @@
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var CommandHandlingAsynchronityLevel;
+	(function (CommandHandlingAsynchronityLevel) {
+	    // TODO: Add QueueOnly
+	    CommandHandlingAsynchronityLevel[CommandHandlingAsynchronityLevel["WaitUntilCommandIsProcessed"] = 0] = "WaitUntilCommandIsProcessed";
+	    CommandHandlingAsynchronityLevel[CommandHandlingAsynchronityLevel["WaitUnitReadModelIsUpdated"] = 1] = "WaitUnitReadModelIsUpdated";
+	})(CommandHandlingAsynchronityLevel = exports.CommandHandlingAsynchronityLevel || (exports.CommandHandlingAsynchronityLevel = {}));
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -344,7 +358,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandHandler_1 = __webpack_require__(5);
+	var CommandHandler_1 = __webpack_require__(6);
 	var SendUserMessageCommandHandler = (function (_super) {
 	    __extends(SendUserMessageCommandHandler, _super);
 	    function SendUserMessageCommandHandler() {
@@ -404,11 +418,12 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var CommandHandlingErrorType_1 = __webpack_require__(6);
+	var CommandHandlingErrorType_1 = __webpack_require__(7);
+	var CommandHandlingAsynchronityLevel_1 = __webpack_require__(4);
 	var CommandHandler = (function () {
 	    function CommandHandler(httpService, qService, timeoutService, configuration) {
 	        this.httpService = httpService;
@@ -434,23 +449,23 @@
 	            CommandHandler.wasSignalrRInitialized = true;
 	        }
 	    }
-	    CommandHandler.prototype.handle = function (command, commandId, shouldWaitForEventsApplicationToReadModel) {
+	    CommandHandler.prototype.handle = function (command, commandId, asynchronityLevel) {
 	        var _this = this;
 	        var deferred = this.qService.defer();
 	        this.connectSignalR()
 	            .then(function () {
-	            _this.sendCommandAndWaitForHandling(command, commandId, shouldWaitForEventsApplicationToReadModel, deferred);
+	            _this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);
 	        })
 	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
 	        return deferred.promise;
 	    };
-	    CommandHandler.prototype.sendCommandAndWaitForHandling = function (command, commandId, shouldWaitForEventsApplicationToReadModel, deferred) {
+	    CommandHandler.prototype.sendCommandAndWaitForHandling = function (command, commandId, asynchronityLevel, deferred) {
 	        var _this = this;
 	        var commandProcessingFinishedAndSucceeded = false;
 	        var commandHandlingSuccessCallback = function (commandHandlingSucceededEvent) {
 	            if (commandHandlingSucceededEvent.commandId === commandId) {
 	                commandProcessingFinishedAndSucceeded = true;
-	                if (!shouldWaitForEventsApplicationToReadModel) {
+	                if (asynchronityLevel === CommandHandlingAsynchronityLevel_1.CommandHandlingAsynchronityLevel.WaitUntilCommandIsProcessed) {
 	                    deferred.resolve();
 	                }
 	                else {
@@ -541,7 +556,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -557,7 +572,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -612,7 +627,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -658,11 +673,11 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var SignInDialogCtrl_1 = __webpack_require__(10);
+	var SignInDialogCtrl_1 = __webpack_require__(11);
 	var SignInDialogComponent = (function () {
 	    function SignInDialogComponent() {
 	        this.controller = SignInDialogCtrl_1.SignInDialogCtrl;
@@ -678,7 +693,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -729,7 +744,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -786,7 +801,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -848,7 +863,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -857,7 +872,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var QueryHandler_1 = __webpack_require__(14);
+	var QueryHandler_1 = __webpack_require__(15);
 	var GetSentUserMessagesQueryHandler = (function (_super) {
 	    __extends(GetSentUserMessagesQueryHandler, _super);
 	    function GetSentUserMessagesQueryHandler() {
@@ -929,7 +944,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -949,11 +964,11 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var DisplayAuctionCtrl_1 = __webpack_require__(16);
+	var DisplayAuctionCtrl_1 = __webpack_require__(17);
 	var DisplayAuctionComponent = (function () {
 	    function DisplayAuctionComponent() {
 	        this.controller = DisplayAuctionCtrl_1.DisplayAuctionCtrl;
@@ -969,11 +984,12 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var GuidGenerator_1 = __webpack_require__(3);
+	var CommandHandlingAsynchronityLevel_1 = __webpack_require__(4);
 	var DisplayAuctionCtrl = (function () {
 	    function DisplayAuctionCtrl(getAuctionDetailsQueryHandler, securityUiService, makeBidCommandUiHandler, genericModalService) {
 	        var _this = this;
@@ -1023,7 +1039,7 @@
 	                expectedAuctionVersion: _this.auction.version,
 	                price: bidPrice
 	            };
-	            _this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator_1.default.generateGuid(), true)
+	            _this.makeBidCommandUiHandler.handle(makeBidCommand, GuidGenerator_1.default.generateGuid(), CommandHandlingAsynchronityLevel_1.CommandHandlingAsynchronityLevel.WaitUnitReadModelIsUpdated)
 	                .then(function () {
 	                return _this.getAuctionDetailsQueryHandler.handle({
 	                    id: _this.auctionId
@@ -1057,7 +1073,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1103,7 +1119,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1112,7 +1128,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var CommandUiHandler_1 = __webpack_require__(19);
+	var CommandUiHandler_1 = __webpack_require__(20);
 	var SendUserMessageCommandUiHandler = (function (_super) {
 	    __extends(SendUserMessageCommandUiHandler, _super);
 	    function SendUserMessageCommandUiHandler(sendUserMessageCommandHandler, busyIndicator, securityUiService, qService, genericModalService) {
@@ -1184,12 +1200,12 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var CommandHandlingErrorType_1 = __webpack_require__(6);
-	var NotificationType_1 = __webpack_require__(20);
+	var CommandHandlingErrorType_1 = __webpack_require__(7);
+	var NotificationType_1 = __webpack_require__(21);
 	var CommandUiHandler = (function () {
 	    function CommandUiHandler(busyIndicator, securityUiService, qService, genericModalService) {
 	        this.busyIndicator = busyIndicator;
@@ -1198,11 +1214,11 @@
 	        this.genericModalService = genericModalService;
 	        this.$inject = ['busyIndicator', 'securityUiService', '$q', 'genericModalService'];
 	    }
-	    CommandUiHandler.prototype.handle = function (command, commandId, shouldWaitForEventsApplicationToReadModel) {
+	    CommandUiHandler.prototype.handle = function (command, commandId, asynchronityLevel) {
 	        var _this = this;
 	        return this.securityUiService.ensureUserIsAuthenticated()
 	            .then(function () {
-	            var promise = _this.getCommandHandler().handle(command, commandId, shouldWaitForEventsApplicationToReadModel);
+	            var promise = _this.getCommandHandler().handle(command, commandId, asynchronityLevel);
 	            return _this.busyIndicator.attachToPromise(promise)
 	                .catch(function (commandHandlingErrorType) {
 	                var actionData = _this.getActionDataForCommandHandlingErrorType(commandHandlingErrorType);
@@ -1245,7 +1261,7 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1258,11 +1274,11 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var AuctionsListCtrl_1 = __webpack_require__(22);
+	var AuctionsListCtrl_1 = __webpack_require__(23);
 	var AuctionsListComponent = (function () {
 	    function AuctionsListComponent() {
 	        this.controller = AuctionsListCtrl_1.AuctionsListCtrl;
@@ -1280,7 +1296,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1289,8 +1305,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var ListHeaderDefinition_1 = __webpack_require__(23);
-	var ListCtrl_1 = __webpack_require__(24);
+	var ListHeaderDefinition_1 = __webpack_require__(24);
+	var ListCtrl_1 = __webpack_require__(25);
 	var AuctionsListCtrl = (function (_super) {
 	    __extends(AuctionsListCtrl, _super);
 	    function AuctionsListCtrl(scope) {
@@ -1320,7 +1336,7 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1337,7 +1353,7 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1393,7 +1409,7 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1433,11 +1449,11 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var SimpleNotificationDialogCtrl_1 = __webpack_require__(27);
+	var SimpleNotificationDialogCtrl_1 = __webpack_require__(28);
 	var SimpleNotificationDialogComponent = (function () {
 	    function SimpleNotificationDialogComponent() {
 	        this.controller = SimpleNotificationDialogCtrl_1.SimpleNotificationDialogCtrl;
@@ -1454,11 +1470,11 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var NotificationType_1 = __webpack_require__(20);
+	var NotificationType_1 = __webpack_require__(21);
 	var SimpleNotificationDialogCtrl = (function () {
 	    function SimpleNotificationDialogCtrl() {
 	    }
@@ -1489,11 +1505,11 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var NotificationType_1 = __webpack_require__(20);
+	var NotificationType_1 = __webpack_require__(21);
 	var GenericModalService = (function () {
 	    function GenericModalService(modalService) {
 	        this.modalService = modalService;
@@ -1525,7 +1541,7 @@
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1541,7 +1557,7 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1572,11 +1588,11 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(32);
+	var ComposeUserMessageDialogCtrl_1 = __webpack_require__(33);
 	var ComposeUserMessageDialogComponent = (function () {
 	    function ComposeUserMessageDialogComponent() {
 	        this.controller = ComposeUserMessageDialogCtrl_1.ComposeUserMessageDialogCtrl;
@@ -1593,11 +1609,12 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var GuidGenerator_1 = __webpack_require__(3);
+	var CommandHandlingAsynchronityLevel_1 = __webpack_require__(4);
 	var ComposeUserMessageDialogCtrl = (function () {
 	    function ComposeUserMessageDialogCtrl(sendUserMessageCommandUiHandler, genericModalService) {
 	        this.sendUserMessageCommandUiHandler = sendUserMessageCommandUiHandler;
@@ -1636,7 +1653,7 @@
 	        if (!this.form.$valid) {
 	            return;
 	        }
-	        this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, false)
+	        this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, CommandHandlingAsynchronityLevel_1.CommandHandlingAsynchronityLevel.WaitUntilCommandIsProcessed)
 	            .then(function () {
 	            _this.modalInstance.close();
 	            _this.genericModalService.showSuccessNotification('Your message was sent successfully.');
@@ -1652,11 +1669,11 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserReferenceCtrl_1 = __webpack_require__(34);
+	var UserReferenceCtrl_1 = __webpack_require__(35);
 	var UserReferenceComponent = (function () {
 	    function UserReferenceComponent() {
 	        this.controller = UserReferenceCtrl_1.UserReferenceCtrl;
@@ -1672,7 +1689,7 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1700,11 +1717,11 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserMessagesCtrl_1 = __webpack_require__(36);
+	var UserMessagesCtrl_1 = __webpack_require__(37);
 	var UserMessagesComponent = (function () {
 	    function UserMessagesComponent() {
 	        this.controller = UserMessagesCtrl_1.UserMessagesCtrl;
@@ -1717,7 +1734,7 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1750,11 +1767,11 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserAuctionsListCtrl_1 = __webpack_require__(38);
+	var UserAuctionsListCtrl_1 = __webpack_require__(39);
 	var UserAuctionsListComponent = (function () {
 	    function UserAuctionsListComponent() {
 	        this.controller = UserAuctionsListCtrl_1.UserAuctionsListCtrl;
@@ -1770,7 +1787,7 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1814,11 +1831,11 @@
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ActiveAuctionsListCtrl_1 = __webpack_require__(40);
+	var ActiveAuctionsListCtrl_1 = __webpack_require__(41);
 	var ActiveAuctionsListComponent = (function () {
 	    function ActiveAuctionsListComponent() {
 	        this.controller = ActiveAuctionsListCtrl_1.ActiveAuctionsListCtrl;
@@ -1834,7 +1851,7 @@
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1861,11 +1878,11 @@
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var UserMessagesListCtrl_1 = __webpack_require__(42);
+	var UserMessagesListCtrl_1 = __webpack_require__(43);
 	var UserMessagesListComponent = (function () {
 	    function UserMessagesListComponent() {
 	        this.controller = UserMessagesListCtrl_1.UserMessagesListCtrl;
@@ -1882,7 +1899,7 @@
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1891,8 +1908,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var ListCtrl_1 = __webpack_require__(24);
-	var ListHeaderDefinition_1 = __webpack_require__(23);
+	var ListCtrl_1 = __webpack_require__(25);
+	var ListHeaderDefinition_1 = __webpack_require__(24);
 	var UserMessagesListCtrl = (function (_super) {
 	    __extends(UserMessagesListCtrl, _super);
 	    function UserMessagesListCtrl(scope, modalService) {
@@ -1927,11 +1944,11 @@
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var NewLinesToParagraphsCtrl_1 = __webpack_require__(44);
+	var NewLinesToParagraphsCtrl_1 = __webpack_require__(45);
 	var NewLinesToParagraphsComponent = (function () {
 	    function NewLinesToParagraphsComponent() {
 	        this.controller = NewLinesToParagraphsCtrl_1.NewLinesToParagraphsCtrl;
@@ -1946,7 +1963,7 @@
 
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1973,11 +1990,11 @@
 
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var DisplayUserMessageDialogCtrl_1 = __webpack_require__(46);
+	var DisplayUserMessageDialogCtrl_1 = __webpack_require__(47);
 	var DisplayUserMessageDialogComponent = (function () {
 	    function DisplayUserMessageDialogComponent() {
 	        this.controller = DisplayUserMessageDialogCtrl_1.DisplayUserMessageDialogCtrl;
@@ -1994,7 +2011,7 @@
 
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports) {
 
 	"use strict";

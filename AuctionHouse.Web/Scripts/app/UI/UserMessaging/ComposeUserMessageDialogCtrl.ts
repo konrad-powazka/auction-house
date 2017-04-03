@@ -3,6 +3,7 @@ import { SendUserMessageCommand } from '../../Messages/Commands';
 import GuidGenerator from '../../Infrastructure/GuidGenerator';
 import { ICommandUiHandler } from '../Shared/CommandHandling/ICommandUiHandler';
 import GenericModalService from '../Shared/GenericModalService';
+import {CommandHandlingAsynchronityLevel} from '../../CommandHandling/CommandHandlingAsynchronityLevel';
 
 export class ComposeUserMessageDialogCtrl implements ng.IController {
 	resolve: {
@@ -58,7 +59,7 @@ export class ComposeUserMessageDialogCtrl implements ng.IController {
 		}
 
 
-		this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, false)
+		this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, CommandHandlingAsynchronityLevel.WaitUntilCommandIsProcessed)
 			.then(() => {
 				this.modalInstance.close();
 				this.genericModalService.showSuccessNotification('Your message was sent successfully.');

@@ -5,6 +5,7 @@ import {IQueryHandler as QueryHandler} from '../../QueryHandling/IQueryHandler';
 import {GetAuctionDetailsQuery as AuctionDetailsQuery} from '../../Messages/Queries';
 import {AuctionDetailsReadModel} from '../../ReadModel';
 import GuidGenerator from '../../Infrastructure/GuidGenerator';
+import {CommandHandlingAsynchronityLevel} from '../../CommandHandling/CommandHandlingAsynchronityLevel';
 
 export class CreateAuctionCtrl implements ng.IController {
     fields: AngularFormly.IFieldArray;
@@ -111,7 +112,7 @@ export class CreateAuctionCtrl implements ng.IController {
         }
 
 	    this.createAuctionCommandUiHandler
-		    .handle(this.model, this.createAuctionCommandId, true)
+			.handle(this.model, this.createAuctionCommandId, CommandHandlingAsynchronityLevel.WaitUnitReadModelIsUpdated)
 		    .then(() => {
 			    this.stateService.go('displayAuction', { auctionId: this.model.id });
 		    });

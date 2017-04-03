@@ -1,3 +1,5 @@
-﻿export interface ICommandUiHandler<TCommand> {
-	handle(command: TCommand, commandId: string, shouldWaitForEventsApplicationToReadModel: boolean): ng.IPromise<void>;
+﻿import { CommandHandlingAsynchronityLevel } from '../../../CommandHandling/CommandHandlingAsynchronityLevel';
+
+export interface ICommandUiHandler<TCommand> {
+	handle(command: TCommand, commandId: string, asynchronityLevel: CommandHandlingAsynchronityLevel): ng.IPromise<void>;
 }
