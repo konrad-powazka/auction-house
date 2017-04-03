@@ -342,9 +342,9 @@
 	"use strict";
 	var CommandHandlingAsynchronityLevel;
 	(function (CommandHandlingAsynchronityLevel) {
-	    // TODO: Add QueueOnly
-	    CommandHandlingAsynchronityLevel[CommandHandlingAsynchronityLevel["WaitUntilCommandIsProcessed"] = 0] = "WaitUntilCommandIsProcessed";
-	    CommandHandlingAsynchronityLevel[CommandHandlingAsynchronityLevel["WaitUnitReadModelIsUpdated"] = 1] = "WaitUnitReadModelIsUpdated";
+	    CommandHandlingAsynchronityLevel[CommandHandlingAsynchronityLevel["QueueOnly"] = 0] = "QueueOnly";
+	    CommandHandlingAsynchronityLevel[CommandHandlingAsynchronityLevel["WaitUntilCommandIsProcessed"] = 1] = "WaitUntilCommandIsProcessed";
+	    CommandHandlingAsynchronityLevel[CommandHandlingAsynchronityLevel["WaitUnitReadModelIsUpdated"] = 2] = "WaitUnitReadModelIsUpdated";
 	})(CommandHandlingAsynchronityLevel = exports.CommandHandlingAsynchronityLevel || (exports.CommandHandlingAsynchronityLevel = {}));
 
 
@@ -452,6 +452,13 @@
 	    CommandHandler.prototype.handle = function (command, commandId, asynchronityLevel) {
 	        var _this = this;
 	        var deferred = this.qService.defer();
+	        if (asynchronityLevel === CommandHandlingAsynchronityLevel_1.CommandHandlingAsynchronityLevel.QueueOnly) {
+	            this.sendCommand(command, commandId)
+	                .then(function () {
+	                deferred.resolve();
+	            })
+	                .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
+	        }
 	        this.connectSignalR()
 	            .then(function () {
 	            _this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);
@@ -1547,8 +1554,8 @@
 	"use strict";
 	var Configuration = (function () {
 	    function Configuration() {
-	        this.commandHandlingTimeoutMilliseconds = 10 * 1000;
-	        this.readModelChangeNotificationTimeoutMilliseconds = 10 * 1000;
+	        this.commandHandlingTimeoutMilliseconds = 15 * 1000;
+	        this.readModelChangeNotificationTimeoutMilliseconds = 15 * 1000;
 	    }
 	    return Configuration;
 	}());
@@ -1653,7 +1660,7 @@
 	        if (!this.form.$valid) {
 	            return;
 	        }
-	        this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, CommandHandlingAsynchronityLevel_1.CommandHandlingAsynchronityLevel.WaitUntilCommandIsProcessed)
+	        this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, CommandHandlingAsynchronityLevel_1.CommandHandlingAsynchronityLevel.QueueOnly)
 	            .then(function () {
 	            _this.modalInstance.close();
 	            _this.genericModalService.showSuccessNotification('Your message was sent successfully.');

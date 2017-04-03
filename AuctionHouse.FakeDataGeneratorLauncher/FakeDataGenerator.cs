@@ -48,12 +48,15 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					_eventsDatabase.AppendToStream(StreamNameGenerator.GenerateAuctionStreamName(generatedAuction.Id),
 						WrapIntoEnvelopeCollection(generatedAuction.Events.AsEnumerable()), ExpectedStreamVersion.NotExisting);
 
-				var finishAuctionCommand = new FinishAuctionCommand
+				if (!generatedAuction.WasFinished)
 				{
-					Id = generatedAuction.Id
-				};
+					var finishAuctionCommand = new FinishAuctionCommand
+					{
+						Id = generatedAuction.Id
+					};
 
-				await _commandQueue.QueueCommand(finishAuctionCommand, Guid.NewGuid(), "system", generatedAuction.EndDateTime);
+					await _commandQueue.QueueCommand(finishAuctionCommand, Guid.NewGuid(), "system", generatedAuction.EndDateTime);
+				}
 			}
 
 			var userMessageSentEvents = userNames.SelectMany(u => GenerateUserMessageSentEvents(u, userNames, utcNow));
@@ -150,7 +153,9 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			var auctionFinishedDateTime = TryGetFinishedDateTime(auctionCreatedEvent, generatedAuctionCharacteristic,
 				isEndDateFuture, bidMadeEvents);
 
-			if (auctionFinishedDateTime.HasValue)
+			var wasFinished = auctionFinishedDateTime.HasValue;
+
+			if (wasFinished)
 			{
 				Debug.Assert(auctionFinishedDateTime.Value <= utcNow);
 
@@ -167,7 +172,8 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			{
 				Id = id,
 				EndDateTime = auctionCreatedEvent.EndDateTime,
-				Events = allEvents
+				Events = allEvents,
+				WasFinished = wasFinished
 			};
 		}
 
@@ -361,6 +367,8 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			public DateTime EndDateTime { get; set; }
 
 			public IReadOnlyCollection<IEvent> Events { get; set; }
+
+			public bool WasFinished { get; set; }
 		}
 	}
 }

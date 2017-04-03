@@ -101,6 +101,12 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 						AppliedEventIds = appliedEventIdsInCurrentBatch.ToList()
 					};
 
+					// In real life this would be handled by a decorator
+					if (Configuration.EventsApplicationToReadModelDelayMilliseconds.HasValue)
+					{
+						Thread.Sleep(Configuration.EventsApplicationToReadModelDelayMilliseconds.Value);
+					}
+
 					// TODO: Only live events should be included
 					_nServiceBusEndpointInstance.Publish(eventsAppliedToReadModelEvent).Wait();
 					appliedEventIdsInCurrentBatch.Clear();
@@ -111,12 +117,6 @@ namespace AuctionHouse.ReadModel.EventsApplyingService
 
 		private void HandleEventEnvelope(PersistedEventEnvelope eventEnvelope)
 		{
-			// In real life this would be handled by a decorator
-			if (Configuration.EventsApplicationToReadModelDelayMilliseconds.HasValue)
-			{
-				Thread.Sleep(Configuration.EventsApplicationToReadModelDelayMilliseconds.Value);
-			}
-
 			foreach (var readModelBuilder in _readModelBuilders)
 			{
 				readModelBuilder.Apply(eventEnvelope, _readModelDbContext).Wait();

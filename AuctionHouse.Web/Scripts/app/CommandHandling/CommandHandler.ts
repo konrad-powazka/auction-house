@@ -51,6 +51,14 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
 	handle(command: TCommand, commandId: string, asynchronityLevel: CommandHandlingAsynchronityLevel): ng.IPromise<void> {
         const deferred = this.qService.defer<void>();
 
+		if (asynchronityLevel === CommandHandlingAsynchronityLevel.QueueOnly) {
+			this.sendCommand(command, commandId)
+				.then(() => {
+					deferred.resolve();
+				})
+				.catch(() => deferred.reject(CommandHandlingErrorType.FailedToQueue));
+		}
+
         this.connectSignalR()
             .then(() => {
                 this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);

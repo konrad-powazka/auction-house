@@ -1,5 +1,5 @@
 ﻿export enum CommandHandlingAsynchronityLevel {
-	// TODO: Add QueueOnly
+	QueueOnly,
 	WaitUntilCommandIsProcessed,
 	WaitUnitReadModelIsUpdated
 }

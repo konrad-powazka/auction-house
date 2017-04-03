@@ -59,7 +59,7 @@ export class ComposeUserMessageDialogCtrl implements ng.IController {
 		}
 
 
-		this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, CommandHandlingAsynchronityLevel.WaitUntilCommandIsProcessed)
+		this.sendUserMessageCommandUiHandler.handle(this.model, this.sendUserMessageCommandId, CommandHandlingAsynchronityLevel.QueueOnly)
 			.then(() => {
 				this.modalInstance.close();
 				this.genericModalService.showSuccessNotification('Your message was sent successfully.');
