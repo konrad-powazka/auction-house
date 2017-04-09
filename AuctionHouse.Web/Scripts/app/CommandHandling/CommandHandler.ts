@@ -49,7 +49,7 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
     }
 
 	handle(command: TCommand, commandId: string, asynchronityLevel: CommandHandlingAsynchronityLevel): ng.IPromise<void> {
-        const deferred = this.qService.defer<void>();
+		const deferred = this.qService.defer<void>();
 
 		if (asynchronityLevel === CommandHandlingAsynchronityLevel.QueueOnly) {
 			this.sendCommand(command, commandId)
@@ -57,13 +57,13 @@ export abstract class CommandHandler<TCommand> implements ICommandHandler<TComma
 					deferred.resolve();
 				})
 				.catch(() => deferred.reject(CommandHandlingErrorType.FailedToQueue));
+		} else {
+			this.connectSignalR()
+				.then(() => {
+					this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);
+				})
+				.catch(() => deferred.reject(CommandHandlingErrorType.FailedToConnectToFeedbackHub));
 		}
-
-        this.connectSignalR()
-            .then(() => {
-                this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);
-            })
-            .catch(() => deferred.reject(CommandHandlingErrorType.FailedToConnectToFeedbackHub));
 
         return deferred.promise;
     }

@@ -459,11 +459,13 @@
 	            })
 	                .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToQueue); });
 	        }
-	        this.connectSignalR()
-	            .then(function () {
-	            _this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);
-	        })
-	            .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
+	        else {
+	            this.connectSignalR()
+	                .then(function () {
+	                _this.sendCommandAndWaitForHandling(command, commandId, asynchronityLevel, deferred);
+	            })
+	                .catch(function () { return deferred.reject(CommandHandlingErrorType_1.CommandHandlingErrorType.FailedToConnectToFeedbackHub); });
+	        }
 	        return deferred.promise;
 	    };
 	    CommandHandler.prototype.sendCommandAndWaitForHandling = function (command, commandId, asynchronityLevel, deferred) {
@@ -639,10 +641,11 @@
 
 	"use strict";
 	var SecurityUiService = (function () {
-	    function SecurityUiService(securityService, modalService, qService) {
+	    function SecurityUiService(securityService, modalService, qService, stateService) {
 	        this.securityService = securityService;
 	        this.modalService = modalService;
 	        this.qService = qService;
+	        this.stateService = stateService;
 	    }
 	    Object.defineProperty(SecurityUiService.prototype, "currentUserName", {
 	        get: function () {
@@ -671,11 +674,15 @@
 	        return modalInstance.result;
 	    };
 	    SecurityUiService.prototype.signOut = function () {
-	        return this.securityService.signOut();
+	        var _this = this;
+	        return this.securityService.signOut()
+	            .then(function () {
+	            _this.stateService.go('home');
+	        });
 	    };
 	    return SecurityUiService;
 	}());
-	SecurityUiService.$inject = ['securityService', '$uibModal', '$q'];
+	SecurityUiService.$inject = ['securityService', '$uibModal', '$q', '$state'];
 	exports.SecurityUiService = SecurityUiService;
 
 
@@ -799,7 +806,9 @@
 	        });
 	    }
 	    ApplicationCtrl.prototype.searchAuctions = function () {
-	        this.$state.go('auctionsSearch', { queryString: this.auctionsSearchQueryString });
+	        var queryString = this.auctionsSearchQueryString;
+	        this.auctionsSearchQueryString = '';
+	        this.$state.go('auctionsSearch', { queryString: queryString });
 	    };
 	    return ApplicationCtrl;
 	}());

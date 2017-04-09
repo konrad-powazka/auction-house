@@ -2,11 +2,13 @@
 import ModalService = angular.ui.bootstrap.IModalService;
 
 export class SecurityUiService {
-    static $inject = ['securityService', '$uibModal', '$q'];
+	static $inject = ['securityService', '$uibModal', '$q', '$state'];
 
     constructor(private securityService: SecurityService,
         private modalService: ModalService,
-        private qService: ng.IQService) {
+		private qService: ng.IQService,
+		private stateService: ng.ui.IStateService
+	) {
     }
 
     get currentUserName(): string | null {
@@ -34,6 +36,9 @@ export class SecurityUiService {
     }
 
     signOut(): ng.IPromise<void> {
-        return this.securityService.signOut();
+	    return this.securityService.signOut()
+		    .then(() => {
+			    this.stateService.go('home');
+		    });
     }
 }

@@ -103,8 +103,9 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 			Randomizer randomizer, Date dateRandomizer, DateTime utcNow)
 		{
 			var otherUserNames = allUserNames.Except(new[] {currentUserName}).ToList();
-			var hasBuyNowPrice = randomizer.Int(1, 3) > 1;
-			var isEndDateFuture = generatedAuctionCharacteristic.CheckIfAuctionIsInProgress() || hasBuyNowPrice;
+			var isEndDateFuture = generatedAuctionCharacteristic.CheckIfAuctionIsInProgress() || randomizer.Bool();
+			var mustHaveBuyNowPrice = isEndDateFuture && generatedAuctionCharacteristic.CheckIfFinishesWithBuy();
+			var hasBuyNowPrice = mustHaveBuyNowPrice || randomizer.Int(1, 3) > 1;
 			var id = Guid.NewGuid();
 
 			var auctionCreatedEventFaker = new Faker<AuctionCreatedEvent>()
@@ -119,8 +120,6 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 					var numberOfParagraphs = s.Random.Int(3, 10);
 					return s.Lorem.Paragraphs(numberOfParagraphs, "\n");
 				})
-				.RuleFor(a => a.BuyNowPrice,
-					(s, a) => hasBuyNowPrice ? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000)) : (decimal?) null)
 				.RuleFor(a => a.EndDateTime, s => isEndDateFuture
 					? s.Date.BetweenUtc(utcNow.AddMinutes(3), utcNow.AddDays(21))
 					: s.Date.BetweenUtc(utcNow.AddDays(-1000), utcNow.AddMinutes(-3)))
@@ -129,9 +128,7 @@ namespace AuctionHouse.FakeDataGeneratorLauncher
 				.RuleFor(a => a.BuyNowPrice,
 					(s, a) =>
 					{
-						var mustHaveBuyNowPrice = isEndDateFuture && generatedAuctionCharacteristic.CheckIfFinishesWithBuy();
-
-						return mustHaveBuyNowPrice || s.Random.Bool()
+						return hasBuyNowPrice
 							? decimal.Round(s.Random.Decimal(a.StartingPrice, 20000))
 							: (decimal?) null;
 					})

@@ -53,6 +53,8 @@ export class ApplicationCtrl implements ng.IController {
 	}
 
 	searchAuctions(): void {
-		this.$state.go('auctionsSearch', { queryString: this.auctionsSearchQueryString });
+		const queryString = this.auctionsSearchQueryString;
+		this.auctionsSearchQueryString = '';
+		this.$state.go('auctionsSearch', { queryString: queryString });
 	}
 }
