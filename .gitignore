@@ -253,3 +253,6 @@ paket-files/
 *.sln.iml
 /AuctionHouse.Web/typings
 /AuctionHouse.Web/App_Data
+
+#Unignore Elasticsearch binaries
+!/AuctionHouse.ElasticsearchLauncher/ElasticsearchFiles/*
